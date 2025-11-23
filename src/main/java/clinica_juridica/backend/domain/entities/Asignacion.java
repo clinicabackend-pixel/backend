@@ -9,18 +9,21 @@ public class Asignacion {
     private String idProfesor;
     private String tipoEstudiante;
     private LocalDate fechaAsignacion;
+    private LocalDate fechaFinalizacion;
 
     public Asignacion() {
     }
 
     public Asignacion(String idEstudiante, String numCaso, Integer idSemestre, 
-                      String idProfesor, String tipoEstudiante, LocalDate fechaAsignacion) {
+                      String idProfesor, String tipoEstudiante, LocalDate fechaAsignacion,
+                      LocalDate fechaFinalizacion) {
         this.idEstudiante = idEstudiante;
         this.numCaso = numCaso;
         this.idSemestre = idSemestre;
         this.idProfesor = idProfesor;
         this.tipoEstudiante = tipoEstudiante;
         this.fechaAsignacion = fechaAsignacion;
+        this.fechaFinalizacion = fechaFinalizacion;
     }
 
     public String getIdEstudiante() {
@@ -69,6 +72,14 @@ public class Asignacion {
 
     public void setFechaAsignacion(LocalDate fechaAsignacion) {
         this.fechaAsignacion = fechaAsignacion;
+    }
+
+    public LocalDate getFechaFinalizacion() {
+        return fechaFinalizacion;
+    }
+
+    public void setFechaFinalizacion(LocalDate fechaFinalizacion) {
+        this.fechaFinalizacion = fechaFinalizacion;
     }
 }
 
