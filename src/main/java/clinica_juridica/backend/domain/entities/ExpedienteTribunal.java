@@ -6,13 +6,13 @@ public class ExpedienteTribunal {
     private String numExpediente;
     private LocalDate fechaCreacion;
     private Integer idTribunal;
-    private Integer idCaso;
+    private String idCaso;
 
     public ExpedienteTribunal() {
     }
 
     public ExpedienteTribunal(String numExpediente, LocalDate fechaCreacion, 
-                              Integer idTribunal, Integer idCaso) {
+                              Integer idTribunal, String idCaso) {
         this.numExpediente = numExpediente;
         this.fechaCreacion = fechaCreacion;
         this.idTribunal = idTribunal;
@@ -43,12 +43,11 @@ public class ExpedienteTribunal {
         this.idTribunal = idTribunal;
     }
 
-    public Integer getIdCaso() {
+    public String getIdCaso() {
         return idCaso;
     }
 
-    public void setIdCaso(Integer idCaso) {
+    public void setIdCaso(String idCaso) {
         this.idCaso = idCaso;
     }
 }
-
