@@ -1,7 +1,7 @@
 package clinica_juridica.backend.application.usecase;
 
 import clinica_juridica.backend.application.port.output.CasoRepository;
-import clinica_juridica.backend.domain.entities.Caso;
+import clinica_juridica.backend.domain.models.Caso;
 
 import java.time.LocalDate;
 

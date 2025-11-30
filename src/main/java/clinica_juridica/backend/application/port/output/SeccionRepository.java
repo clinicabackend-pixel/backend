@@ -1,8 +1,9 @@
 package clinica_juridica.backend.application.port.output;
 
-import clinica_juridica.backend.domain.entities.Seccion;
 import java.util.List;
 import java.util.Optional;
+
+import clinica_juridica.backend.domain.models.Seccion;
 
 public interface SeccionRepository {
     Seccion save(Seccion seccion);

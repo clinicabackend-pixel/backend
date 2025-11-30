@@ -1,8 +1,9 @@
 package clinica_juridica.backend.application.port.output;
 
-import clinica_juridica.backend.domain.entities.Caso;
 import java.util.List;
 import java.util.Optional;
+
+import clinica_juridica.backend.domain.models.Caso;
 
 /**
  * Puerto de salida (interfaz de repositorio) para la entidad Caso.

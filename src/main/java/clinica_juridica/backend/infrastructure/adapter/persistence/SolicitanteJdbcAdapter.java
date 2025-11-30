@@ -1,7 +1,8 @@
 package clinica_juridica.backend.infrastructure.adapter.persistence;
 
 import clinica_juridica.backend.application.port.output.SolicitanteRepository;
-import clinica_juridica.backend.domain.entities.Solicitante;
+import clinica_juridica.backend.domain.models.Solicitante;
+
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 

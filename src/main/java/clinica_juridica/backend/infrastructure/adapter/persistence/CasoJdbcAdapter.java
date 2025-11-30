@@ -1,7 +1,8 @@
 package clinica_juridica.backend.infrastructure.adapter.persistence;
 
 import clinica_juridica.backend.application.port.output.CasoRepository;
-import clinica_juridica.backend.domain.entities.Caso;
+import clinica_juridica.backend.domain.models.Caso;
+
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;

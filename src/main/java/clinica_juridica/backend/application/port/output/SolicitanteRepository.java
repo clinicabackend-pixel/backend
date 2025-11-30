@@ -1,8 +1,9 @@
 package clinica_juridica.backend.application.port.output;
 
-import clinica_juridica.backend.domain.entities.Solicitante;
 import java.util.List;
 import java.util.Optional;
+
+import clinica_juridica.backend.domain.models.Solicitante;
 
 public interface SolicitanteRepository {
     Solicitante save(Solicitante solicitante);

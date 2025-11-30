@@ -3,6 +3,7 @@ package clinica_juridica.backend.infrastructure.config;
 import clinica_juridica.backend.application.port.output.CasoRepository;
 import clinica_juridica.backend.application.usecase.ObtenerCasosPorSolicitante;
 import clinica_juridica.backend.application.usecase.RegistrarCaso;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

@@ -2,7 +2,8 @@ package clinica_juridica.backend.infrastructure.web.controller;
 
 import clinica_juridica.backend.application.usecase.ObtenerCasosPorSolicitante;
 import clinica_juridica.backend.application.usecase.RegistrarCaso;
-import clinica_juridica.backend.domain.entities.Caso;
+import clinica_juridica.backend.domain.models.Caso;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
