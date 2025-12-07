@@ -1,7 +1,7 @@
 package clinica_juridica.backend.domain.models;
 
 public class Trabajo {
-    private String cedula;
+    private String idTrabajo;
     private String trabaja;
     private String condicionActividad;
     private String condicionTrabajo;
@@ -10,21 +10,21 @@ public class Trabajo {
     public Trabajo() {
     }
 
-    public Trabajo(String cedula, String trabaja, String condicionActividad, 
-                   String condicionTrabajo, String estaBuscando) {
-        this.cedula = cedula;
+    public Trabajo(String idTrabajo, String trabaja, String condicionActividad,
+            String condicionTrabajo, String estaBuscando) {
+        this.idTrabajo = idTrabajo;
         this.trabaja = trabaja;
         this.condicionActividad = condicionActividad;
         this.condicionTrabajo = condicionTrabajo;
         this.estaBuscando = estaBuscando;
     }
 
-    public String getCedula() {
-        return cedula;
+    public String getIdTrabajo() {
+        return idTrabajo;
     }
 
-    public void setCedula(String cedula) {
-        this.cedula = cedula;
+    public void setIdTrabajo(String idTrabajo) {
+        this.idTrabajo = idTrabajo;
     }
 
     public String getTrabaja() {
@@ -59,4 +59,3 @@ public class Trabajo {
         this.estaBuscando = estaBuscando;
     }
 }
-

@@ -14,9 +14,9 @@ public class Estudiante {
     public Estudiante() {
     }
 
-    public Estudiante(String idEstudiante, String nombre, String sexo, String email, 
-                      String username, String contrasena, String estatus, 
-                      Boolean culminado, String tipo) {
+    public Estudiante(String idEstudiante, String nombre, String sexo, String email,
+            String username, String contrasena, String estatus,
+            Boolean culminado, String tipo) {
         this.idEstudiante = idEstudiante;
         this.nombre = nombre;
         this.sexo = sexo;
@@ -100,4 +100,3 @@ public class Estudiante {
         this.tipo = tipo;
     }
 }
-

@@ -48,4 +48,3 @@ public class AmbitoLegal {
         this.descripcion = descripcion;
     }
 }
-

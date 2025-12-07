@@ -28,4 +28,3 @@ public class Materia {
         this.nombreMateria = nombreMateria;
     }
 }
-

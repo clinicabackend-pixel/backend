@@ -38,4 +38,3 @@ public class Tribunal {
         this.nombreTribunal = nombreTribunal;
     }
 }
-

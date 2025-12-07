@@ -28,4 +28,3 @@ public class Estado {
         this.nombreEstado = nombreEstado;
     }
 }
-

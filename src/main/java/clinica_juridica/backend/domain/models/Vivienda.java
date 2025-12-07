@@ -1,7 +1,7 @@
 package clinica_juridica.backend.domain.models;
 
 public class Vivienda {
-    private String idSolicitante;
+    private String idVivienda;
     private String tipo;
     private Integer cantHabitaciones;
     private Integer cantBanos;
@@ -15,11 +15,11 @@ public class Vivienda {
     public Vivienda() {
     }
 
-    public Vivienda(String idSolicitante, String tipo, Integer cantHabitaciones, 
-                    Integer cantBanos, String materialParedes, String aguasNegras, 
-                    String servicioAgua, String materialTecho, String materialPiso, 
-                    String servicioAseo) {
-        this.idSolicitante = idSolicitante;
+    public Vivienda(String idVivienda, String tipo, Integer cantHabitaciones,
+            Integer cantBanos, String materialParedes, String aguasNegras,
+            String servicioAgua, String materialTecho, String materialPiso,
+            String servicioAseo) {
+        this.idVivienda = idVivienda;
         this.tipo = tipo;
         this.cantHabitaciones = cantHabitaciones;
         this.cantBanos = cantBanos;
@@ -31,12 +31,12 @@ public class Vivienda {
         this.servicioAseo = servicioAseo;
     }
 
-    public String getIdSolicitante() {
-        return idSolicitante;
+    public String getIdVivienda() {
+        return idVivienda;
     }
 
-    public void setIdSolicitante(String idSolicitante) {
-        this.idSolicitante = idSolicitante;
+    public void setIdVivienda(String idVivienda) {
+        this.idVivienda = idVivienda;
     }
 
     public String getTipo() {
@@ -111,4 +111,3 @@ public class Vivienda {
         this.servicioAseo = servicioAseo;
     }
 }
-

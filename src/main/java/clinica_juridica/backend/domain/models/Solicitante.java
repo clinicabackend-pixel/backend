@@ -13,16 +13,20 @@ public class Solicitante {
     private String concubinato;
     private String estadoCivil;
     private String descripcionTrabajo;
-    private String tipoTrabajo;
     private Integer idNivelEdu;
+    private String idVivienda;
+    private String idTrabajo;
+    private Integer idFamilia;
+    private Integer idParroquia;
 
     public Solicitante() {
     }
 
-    public Solicitante(String idSolicitante, String nombre, String sexo, String email, 
-                       Integer edad, String nacionalidad, LocalDate fNacimiento, 
-                       String concubinato, String estadoCivil, String descripcionTrabajo, 
-                       String tipoTrabajo, Integer idNivelEdu) {
+    public Solicitante(String idSolicitante, String nombre, String sexo, String email,
+            Integer edad, String nacionalidad, LocalDate fNacimiento,
+            String concubinato, String estadoCivil, String descripcionTrabajo,
+            Integer idNivelEdu, String idVivienda, String idTrabajo,
+            Integer idFamilia, Integer idParroquia) {
         this.idSolicitante = idSolicitante;
         this.nombre = nombre;
         this.sexo = sexo;
@@ -33,8 +37,11 @@ public class Solicitante {
         this.concubinato = concubinato;
         this.estadoCivil = estadoCivil;
         this.descripcionTrabajo = descripcionTrabajo;
-        this.tipoTrabajo = tipoTrabajo;
         this.idNivelEdu = idNivelEdu;
+        this.idVivienda = idVivienda;
+        this.idTrabajo = idTrabajo;
+        this.idFamilia = idFamilia;
+        this.idParroquia = idParroquia;
     }
 
     public String getIdSolicitante() {
@@ -85,11 +92,11 @@ public class Solicitante {
         this.nacionalidad = nacionalidad;
     }
 
-    public LocalDate getfNacimiento() {
+    public LocalDate getFNacimiento() {
         return fNacimiento;
     }
 
-    public void setfNacimiento(LocalDate fNacimiento) {
+    public void setFNacimiento(LocalDate fNacimiento) {
         this.fNacimiento = fNacimiento;
     }
 
@@ -117,14 +124,6 @@ public class Solicitante {
         this.descripcionTrabajo = descripcionTrabajo;
     }
 
-    public String getTipoTrabajo() {
-        return tipoTrabajo;
-    }
-
-    public void setTipoTrabajo(String tipoTrabajo) {
-        this.tipoTrabajo = tipoTrabajo;
-    }
-
     public Integer getIdNivelEdu() {
         return idNivelEdu;
     }
@@ -132,5 +131,36 @@ public class Solicitante {
     public void setIdNivelEdu(Integer idNivelEdu) {
         this.idNivelEdu = idNivelEdu;
     }
-}
 
+    public String getIdVivienda() {
+        return idVivienda;
+    }
+
+    public void setIdVivienda(String idVivienda) {
+        this.idVivienda = idVivienda;
+    }
+
+    public String getIdTrabajo() {
+        return idTrabajo;
+    }
+
+    public void setIdTrabajo(String idTrabajo) {
+        this.idTrabajo = idTrabajo;
+    }
+
+    public Integer getIdFamilia() {
+        return idFamilia;
+    }
+
+    public void setIdFamilia(Integer idFamilia) {
+        this.idFamilia = idFamilia;
+    }
+
+    public Integer getIdParroquia() {
+        return idParroquia;
+    }
+
+    public void setIdParroquia(Integer idParroquia) {
+        this.idParroquia = idParroquia;
+    }
+}

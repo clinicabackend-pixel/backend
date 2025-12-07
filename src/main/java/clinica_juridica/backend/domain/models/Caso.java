@@ -3,14 +3,6 @@ package clinica_juridica.backend.domain.models;
 import java.time.LocalDate;
 
 public class Caso {
-
-    public enum EstadoCaso {
-        ABIERTO,
-        CERRADO,
-        ACTIVO,
-        EN_PAUSA
-    }
-
     private String numCaso;
     private LocalDate fechaRecepcion;
     private Integer cantBeneficiarios;
@@ -24,9 +16,9 @@ public class Caso {
     public Caso() {
     }
 
-    public Caso(String numCaso, LocalDate fechaRecepcion, Integer cantBeneficiarios, 
-                String tramite, String estatus, String sintesis, Integer idCentro, 
-                Integer idAmbitoLegal, String idSolicitante) {
+    public Caso(String numCaso, LocalDate fechaRecepcion, Integer cantBeneficiarios,
+            String tramite, String estatus, String sintesis, Integer idCentro,
+            Integer idAmbitoLegal, String idSolicitante) {
         this.numCaso = numCaso;
         this.fechaRecepcion = fechaRecepcion;
         this.cantBeneficiarios = cantBeneficiarios;

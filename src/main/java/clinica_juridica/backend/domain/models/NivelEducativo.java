@@ -3,15 +3,15 @@ package clinica_juridica.backend.domain.models;
 public class NivelEducativo {
     private Integer idNivelEdu;
     private String nivel;
-    private Integer ano;
+    private Integer anio;
 
     public NivelEducativo() {
     }
 
-    public NivelEducativo(Integer idNivelEdu, String nivel, Integer ano) {
+    public NivelEducativo(Integer idNivelEdu, String nivel, Integer anio) {
         this.idNivelEdu = idNivelEdu;
         this.nivel = nivel;
-        this.ano = ano;
+        this.anio = anio;
     }
 
     public Integer getIdNivelEdu() {
@@ -30,12 +30,11 @@ public class NivelEducativo {
         this.nivel = nivel;
     }
 
-    public Integer getAno() {
-        return ano;
+    public Integer getAnio() {
+        return anio;
     }
 
-    public void setAno(Integer ano) {
-        this.ano = ano;
+    public void setAnio(Integer anio) {
+        this.anio = anio;
     }
 }
-

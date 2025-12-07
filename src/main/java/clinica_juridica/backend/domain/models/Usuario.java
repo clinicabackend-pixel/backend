@@ -13,8 +13,8 @@ public class Usuario {
     public Usuario() {
     }
 
-    public Usuario(String idUsuario, String nombre, String sexo, String email, 
-                   String username, String contrasena, String estatus, String tipoUsuario) {
+    public Usuario(String idUsuario, String nombre, String sexo, String email,
+            String username, String contrasena, String estatus, String tipoUsuario) {
         this.idUsuario = idUsuario;
         this.nombre = nombre;
         this.sexo = sexo;
@@ -89,4 +89,3 @@ public class Usuario {
         this.tipoUsuario = tipoUsuario;
     }
 }
-
