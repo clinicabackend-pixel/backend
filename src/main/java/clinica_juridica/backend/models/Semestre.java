@@ -1,12 +1,26 @@
-package clinica_juridica.backend.domain.models;
+package clinica_juridica.backend.models;
 
 import java.time.LocalDate;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.Table;
 
+@Table("Semestre")
 public class Semestre {
+    @Id
+    @Column("id")
     private Integer id;
+
+    @Column("termino")
     private String termino;
+
+    @Column("periodo")
     private String periodo;
+
+    @Column("fecha_ini")
     private LocalDate fechaIni;
+
+    @Column("fecha_fin")
     private LocalDate fechaFin;
 
     public Semestre() {

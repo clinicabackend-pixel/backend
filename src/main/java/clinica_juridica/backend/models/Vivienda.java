@@ -1,15 +1,40 @@
-package clinica_juridica.backend.domain.models;
+package clinica_juridica.backend.models;
 
+import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.Table;
+
+@Table("Viviendas")
 public class Vivienda {
+    @Id
+    @Column("id_vivienda")
     private String idVivienda;
+
+    @Column("tipo")
     private String tipo;
+
+    @Column("cant_habitaciones")
     private Integer cantHabitaciones;
+
+    @Column("cant_banos")
     private Integer cantBanos;
+
+    @Column("material_paredes")
     private String materialParedes;
+
+    @Column("aguas_negras")
     private String aguasNegras;
+
+    @Column("servicio_agua")
     private String servicioAgua;
+
+    @Column("material_techo")
     private String materialTecho;
+
+    @Column("material_piso")
     private String materialPiso;
+
+    @Column("servicio_aseo")
     private String servicioAseo;
 
     public Vivienda() {

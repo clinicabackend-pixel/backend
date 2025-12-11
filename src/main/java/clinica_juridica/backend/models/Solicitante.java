@@ -1,23 +1,69 @@
-package clinica_juridica.backend.domain.models;
+package clinica_juridica.backend.models;
 
 import java.time.LocalDate;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.Table;
 
+@Table("Usuarios")
 public class Solicitante {
+    @Id
+    @Column("id_usuario")
     private String idSolicitante;
+
+    @Column("nombre")
     private String nombre;
+
+    @Column("sexo")
     private String sexo;
+
+    @Column("email")
     private String email;
+
+    @Column("edad")
     private Integer edad;
+
+    @Column("nacionalidad")
     private String nacionalidad;
+
+    @Column("f_nacimiento")
     private LocalDate fNacimiento;
+
+    @Column("concubinato")
     private String concubinato;
+
+    @Column("estado_civil")
     private String estadoCivil;
+
+    @Column("descripcion_trabajo")
     private String descripcionTrabajo;
+
+    @Column("id_nivel_edu")
     private Integer idNivelEdu;
+
+    @Column("id_vivienda")
     private String idVivienda;
+
+    @Column("id_trabajo")
     private String idTrabajo;
-    private Integer idFamilia;
+
+    @Column("id_parroquia")
     private Integer idParroquia;
+
+    // idFamilia removed from schema but exists in POJO. It is FK in Familias table
+    // pointing to Usuarios.
+    // So Solicitante does not have id_familia column.
+    // We should probably mark it as transient OR remove it if it's not in the
+    // table.
+    // The schema says: "-- Nota: Se eliminó id_familia porque la tabla Familias se
+    // vincula a esta mediante id_solicitante"
+    // So I will make it Transient or ignore it for now, but to avoid errors, I'll
+    // add @Column(value = "id_familia") which will fail if column missing.
+    // Better to remove it or mark @Transient. I will mark
+    // @org.springframework.data.annotation.Transient
+
+    @org.springframework.data.annotation.Transient
+    private Integer idFamilia;
 
     public Solicitante() {
     }

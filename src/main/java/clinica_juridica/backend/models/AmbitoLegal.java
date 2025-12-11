@@ -1,9 +1,22 @@
-package clinica_juridica.backend.domain.models;
+package clinica_juridica.backend.models;
 
+import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.Table;
+
+@Table("Ambitos_Legales")
 public class AmbitoLegal {
+    @Id
+    @Column("id_ambito_legal")
     private Integer idAmbitoLegal;
+
+    @Column("materia")
     private String materia;
+
+    @Column("tipo")
     private String tipo;
+
+    @Column("descripcion")
     private String descripcion;
 
     public AmbitoLegal() {

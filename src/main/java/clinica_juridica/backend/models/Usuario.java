@@ -1,13 +1,34 @@
-package clinica_juridica.backend.domain.models;
+package clinica_juridica.backend.models;
 
+import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.Table;
+
+@Table("Personal")
 public class Usuario {
+    @Id
+    @Column("id_usuario")
     private String idUsuario;
+
+    @Column("nombre")
     private String nombre;
+
+    @Column("sexo")
     private String sexo;
+
+    @Column("email")
     private String email;
+
+    @Column("username")
     private String username;
+
+    @Column("contrasena")
     private String contrasena;
+
+    @Column("estatus")
     private String estatus;
+
+    @Column("tipo_usuario")
     private String tipoUsuario;
 
     public Usuario() {

@@ -1,16 +1,38 @@
-package clinica_juridica.backend.domain.models;
+package clinica_juridica.backend.models;
 
 import java.time.LocalDate;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.Table;
 
+@Table("Casos")
 public class Caso {
+    @Id
+    @Column("num_caso")
     private String numCaso;
+
+    @Column("fecha_recepcion")
     private LocalDate fechaRecepcion;
+
+    @Column("cant_beneficiarios")
     private Integer cantBeneficiarios;
+
+    @Column("tramite")
     private String tramite;
+
+    @Column("estatus")
     private String estatus;
+
+    @Column("sintesis")
     private String sintesis;
+
+    @Column("id_centro")
     private Integer idCentro;
+
+    @Column("id_ambito_legal")
     private Integer idAmbitoLegal;
+
+    @Column("id_solicitante")
     private String idSolicitante;
 
     public Caso() {

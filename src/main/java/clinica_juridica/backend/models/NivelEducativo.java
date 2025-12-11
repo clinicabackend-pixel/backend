@@ -1,8 +1,19 @@
-package clinica_juridica.backend.domain.models;
+package clinica_juridica.backend.models;
 
+import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.Table;
+
+@Table("Niveles_Educativos")
 public class NivelEducativo {
+    @Id
+    @Column("id_nivel_edu")
     private Integer idNivelEdu;
+
+    @Column("nivel")
     private String nivel;
+
+    @Column("anio")
     private Integer anio;
 
     public NivelEducativo() {

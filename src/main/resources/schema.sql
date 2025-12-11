@@ -1,5 +1,5 @@
 -- -----------------------------------------------------
--- Limpieza inicial (Opcional, para reiniciar la BD)
+-- Limpieza inicial
 -- -----------------------------------------------------
 DROP SCHEMA IF EXISTS public CASCADE;
 CREATE SCHEMA public;
@@ -50,7 +50,7 @@ CREATE TABLE "Viviendas" (
   "tipo" VARCHAR(50),
   "cant_habitaciones" INTEGER,
   "cant_banos" INTEGER,
-  "material_paredes" VARCHAR(50), -- Cambiado de entero a varchar (usualmente es descripción)
+  "material_paredes" VARCHAR(50),
   "aguas_negras" VARCHAR(50),
   "servicio_agua" VARCHAR(50),
   "material_techo" VARCHAR(50),
@@ -103,7 +103,7 @@ CREATE TABLE "Personal" (
   "nombre" VARCHAR(100),
   "sexo" VARCHAR(20),
   "email" VARCHAR(100) UNIQUE,
-  "username" VARCHAR(50) UNIQUE, -- Agregado Unique
+  "username" VARCHAR(50) UNIQUE,
   "contrasena" VARCHAR(255),
   "estatus" VARCHAR(20),
   "tipo_usuario" VARCHAR(50)
@@ -122,21 +122,21 @@ CREATE TABLE "Estudiante" (
 );
 
 CREATE TABLE "Usuarios" (
-  "id_solicitante" VARCHAR(50) PRIMARY KEY, -- Equivalente al usuario externo/cliente
+  "id_usuario" VARCHAR(50) PRIMARY KEY, -- Usuario externo / Cliente
   "nombre" VARCHAR(100),
   "sexo" VARCHAR(20),
   "email" VARCHAR(100),
   "edad" INTEGER,
   "nacionalidad" VARCHAR(50),
   "f_nacimiento" DATE,
-  "concubinato" VARCHAR(50), -- Corregido typo 'conbinato'
+  "concubinato" VARCHAR(50),
   "estado_civil" VARCHAR(50),
   "descripcion_trabajo" TEXT,
   "id_nivel_edu" INTEGER,
-  "id_vivienda" VARCHAR(50), -- Ajustado para coincidir con PK de Viviendas
-  "id_trabajo" VARCHAR(50),  -- Ajustado para coincidir con PK de Trabajos
-  "id_familia" INTEGER,      -- Nota: La tabla Familias se crea después, ver lógica circular abajo
+  "id_vivienda" VARCHAR(50),
+  "id_trabajo" VARCHAR(50),
   "id_parroquia" INTEGER,
+  -- Nota: Se eliminó id_familia porque la tabla Familias se vincula a esta mediante id_solicitante
   CONSTRAINT "FK_Usuarios_id_nivel_edu" FOREIGN KEY ("id_nivel_edu") REFERENCES "Niveles_Educativos"("id_nivel_edu"),
   CONSTRAINT "FK_Usuarios_id_vivienda" FOREIGN KEY ("id_vivienda") REFERENCES "Viviendas"("id_vivienda"),
   CONSTRAINT "FK_Usuarios_id_trabajo" FOREIGN KEY ("id_trabajo") REFERENCES "Trabajos"("id_trabajo")
@@ -154,7 +154,7 @@ CREATE TABLE "Parroquia" (
     FOREIGN KEY ("id_municipio") REFERENCES "Municipios"("id_municipio")
 );
 
--- Ahora que existe Parroquia, agregamos la FK a Usuarios (que la dejamos pendiente o se altera)
+-- Agregar la FK a Usuarios ahora que Parroquia existe
 ALTER TABLE "Usuarios" ADD CONSTRAINT "FK_Usuarios_id_parroquia"
     FOREIGN KEY ("id_parroquia") REFERENCES "Parroquia"("id_parroquia");
 
@@ -177,7 +177,7 @@ CREATE TABLE "Familias" (
   "cant_trabaja" INTEGER,
   "id_nivel_edu" INTEGER,
   CONSTRAINT "FK_Familias_id_solicitante"
-    FOREIGN KEY ("id_solicitante") REFERENCES "Usuarios"("id_solicitante"),
+    FOREIGN KEY ("id_solicitante") REFERENCES "Usuarios"("id_usuario"),
   CONSTRAINT "FK_Familias_id_nivel_edu"
     FOREIGN KEY ("id_nivel_edu") REFERENCES "Niveles_Educativos"("id_nivel_edu")
 );
@@ -187,7 +187,7 @@ CREATE TABLE "Telefonos" (
   "telefono" VARCHAR(20),
   PRIMARY KEY ("id_solicitante", "telefono"),
   CONSTRAINT "FK_Telefonos_id_solicitante"
-    FOREIGN KEY ("id_solicitante") REFERENCES "Usuarios"("id_solicitante")
+    FOREIGN KEY ("id_solicitante") REFERENCES "Usuarios"("id_usuario")
 );
 
 CREATE TABLE "Electrodomesticos_Solicitantes" (
@@ -197,7 +197,7 @@ CREATE TABLE "Electrodomesticos_Solicitantes" (
   CONSTRAINT "FK_Electro_Sol_id_electro"
     FOREIGN KEY ("id_electrodomestico") REFERENCES "Electrodomesticos"("id_electrodomestico"),
   CONSTRAINT "FK_Electro_Sol_id_solicitante"
-    FOREIGN KEY ("id_solicitante") REFERENCES "Usuarios"("id_solicitante")
+    FOREIGN KEY ("id_solicitante") REFERENCES "Usuarios"("id_usuario")
 );
 
 CREATE TABLE "Secciones" (
@@ -217,7 +217,7 @@ CREATE TABLE "Secciones" (
 -- TABLAS DEL SISTEMA DE CASOS
 -- -----------------------------------------------------
 
-CREATE TABLE "CASOS" (
+CREATE TABLE "Casos" (
   "num_caso" VARCHAR(50) PRIMARY KEY,
   "fecha_recepcion" DATE,
   "cant_beneficiarios" INTEGER,
@@ -227,46 +227,47 @@ CREATE TABLE "CASOS" (
   "id_centro" INTEGER,
   "id_ambito_legal" INTEGER,
   "id_solicitante" VARCHAR(50),
-  CONSTRAINT "FK_CASOS_id_ambito_legal" FOREIGN KEY ("id_ambito_legal") REFERENCES "Ambitos_Legales"("id_ambito_legal"),
-  CONSTRAINT "FK_CASOS_id_solicitante" FOREIGN KEY ("id_solicitante") REFERENCES "Usuarios"("id_solicitante"),
-  CONSTRAINT "FK_CASOS_id_centro" FOREIGN KEY ("id_centro") REFERENCES "Centros"("id_centro")
+  CONSTRAINT "FK_Casos_id_ambito_legal" FOREIGN KEY ("id_ambito_legal") REFERENCES "Ambitos_Legales"("id_ambito_legal"),
+  CONSTRAINT "FK_Casos_id_solicitante" FOREIGN KEY ("id_solicitante") REFERENCES "Usuarios"("id_usuario"),
+  CONSTRAINT "FK_Casos_id_centro" FOREIGN KEY ("id_centro") REFERENCES "Centros"("id_centro")
 );
 
 CREATE TABLE "Beneficiarios_casos" (
-  "id_beneficiario" VARCHAR(50), -- Asumiendo que refiere a un usuario/solicitante adicional
+  "id_beneficiario" VARCHAR(50),
   "num_caso" VARCHAR(50),
   "tipo_beneficiario" VARCHAR(50),
   "parentesco" VARCHAR(50),
   PRIMARY KEY ("id_beneficiario", "num_caso"),
-  CONSTRAINT "FK_Beneficiarios_casos_id" FOREIGN KEY ("id_beneficiario") REFERENCES "Usuarios"("id_solicitante"),
-  CONSTRAINT "FK_Beneficiarios_casos_caso" FOREIGN KEY ("num_caso") REFERENCES "CASOS"("num_caso")
+  CONSTRAINT "FK_Beneficiarios_casos_id" FOREIGN KEY ("id_beneficiario") REFERENCES "Usuarios"("id_usuario"),
+  CONSTRAINT "FK_Beneficiarios_casos_caso" FOREIGN KEY ("num_caso") REFERENCES "Casos"("num_caso")
 );
 
 CREATE TABLE "Citas" (
-  "fecha" TIMESTAMP, -- Cambiado a timestamp para hora exacta
+  "fecha" TIMESTAMP,
   "num_caso" VARCHAR(50),
   "estado" VARCHAR(50),
   "orientacion" TEXT,
   PRIMARY KEY ("fecha", "num_caso"),
-  CONSTRAINT "FK_Citas_num_caso" FOREIGN KEY ("num_caso") REFERENCES "CASOS"("num_caso")
+  CONSTRAINT "FK_Citas_num_caso" FOREIGN KEY ("num_caso") REFERENCES "Casos"("num_caso")
 );
 
 CREATE TABLE "Citas_atendidas" (
   "num_caso" VARCHAR(50),
-  "fecha" TIMESTAMP, -- Debe coincidir con Citas si es la misma logica, o ser independiente
+  "fecha" TIMESTAMP,
   "id_usuario" VARCHAR(50),
   PRIMARY KEY ("num_caso", "fecha", "id_usuario"),
   CONSTRAINT "FK_Citas_atendidas_id_usuario" FOREIGN KEY ("id_usuario") REFERENCES "Personal"("id_usuario"),
-  CONSTRAINT "FK_Citas_atendidas_num_caso" FOREIGN KEY ("num_caso") REFERENCES "CASOS"("num_caso")
+  CONSTRAINT "FK_Citas_atendidas_num_caso" FOREIGN KEY ("num_caso") REFERENCES "Casos"("num_caso")
+  -- Se podría agregar FK compuesta a Citas, pero requiere que fecha y num_caso coincidan exactamente
 );
 
 CREATE TABLE "Pruebas" (
-  "id_caso" VARCHAR(50), -- Ajustado para coincidir con num_caso que es VARCHAR
+  "id_caso" VARCHAR(50),
   "id_prueba" SERIAL,
   "fecha" DATE,
-  "documento" VARCHAR(255), -- Ruta o nombre archivo
+  "documento" VARCHAR(255),
   PRIMARY KEY ("id_caso", "id_prueba"),
-  CONSTRAINT "FK_Pruebas_id_caso" FOREIGN KEY ("id_caso") REFERENCES "CASOS"("num_caso")
+  CONSTRAINT "FK_Pruebas_id_caso" FOREIGN KEY ("id_caso") REFERENCES "Casos"("num_caso")
 );
 
 CREATE TABLE "Acciones" (
@@ -274,11 +275,11 @@ CREATE TABLE "Acciones" (
   "num_caso" VARCHAR(50),
   "titulo" VARCHAR(100),
   "descripcion" TEXT,
-  "id_usuario" VARCHAR(50), -- CORREGIDO: En Personal era varchar, aquí estaba int
+  "id_usuario" VARCHAR(50),
   "f_registro" DATE,
-  "f_ejecucion" DATE, -- Corregido de 'Tipo' a DATE
+  "f_ejecucion" DATE,
   PRIMARY KEY ("id_accion", "num_caso"),
-  CONSTRAINT "FK_Acciones_num_caso" FOREIGN KEY ("num_caso") REFERENCES "CASOS"("num_caso"),
+  CONSTRAINT "FK_Acciones_num_caso" FOREIGN KEY ("num_caso") REFERENCES "Casos"("num_caso"),
   CONSTRAINT "FK_Acciones_id_usuario" FOREIGN KEY ("id_usuario") REFERENCES "Personal"("id_usuario")
 );
 
@@ -287,8 +288,8 @@ CREATE TABLE "Cambios_estatus" (
   "num_caso" VARCHAR(50),
   "fecha_cambio" DATE,
   "status_ant" VARCHAR(50),
-  PRIMARY KEY ("id_usuario", "num_caso", "fecha_cambio"), -- Agregué fecha a la PK por lógica histórica
-  CONSTRAINT "FK_Cambios_estatus_num_caso" FOREIGN KEY ("num_caso") REFERENCES "CASOS"("num_caso"),
+  PRIMARY KEY ("id_usuario", "num_caso", "fecha_cambio"),
+  CONSTRAINT "FK_Cambios_estatus_num_caso" FOREIGN KEY ("num_caso") REFERENCES "Casos"("num_caso"),
   CONSTRAINT "FK_Cambios_estatus_id_usuario" FOREIGN KEY ("id_usuario") REFERENCES "Personal"("id_usuario")
 );
 
@@ -310,7 +311,7 @@ CREATE TABLE "Estudiantes_inscritos" (
 );
 
 CREATE TABLE "Asignaciones" (
-  "id_asignacion" SERIAL PRIMARY KEY, -- Agregué PK surrogate para simplificar
+  "id_asignacion" SERIAL PRIMARY KEY,
   "id_estudiante" VARCHAR(50),
   "num_caso" VARCHAR(50),
   "id_semestre" INTEGER,
@@ -320,9 +321,8 @@ CREATE TABLE "Asignaciones" (
   "fecha_fin_asignacion" DATE,
   "id_materia" INTEGER,
   "id_seccion" INTEGER,
-  CONSTRAINT "FK_Asignaciones_num_caso" FOREIGN KEY ("num_caso") REFERENCES "CASOS"("num_caso"),
+  CONSTRAINT "FK_Asignaciones_num_caso" FOREIGN KEY ("num_caso") REFERENCES "Casos"("num_caso"),
   CONSTRAINT "FK_Asignaciones_id_estudiante" FOREIGN KEY ("id_estudiante") REFERENCES "Estudiante"("id_estudiante"),
-  -- FK compuesta hacia Secciones
   CONSTRAINT "FK_Asignaciones_seccion" 
     FOREIGN KEY ("id_materia", "id_seccion", "id_semestre") 
     REFERENCES "Secciones"("id_materia", "id_seccion", "id_semestre")
@@ -332,9 +332,9 @@ CREATE TABLE "Expediente_Tribunales" (
   "num_expediente" VARCHAR(50) PRIMARY KEY,
   "fecha_creacion" DATE,
   "id_tribunal" INTEGER,
-  "id_caso" VARCHAR(50), -- Ajustado a varchar por CASOS
+  "id_caso" VARCHAR(50),
   CONSTRAINT "FK_Expediente_Trib_id_tribunal" FOREIGN KEY ("id_tribunal") REFERENCES "Tribunales"("id_tribunal"),
-  CONSTRAINT "FK_Expediente_Trib_id_caso" FOREIGN KEY ("id_caso") REFERENCES "CASOS"("num_caso")
+  CONSTRAINT "FK_Expediente_Trib_id_caso" FOREIGN KEY ("id_caso") REFERENCES "Casos"("num_caso")
 );
 
 CREATE TABLE "Documentos_Tribunales" (

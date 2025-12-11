@@ -1,10 +1,25 @@
-package clinica_juridica.backend.domain.models;
+package clinica_juridica.backend.models;
 
+import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.Table;
+
+@Table("Trabajos")
 public class Trabajo {
+    @Id
+    @Column("id_trabajo")
     private String idTrabajo;
+
+    @Column("trabaja")
     private String trabaja;
+
+    @Column("condicion_actividad")
     private String condicionActividad;
+
+    @Column("condicion_trabajo")
     private String condicionTrabajo;
+
+    @Column("esta_buscando")
     private String estaBuscando;
 
     public Trabajo() {
