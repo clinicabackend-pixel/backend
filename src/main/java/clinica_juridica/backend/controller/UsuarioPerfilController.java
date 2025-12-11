@@ -35,9 +35,9 @@ public class UsuarioPerfilController {
         Iterable<Solicitante> solicitantes = usuarioPerfilService.findAllSolicitantes();
         Iterable<SolicitanteResponse> response = StreamSupport.stream(solicitantes.spliterator(), false)
                 .map(s -> new SolicitanteResponse(
-                        s.getIdSolicitante(), s.getNombre(), s.getSexo(), s.getFechaNacimiento(),
-                        s.getEstadoCivil(), s.getNumHijos(), s.getDireccion(), s.getIdParroquia(),
-                        s.getIdNivelEducativo(), s.getIdVivienda(), s.getIdTrabajo(), s.getIngresoFamiliar()))
+                        s.getIdSolicitante(), s.getNombre(), s.getSexo(), s.getFNacimiento(),
+                        s.getEstadoCivil(), s.getIdParroquia(),
+                        s.getIdNivelEdu(), s.getIdVivienda(), s.getIdTrabajo()))
                 .toList();
         return ResponseEntity.ok(response);
     }

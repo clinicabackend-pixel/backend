@@ -24,7 +24,7 @@ public class PersonalAuditoriaController {
     public ResponseEntity<Iterable<AccionResponse>> getAllAcciones() {
         Iterable<Accion> acciones = personalAuditoriaService.findAllAcciones();
         Iterable<AccionResponse> response = StreamSupport.stream(acciones.spliterator(), false)
-                .map(a -> new AccionResponse(a.getIdAccion(), a.getFecha(), a.getDescripcion(), a.getTipoAccion()))
+                .map(a -> new AccionResponse(a.getIdAccion(), a.getFRegistro(), a.getDescripcion(), a.getTitulo()))
                 .toList();
         return ResponseEntity.ok(response);
     }

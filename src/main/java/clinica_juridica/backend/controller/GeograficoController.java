@@ -52,8 +52,7 @@ public class GeograficoController {
     public ResponseEntity<Iterable<CentroResponse>> getAllCentros() {
         Iterable<Centro> centros = geograficoService.findAllCentros();
         Iterable<CentroResponse> response = StreamSupport.stream(centros.spliterator(), false)
-                .map(c -> new CentroResponse(c.getIdCentro(), c.getNombreCentro(), c.getDireccion(),
-                        c.getIdParroquia()))
+                .map(c -> new CentroResponse(c.getIdCentro(), c.getNombre(), c.getIdParroquia()))
                 .toList();
         return ResponseEntity.ok(response);
     }
