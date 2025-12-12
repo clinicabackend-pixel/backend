@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
-@Table("Citas_atendidas")
+@Table("citas_atendidas")
 public class CitaAtendida {
     @Column("num_caso")
     private String numCaso;

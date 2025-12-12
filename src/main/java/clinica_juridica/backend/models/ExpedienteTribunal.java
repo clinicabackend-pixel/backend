@@ -5,7 +5,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
-@Table("Expedientes_tribunales")
+@Table("expediente_tribunales")
 public class ExpedienteTribunal {
     @Id
     @Column("num_expediente")

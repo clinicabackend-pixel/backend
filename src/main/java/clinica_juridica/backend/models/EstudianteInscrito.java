@@ -3,7 +3,7 @@ package clinica_juridica.backend.models;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
-@Table("Estudiantes_inscritos")
+@Table("estudiantes_inscritos")
 public class EstudianteInscrito {
     @Column("id_estudiante")
     private String idEstudiante;

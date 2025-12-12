@@ -4,7 +4,7 @@ import java.time.LocalDate;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
-@Table("Documentos_tribunales")
+@Table("documentos_tribunales")
 public class DocumentoTribunal {
     @Column("num_expediente")
     private String numExpediente;

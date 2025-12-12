@@ -4,7 +4,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
-@Table("Niveles_Educativos")
+@Table("niveles_educativos")
 public class NivelEducativo {
     @Id
     @Column("id_nivel_edu")

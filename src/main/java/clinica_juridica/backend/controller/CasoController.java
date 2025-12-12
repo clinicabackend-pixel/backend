@@ -25,8 +25,8 @@ public class CasoController {
         Iterable<Caso> casos = casoService.findAllCasos();
         Iterable<CasoResponse> response = StreamSupport.stream(casos.spliterator(), false)
                 .map(c -> new CasoResponse(
-                        c.getNumCaso(), c.getFechaInicio(), c.getEstado(),
-                        c.getDescripcion(), c.getIdSolicitante(), c.getIdAmbitoLegal()))
+                        c.getNumCaso(), c.getFechaRecepcion(), c.getEstatus(),
+                        c.getSintesis(), c.getIdSolicitante(), c.getIdAmbitoLegal()))
                 .toList();
         return ResponseEntity.ok(response);
     }

@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
-@Table("Citas")
+@Table("citas")
 public class Cita {
     @Column("fecha")
     private LocalDateTime fecha;

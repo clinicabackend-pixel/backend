@@ -4,7 +4,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
-@Table("Parroquia")
+@Table("parroquia")
 public class Parroquia {
     @Id
     @Column("id_parroquia")

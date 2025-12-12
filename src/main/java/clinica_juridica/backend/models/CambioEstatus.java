@@ -4,7 +4,7 @@ import java.time.LocalDate;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
-@Table("Cambios_estatus")
+@Table("cambios_estatus")
 public class CambioEstatus {
     @Column("id_usuario")
     private String idUsuario;
