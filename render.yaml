@@ -1,0 +1,14 @@
+# Basic Render service configuration to deploy the Dockerfile-built image.
+# You can connect this repo to Render and it will use the Dockerfile to build the container.
+services:
+  - type: web
+    name: proyecto-db-backend
+    env: docker
+    region: oregon
+    plan: free
+    dockerfilePath: Dockerfile
+    # The service will use the Dockerfile CMD which maps the server port to $PORT
+    # You can add environment variables via the Render dashboard or add them here.
+    # envVars:
+    #  - key: EXAMPLE_KEY
+    #    value: example_value
