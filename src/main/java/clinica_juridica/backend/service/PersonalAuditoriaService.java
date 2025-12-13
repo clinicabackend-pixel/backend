@@ -8,15 +8,9 @@ import org.springframework.stereotype.Service;
 public class PersonalAuditoriaService {
 
     private final AccionRepository accionRepository;
-    private final CambioEstatusRepository cambioEstatusRepository;
-    private final CitaAtendidaRepository citaAtendidaRepository;
 
-    public PersonalAuditoriaService(AccionRepository accionRepository,
-            CambioEstatusRepository cambioEstatusRepository,
-            CitaAtendidaRepository citaAtendidaRepository) {
+    public PersonalAuditoriaService(AccionRepository accionRepository) {
         this.accionRepository = accionRepository;
-        this.cambioEstatusRepository = cambioEstatusRepository;
-        this.citaAtendidaRepository = citaAtendidaRepository;
     }
 
     public Iterable<Accion> findAllAcciones() {

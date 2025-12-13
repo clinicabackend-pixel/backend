@@ -8,15 +8,9 @@ import org.springframework.stereotype.Service;
 public class LegalTribunalService {
 
     private final TribunalRepository tribunalRepository;
-    private final ExpedienteTribunalRepository expedienteTribunalRepository;
-    private final DocumentoTribunalRepository documentoTribunalRepository;
 
-    public LegalTribunalService(TribunalRepository tribunalRepository,
-            ExpedienteTribunalRepository expedienteTribunalRepository,
-            DocumentoTribunalRepository documentoTribunalRepository) {
+    public LegalTribunalService(TribunalRepository tribunalRepository) {
         this.tribunalRepository = tribunalRepository;
-        this.expedienteTribunalRepository = expedienteTribunalRepository;
-        this.documentoTribunalRepository = documentoTribunalRepository;
     }
 
     public Iterable<Tribunal> findAllTribunales() {
