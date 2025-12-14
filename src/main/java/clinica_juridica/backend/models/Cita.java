@@ -12,6 +12,9 @@ public class Cita {
     @Column("num_caso")
     private String numCaso;
 
+    @Column("tramite")
+    private String tramite;
+
     @Column("estado")
     private String estado;
 
@@ -21,9 +24,10 @@ public class Cita {
     public Cita() {
     }
 
-    public Cita(LocalDateTime fecha, String numCaso, String estado, String orientacion) {
+    public Cita(LocalDateTime fecha, String numCaso, String tramite, String estado, String orientacion) {
         this.fecha = fecha;
         this.numCaso = numCaso;
+        this.tramite = tramite;
         this.estado = estado;
         this.orientacion = orientacion;
     }
@@ -42,6 +46,14 @@ public class Cita {
 
     public void setNumCaso(String numCaso) {
         this.numCaso = numCaso;
+    }
+
+    public String getTramite() {
+        return tramite;
+    }
+
+    public void setTramite(String tramite) {
+        this.tramite = tramite;
     }
 
     public String getEstado() {

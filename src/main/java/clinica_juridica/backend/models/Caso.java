@@ -17,9 +17,6 @@ public class Caso {
     @Column("cant_beneficiarios")
     private Integer cantBeneficiarios;
 
-    @Column("tramite")
-    private String tramite;
-
     @Column("estatus")
     private String estatus;
 
@@ -44,7 +41,6 @@ public class Caso {
         this.numCaso = numCaso;
         this.fechaRecepcion = fechaRecepcion;
         this.cantBeneficiarios = cantBeneficiarios;
-        this.tramite = tramite;
         this.estatus = estatus;
         this.sintesis = sintesis;
         this.idCentro = idCentro;
@@ -76,13 +72,6 @@ public class Caso {
         this.cantBeneficiarios = cantBeneficiarios;
     }
 
-    public String getTramite() {
-        return tramite;
-    }
-
-    public void setTramite(String tramite) {
-        this.tramite = tramite;
-    }
 
     public String getEstatus() {
         return estatus;
