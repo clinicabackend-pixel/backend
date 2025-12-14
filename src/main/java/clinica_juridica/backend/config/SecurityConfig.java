@@ -25,9 +25,7 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**").permitAll() // Permitir autenticación
-                        .anyRequest().authenticated() // Todo lo demas requiere login
-                )
+                        .anyRequest().permitAll())
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(
                                 org.springframework.security.config.http.SessionCreationPolicy.STATELESS))
