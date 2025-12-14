@@ -6,6 +6,7 @@ import org.springframework.data.relational.core.mapping.Table;
 
 @Table("personal")
 public class Usuario {
+
     @Id
     @Column("id_usuario")
     private String idUsuario;
@@ -31,8 +32,7 @@ public class Usuario {
     @Column("tipo_usuario")
     private String tipoUsuario;
 
-    public Usuario() {
-    }
+    public Usuario() {}
 
     public Usuario(String idUsuario, String nombre, String sexo, String email,
             String username, String contrasena, String estatus, String tipoUsuario) {
