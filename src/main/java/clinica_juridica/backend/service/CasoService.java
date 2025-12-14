@@ -6,7 +6,6 @@ import clinica_juridica.backend.repository.*;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
-import clinica_juridica.backend.dto.response.CasoListaResponse;
 
 @Service
 public class CasoService {
