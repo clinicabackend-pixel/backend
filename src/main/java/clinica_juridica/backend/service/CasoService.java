@@ -2,6 +2,9 @@ package clinica_juridica.backend.service;
 
 import clinica_juridica.backend.models.*;
 import clinica_juridica.backend.repository.*;
+
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import clinica_juridica.backend.dto.response.CasoListaResponse;
 
@@ -14,7 +17,14 @@ public class CasoService {
         this.casoRepository = casoRepository;
     }
 
-    public Iterable<Caso> findAllCasos() {
-        return casoRepository.findAll();
+    public List<CasoListaResponse> findAllWithSolicitanteInfo() {
+        return casoRepository.findAllWithSolicitanteInfo();
     }
+
+    public String createCaso(Caso caso) {
+        return casoRepository.createCaso(caso);
+    }
+
+    
+
 }

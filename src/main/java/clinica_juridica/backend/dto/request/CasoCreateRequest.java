@@ -2,8 +2,7 @@ package clinica_juridica.backend.dto.request;
 
 import java.time.LocalDate;
 
-public record CasoRequest(
-        String numCaso,
+public record CasoCreateRequest(
         LocalDate fechaInicio,
         String estado,
         String descripcion,

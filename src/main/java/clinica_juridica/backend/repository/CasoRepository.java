@@ -2,6 +2,7 @@ package clinica_juridica.backend.repository;
 
 import clinica_juridica.backend.models.Caso;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
@@ -19,6 +20,7 @@ public interface CasoRepository extends CrudRepository<Caso, String> {
             "JOIN usuarios u ON c.id_solicitante = u.id_usuario")
     List<CasoListaResponse> findAllWithSolicitanteInfo();
 
-    
+    @Query("SELECT sp_registrar_caso(:#{#caso.idSolicitante}, 1, :#{#caso.idAmbitoLegal}, :#{#caso.fechaRecepcion}, :#{#caso.estatus}, :#{#caso.sintesis}, 0)")
+    String createCaso(@Param("caso") Caso caso);
 
 }
