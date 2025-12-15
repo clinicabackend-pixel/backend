@@ -1,15 +1,13 @@
 package clinica_juridica.backend.controller;
 
+import clinica_juridica.backend.dto.request.BeneficiarioRequest;
 import clinica_juridica.backend.dto.request.CasoCreateRequest;
+import clinica_juridica.backend.dto.request.CasoUpdateRequest;
 import clinica_juridica.backend.dto.response.*;
 import clinica_juridica.backend.models.Caso;
 import clinica_juridica.backend.service.CasoService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -23,7 +21,7 @@ public class CasoController {
         this.casoService = casoService;
     }
 
-    @GetMapping("/list")        
+    @GetMapping("/list")
     public ResponseEntity<List<CasoListResponse>> getAllCasos() {
         List<CasoListResponse> casos = casoService.findAllWithSolicitanteInfo();
         return ResponseEntity.ok(casos);
@@ -40,5 +38,33 @@ public class CasoController {
 
         String result = casoService.createCaso(caso);
         return ResponseEntity.ok(result);
+    }
+
+    @PutMapping("/update/{numCaso}")
+    public ResponseEntity<String> updateCaso(@PathVariable String numCaso, @RequestBody CasoUpdateRequest request) {
+        Caso caso = new Caso();
+        caso.setNumCaso(numCaso);
+        caso.setFechaRecepcion(request.fechaInicio());
+        caso.setEstatus(request.estado());
+        caso.setSintesis(request.descripcion());
+        caso.setIdSolicitante(request.idSolicitante());
+        caso.setIdAmbitoLegal(request.idAmbitoLegal());
+
+        String result = casoService.updateCaso(caso);
+        return ResponseEntity.ok(result);
+    }
+
+    @PostMapping("/{numCaso}/beneficiarios")
+    public ResponseEntity<String> addBeneficiario(@PathVariable String numCaso,
+            @RequestBody BeneficiarioRequest request) {
+        String result = casoService.addBeneficiario(numCaso, request);
+        return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/{numCaso}/detalle")
+    public ResponseEntity<clinica_juridica.backend.dto.response.CasoDetalleResponse> getInfoCompleta(
+            @PathVariable String numCaso) {
+        clinica_juridica.backend.dto.response.CasoDetalleResponse response = casoService.getCasoDetalle(numCaso);
+        return ResponseEntity.ok(response);
     }
 }

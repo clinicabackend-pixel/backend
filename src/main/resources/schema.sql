@@ -236,7 +236,7 @@ CREATE TABLE estudiantes_inscritos (
 -- ==========================================================
 
 CREATE TABLE casos (
-  num_caso VARCHAR(50) PRIMARY KEY,
+  num_caso VARCHAR(50) PRIMARY KEY, --Ej: GY-2024-20-0002 
   fecha_recepcion DATE,
   cant_beneficiarios INTEGER,
   estatus VARCHAR(50),
