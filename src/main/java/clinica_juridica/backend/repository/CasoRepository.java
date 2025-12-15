@@ -8,7 +8,7 @@ import java.util.List;
 
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.stereotype.Repository;
-import clinica_juridica.backend.dto.response.CasoListaResponse;
+import clinica_juridica.backend.dto.response.CasoListResponse;
 
 @Repository
 public interface CasoRepository extends CrudRepository<Caso, String> {
@@ -18,7 +18,7 @@ public interface CasoRepository extends CrudRepository<Caso, String> {
             "FROM casos c " +
             "JOIN ambitos_legales al ON c.id_ambito_legal = al.id_ambito_legal " +
             "JOIN usuarios u ON c.id_solicitante = u.id_usuario")
-    List<CasoListaResponse> findAllWithSolicitanteInfo();
+    List<CasoListResponse> findAllWithSolicitanteInfo();
 
     @Query("SELECT sp_registrar_caso(:#{#caso.idSolicitante}, 1, :#{#caso.idAmbitoLegal}, :#{#caso.fechaRecepcion}, :#{#caso.estatus}, :#{#caso.sintesis}, 0)")
     String createCaso(@Param("caso") Caso caso);

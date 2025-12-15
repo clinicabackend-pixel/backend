@@ -1,5 +1,6 @@
 package clinica_juridica.backend.service;
 
+import clinica_juridica.backend.dto.response.CasoListResponse;
 import clinica_juridica.backend.models.*;
 import clinica_juridica.backend.repository.*;
 
@@ -16,7 +17,7 @@ public class CasoService {
         this.casoRepository = casoRepository;
     }
 
-    public List<CasoListaResponse> findAllWithSolicitanteInfo() {
+    public List<CasoListResponse> findAllWithSolicitanteInfo() {
         return casoRepository.findAllWithSolicitanteInfo();
     }
 

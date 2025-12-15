@@ -1,6 +1,6 @@
 package clinica_juridica.backend.dto.response;
 
-public record CasoListaResponse(
+public record CasoListResponse(
         String numCaso,
         String materia,
         String cedula,

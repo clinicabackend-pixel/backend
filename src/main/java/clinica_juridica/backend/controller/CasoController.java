@@ -24,8 +24,8 @@ public class CasoController {
     }
 
     @GetMapping("/list")        
-    public ResponseEntity<List<CasoListaResponse>> getAllCasos() {
-        List<CasoListaResponse> casos = casoService.findAllWithSolicitanteInfo();
+    public ResponseEntity<List<CasoListResponse>> getAllCasos() {
+        List<CasoListResponse> casos = casoService.findAllWithSolicitanteInfo();
         return ResponseEntity.ok(casos);
     }
 
