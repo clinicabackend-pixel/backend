@@ -1,8 +1,8 @@
-package clinica_juridica.backend.dto.response;
+package clinica_juridica.backend.dto.projection;
 
 import java.time.LocalDate;
 
-public record CasoBasicInfoResponse(
+public record CasoBasicInfoProjection(
         String numCaso,
         LocalDate fechaRecepcion,
         String estatus,
@@ -10,5 +10,6 @@ public record CasoBasicInfoResponse(
         Integer cantBeneficiarios,
         String idSolicitante,
         String nombreSolicitante,
-        String materia) {
+        String materia,
+        String nombreCentro) {
 }

@@ -12,10 +12,14 @@ import java.util.List;
 @Repository
 public interface AsignacionRepository extends CrudRepository<Asignacion, Integer> {
 
-    @Query("SELECT a.id_estudiante, p.nombre, a.id_semestre as semestre, a.id_materia as materia, a.id_seccion as seccion "
-            +
-            "FROM asignaciones a " +
-            "JOIN personal p ON a.id_estudiante = p.id_usuario " +
-            "WHERE a.num_caso = :numCaso")
-    List<EstudianteAsignadoResponse> findByNumCaso(@Param("numCaso") String numCaso);
+        @Query("SELECT a.id_estudiante, p.nombre, a.id_semestre as semestre, a.id_materia as materia, a.id_seccion as seccion "
+                        +
+                        "FROM asignaciones a " +
+                        "JOIN personal p ON a.id_estudiante = p.id_usuario " +
+                        "WHERE a.num_caso = :numCaso")
+        List<EstudianteAsignadoResponse> findByNumCaso(@Param("numCaso") String numCaso);
+
+        @Query("SELECT a.num_caso, a.id_estudiante, p.nombre FROM asignaciones a JOIN personal p ON a.id_estudiante = p.id_usuario WHERE a.num_caso IN (:numCasos)")
+        List<clinica_juridica.backend.dto.projection.NombreEstudianteProjection> findNombresByNumCasos(
+                        @Param("numCasos") List<String> numCasos);
 }
