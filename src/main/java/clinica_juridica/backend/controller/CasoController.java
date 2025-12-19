@@ -27,6 +27,12 @@ public class CasoController {
         return ResponseEntity.ok(casos);
     }
 
+    @GetMapping("/status/{status}")
+    public ResponseEntity<List<CasoListResponse>> getCasosByStatus(@PathVariable String status) {
+        List<CasoListResponse> casos = casoService.getCasosByStatus(status);
+        return ResponseEntity.ok(casos);
+    }
+
     @PostMapping("/create")
     public ResponseEntity<String> createCaso(@RequestBody CasoCreateRequest request) {
         Caso caso = new Caso();

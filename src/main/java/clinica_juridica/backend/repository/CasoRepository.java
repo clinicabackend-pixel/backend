@@ -21,6 +21,14 @@ public interface CasoRepository extends CrudRepository<Caso, String> {
                         "JOIN usuarios u ON c.id_solicitante = u.id_usuario")
         List<CasoListProjection> findAllWithSolicitanteInfo();
 
+        @Query("SELECT c.num_caso, al.materia, u.id_usuario as cedula, u.nombre, c.fecha_recepcion as fecha, c.estatus "
+                        +
+                        "FROM casos c " +
+                        "JOIN ambitos_legales al ON c.id_ambito_legal = al.id_ambito_legal " +
+                        "JOIN usuarios u ON c.id_solicitante = u.id_usuario " +
+                        "WHERE c.estatus = :estatus")
+        List<CasoListProjection> findAllByEstatus(@Param("estatus") String estatus);
+
         @Query("SELECT sp_registrar_caso(:#{#caso.idSolicitante}, 1, :#{#caso.idAmbitoLegal}, :#{#caso.fechaRecepcion}, :#{#caso.estatus}, :#{#caso.sintesis}, 0)")
         String createCaso(@Param("caso") Caso caso);
 
