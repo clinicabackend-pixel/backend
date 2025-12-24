@@ -24,7 +24,7 @@ public class LegalTribunalController {
     public ResponseEntity<Iterable<TribunalResponse>> getAllTribunales() {
         Iterable<Tribunal> tribunales = legalTribunalService.findAllTribunales();
         Iterable<TribunalResponse> response = StreamSupport.stream(tribunales.spliterator(), false)
-                .map(t -> new TribunalResponse(t.getIdTribunal(), t.getTipoTribunal(), t.getNombreTribunal()))
+                .map(t -> new TribunalResponse(t.getIdTribunal(), t.getMateria(), t.getNombreTribunal()))
                 .toList();
         return ResponseEntity.ok(response);
     }

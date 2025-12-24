@@ -1,63 +1,50 @@
 package clinica_juridica.backend.models;
 
 import org.springframework.data.annotation.Id;
-import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
-@Table("ambitos_legales")
+@Table("ambito_legal")
 public class AmbitoLegal {
     @Id
-    @Column("id_ambito_legal")
-    private Integer idAmbitoLegal;
-
-    @Column("materia")
-    private String materia;
-
-    @Column("tipo")
-    private String tipo;
-
-    @Column("descripcion")
-    private String descripcion;
+    private Integer codAmbLegal;
+    private Integer codSubAmbLegal;
+    private String ambLegal;
 
     public AmbitoLegal() {
     }
 
-    public AmbitoLegal(Integer idAmbitoLegal, String materia, String tipo, String descripcion) {
-        this.idAmbitoLegal = idAmbitoLegal;
-        this.materia = materia;
-        this.tipo = tipo;
-        this.descripcion = descripcion;
+    public AmbitoLegal(Integer codAmbLegal, Integer codSubAmbLegal, String ambLegal) {
+        this.codAmbLegal = codAmbLegal;
+        this.codSubAmbLegal = codSubAmbLegal;
+        this.ambLegal = ambLegal;
     }
 
-    public Integer getIdAmbitoLegal() {
-        return idAmbitoLegal;
+    public Integer getCodAmbLegal() {
+        return codAmbLegal;
     }
 
-    public void setIdAmbitoLegal(Integer idAmbitoLegal) {
-        this.idAmbitoLegal = idAmbitoLegal;
+    public void setCodAmbLegal(Integer codAmbLegal) {
+        this.codAmbLegal = codAmbLegal;
     }
 
-    public String getMateria() {
-        return materia;
+    public Integer getCodSubAmbLegal() {
+        return codSubAmbLegal;
     }
 
-    public void setMateria(String materia) {
-        this.materia = materia;
+    public void setCodSubAmbLegal(Integer codSubAmbLegal) {
+        this.codSubAmbLegal = codSubAmbLegal;
     }
 
-    public String getTipo() {
-        return tipo;
+    public String getAmbLegal() {
+        return ambLegal;
     }
 
-    public void setTipo(String tipo) {
-        this.tipo = tipo;
+    public void setAmbLegal(String ambLegal) {
+        this.ambLegal = ambLegal;
     }
 
-    public String getDescripcion() {
-        return descripcion;
-    }
-
-    public void setDescripcion(String descripcion) {
-        this.descripcion = descripcion;
+    @Override
+    public String toString() {
+        return "AmbitoLegal{codAmbLegal=" + codAmbLegal + ", ambLegal='" + ambLegal + "'}";
     }
 }

@@ -23,34 +23,29 @@ public class UsuarioPerfilController {
     public ResponseEntity<Iterable<UsuarioResponse>> getAllPersonal() {
         Iterable<Usuario> personal = usuarioPerfilService.findAllUsuarios();
         Iterable<UsuarioResponse> response = StreamSupport.stream(personal.spliterator(), false)
-                .map(p -> new UsuarioResponse(p.getIdUsuario(), p.getNombre(), p.getSexo(), p.getEmail(),
-                        p.getUsername(), p.getEstatus(), p.getTipoUsuario()))
+                .map(p -> new UsuarioResponse(p.getCedula(), p.getNombre(), "N/A", p.getEmail(),
+                        p.getUsername(), p.getStatus(), p.getTipo()))
                 .toList();
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/solicitantes")
     public ResponseEntity<Iterable<SolicitanteResponse>> getAllSolicitantes() {
-        Iterable<Solicitante> solicitantes =
-            usuarioPerfilService.findAllSolicitantes();
+        Iterable<Solicitante> solicitantes = usuarioPerfilService.findAllSolicitantes();
         Iterable<SolicitanteResponse> response = StreamSupport.stream(
-            solicitantes.spliterator(),
-            false
-        )
-            .map(s ->
-                new SolicitanteResponse(
-                    s.getIdSolicitante(),
-                    s.getNombre(),
-                    s.getSexo(),
-                    s.getFNacimiento(),
-                    s.getEstadoCivil(),
-                    s.getIdParroquia(),
-                    s.getIdNivelEdu(),
-                    s.getIdVivienda(),
-                    s.getIdTrabajo()
-                )
-            )
-            .toList();
+                solicitantes.spliterator(),
+                false)
+                .map(s -> new SolicitanteResponse(
+                        s.getCedula(),
+                        s.getNombre(),
+                        s.getSexo(),
+                        s.getFNacimiento(),
+                        s.getIdEstadoCivil() != null ? s.getIdEstadoCivil().toString() : null,
+                        null,
+                        s.getIdNivel(),
+                        null,
+                        s.getIdCondicion() != null ? s.getIdCondicion().toString() : null))
+                .toList();
         return ResponseEntity.ok(response);
     }
 }

@@ -1,46 +1,32 @@
 package clinica_juridica.backend.models;
 
-import java.time.LocalDate;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
+import java.time.LocalDate;
 
-@Table("acciones")
+@Table("accion")
 public class Accion {
     @Id
-    @Column("id_accion")
     private Integer idAccion;
-
-    @Column("num_caso")
     private String numCaso;
-
-    @Column("titulo")
     private String titulo;
-
-    @Column("descripcion")
     private String descripcion;
-
-    @Column("id_usuario")
-    private String idUsuario;
-
-    @Column("f_registro")
-    private LocalDate fRegistro;
-
-    @Column("f_ejecucion")
-    private LocalDate fEjecucion;
+    private LocalDate fechaRegistro;
+    private LocalDate fechaEjecucion;
+    private String username;
 
     public Accion() {
     }
 
-    public Accion(Integer idAccion, String numCaso, String titulo, String descripcion,
-            String idUsuario, LocalDate fRegistro, LocalDate fEjecucion) {
+    public Accion(Integer idAccion, String numCaso, String titulo, String descripcion, LocalDate fechaRegistro,
+            LocalDate fechaEjecucion, String username) {
         this.idAccion = idAccion;
         this.numCaso = numCaso;
         this.titulo = titulo;
         this.descripcion = descripcion;
-        this.idUsuario = idUsuario;
-        this.fRegistro = fRegistro;
-        this.fEjecucion = fEjecucion;
+        this.fechaRegistro = fechaRegistro;
+        this.fechaEjecucion = fechaEjecucion;
+        this.username = username;
     }
 
     public Integer getIdAccion() {
@@ -75,27 +61,32 @@ public class Accion {
         this.descripcion = descripcion;
     }
 
-    public String getIdUsuario() {
-        return idUsuario;
+    public LocalDate getFechaRegistro() {
+        return fechaRegistro;
     }
 
-    public void setIdUsuario(String idUsuario) {
-        this.idUsuario = idUsuario;
+    public void setFechaRegistro(LocalDate fechaRegistro) {
+        this.fechaRegistro = fechaRegistro;
     }
 
-    public LocalDate getFRegistro() {
-        return fRegistro;
+    public LocalDate getFechaEjecucion() {
+        return fechaEjecucion;
     }
 
-    public void setFRegistro(LocalDate fRegistro) {
-        this.fRegistro = fRegistro;
+    public void setFechaEjecucion(LocalDate fechaEjecucion) {
+        this.fechaEjecucion = fechaEjecucion;
     }
 
-    public LocalDate getFEjecucion() {
-        return fEjecucion;
+    public String getUsername() {
+        return username;
     }
 
-    public void setFEjecucion(LocalDate fEjecucion) {
-        this.fEjecucion = fEjecucion;
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    @Override
+    public String toString() {
+        return "Accion{idAccion=" + idAccion + ", titulo='" + titulo + "'}";
     }
 }

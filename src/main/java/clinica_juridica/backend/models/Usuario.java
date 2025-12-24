@@ -1,81 +1,35 @@
 package clinica_juridica.backend.models;
 
 import org.springframework.data.annotation.Id;
-import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.domain.Persistable;
 import org.springframework.data.relational.core.mapping.Table;
 
-@Table("personal")
-public class Usuario {
+import java.util.Objects;
+
+@Table("usuarios")
+public class Usuario implements Persistable<String> {
 
     @Id
-    @Column("id_usuario")
-    private String idUsuario;
-
-    @Column("nombre")
-    private String nombre;
-
-    @Column("sexo")
-    private String sexo;
-
-    @Column("email")
-    private String email;
-
-    @Column("username")
     private String username;
-
-    @Column("contrasena")
+    private String cedula;
     private String contrasena;
+    private String nombre;
+    private String email;
+    private String status;
+    private String tipo;
 
-    @Column("estatus")
-    private String estatus;
+    public Usuario() {
+    }
 
-    @Column("tipo_usuario")
-    private String tipoUsuario;
-
-    public Usuario() {}
-
-    public Usuario(String idUsuario, String nombre, String sexo, String email,
-            String username, String contrasena, String estatus, String tipoUsuario) {
-        this.idUsuario = idUsuario;
-        this.nombre = nombre;
-        this.sexo = sexo;
-        this.email = email;
+    public Usuario(String username, String cedula, String contrasena, String nombre, String email, String status,
+            String tipo) {
         this.username = username;
+        this.cedula = cedula;
         this.contrasena = contrasena;
-        this.estatus = estatus;
-        this.tipoUsuario = tipoUsuario;
-    }
-
-    public String getIdUsuario() {
-        return idUsuario;
-    }
-
-    public void setIdUsuario(String idUsuario) {
-        this.idUsuario = idUsuario;
-    }
-
-    public String getNombre() {
-        return nombre;
-    }
-
-    public void setNombre(String nombre) {
         this.nombre = nombre;
-    }
-
-    public String getSexo() {
-        return sexo;
-    }
-
-    public void setSexo(String sexo) {
-        this.sexo = sexo;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
         this.email = email;
+        this.status = status;
+        this.tipo = tipo;
     }
 
     public String getUsername() {
@@ -86,6 +40,14 @@ public class Usuario {
         this.username = username;
     }
 
+    public String getCedula() {
+        return cedula;
+    }
+
+    public void setCedula(String cedula) {
+        this.cedula = cedula;
+    }
+
     public String getContrasena() {
         return contrasena;
     }
@@ -94,19 +56,72 @@ public class Usuario {
         this.contrasena = contrasena;
     }
 
-    public String getEstatus() {
-        return estatus;
+    public String getNombre() {
+        return nombre;
     }
 
-    public void setEstatus(String estatus) {
-        this.estatus = estatus;
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
     }
 
-    public String getTipoUsuario() {
-        return tipoUsuario;
+    public String getEmail() {
+        return email;
     }
 
-    public void setTipoUsuario(String tipoUsuario) {
-        this.tipoUsuario = tipoUsuario;
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getTipo() {
+        return tipo;
+    }
+
+    public void setTipo(String tipo) {
+        this.tipo = tipo;
+    }
+
+    @Override
+    public String getId() {
+        return username;
+    }
+
+    @Override
+    public boolean isNew() {
+        return true; // Simplified for now
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        Usuario usuario = (Usuario) o;
+        return Objects.equals(username, usuario.username);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(username);
+    }
+
+    @Override
+    public String toString() {
+        return "Usuario{" +
+                "username='" + username + '\'' +
+                ", cedula='" + cedula + '\'' +
+                ", nombre='" + nombre + '\'' +
+                ", email='" + email + '\'' +
+                ", status='" + status + '\'' +
+                ", tipo='" + tipo + '\'' +
+                '}';
     }
 }

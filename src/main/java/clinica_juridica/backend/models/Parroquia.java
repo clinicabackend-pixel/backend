@@ -1,28 +1,22 @@
 package clinica_juridica.backend.models;
 
 import org.springframework.data.annotation.Id;
-import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
-@Table("parroquia")
+@Table("parroquias")
 public class Parroquia {
     @Id
-    @Column("id_parroquia")
     private Integer idParroquia;
-
-    @Column("id_municipio")
+    private String parroquia;
     private Integer idMunicipio;
-
-    @Column("nombre_parroquia")
-    private String nombreParroquia;
 
     public Parroquia() {
     }
 
-    public Parroquia(Integer idParroquia, Integer idMunicipio, String nombreParroquia) {
+    public Parroquia(Integer idParroquia, String parroquia, Integer idMunicipio) {
         this.idParroquia = idParroquia;
+        this.parroquia = parroquia;
         this.idMunicipio = idMunicipio;
-        this.nombreParroquia = nombreParroquia;
     }
 
     public Integer getIdParroquia() {
@@ -33,6 +27,14 @@ public class Parroquia {
         this.idParroquia = idParroquia;
     }
 
+    public String getParroquia() {
+        return parroquia;
+    }
+
+    public void setParroquia(String parroquia) {
+        this.parroquia = parroquia;
+    }
+
     public Integer getIdMunicipio() {
         return idMunicipio;
     }
@@ -41,11 +43,9 @@ public class Parroquia {
         this.idMunicipio = idMunicipio;
     }
 
-    public String getNombreParroquia() {
-        return nombreParroquia;
-    }
-
-    public void setNombreParroquia(String nombreParroquia) {
-        this.nombreParroquia = nombreParroquia;
+    @Override
+    public String toString() {
+        return "Parroquia{idParroquia=" + idParroquia + ", parroquia='" + parroquia + "', idMunicipio=" + idMunicipio
+                + "}";
     }
 }

@@ -1,11 +1,7 @@
 package clinica_juridica.backend.controller;
 
-import clinica_juridica.backend.dto.request.BeneficiarioRequest;
-import clinica_juridica.backend.dto.request.CasoCreateRequest;
-import clinica_juridica.backend.dto.request.CasoUpdateRequest;
-import clinica_juridica.backend.dto.response.*;
 import clinica_juridica.backend.models.Caso;
-import clinica_juridica.backend.service.CasoService;
+import clinica_juridica.backend.repository.CasoRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,62 +11,46 @@ import java.util.List;
 @RequestMapping("/api/casos")
 public class CasoController {
 
-    private final CasoService casoService;
+    private final CasoRepository casoRepository;
 
-    public CasoController(CasoService casoService) {
-        this.casoService = casoService;
+    public CasoController(CasoRepository casoRepository) {
+        this.casoRepository = casoRepository;
     }
 
-    @GetMapping("/list")
-    public ResponseEntity<List<CasoListResponse>> getAllCasos() {
-        List<CasoListResponse> casos = casoService.findAllWithSolicitanteInfo();
-        return ResponseEntity.ok(casos);
+    @GetMapping
+    public ResponseEntity<List<Caso>> getAll() {
+        return ResponseEntity.ok(casoRepository.findAll());
     }
 
-    @GetMapping("/status/{status}")
-    public ResponseEntity<List<CasoListResponse>> getCasosByStatus(@PathVariable String status) {
-        List<CasoListResponse> casos = casoService.getCasosByStatus(status);
-        return ResponseEntity.ok(casos);
+    @GetMapping("/{id}")
+    public ResponseEntity<Caso> getById(@PathVariable String id) {
+        return casoRepository.findById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
-    @PostMapping("/create")
-    public ResponseEntity<String> createCaso(@RequestBody CasoCreateRequest request) {
-        Caso caso = new Caso();
-        caso.setFechaRecepcion(request.fechaInicio());
-        caso.setEstatus(request.estado());
-        caso.setSintesis(request.descripcion());
-        caso.setIdSolicitante(request.idSolicitante());
-        caso.setIdAmbitoLegal(request.idAmbitoLegal());
-
-        String result = casoService.createCaso(caso);
-        return ResponseEntity.ok(result);
+    @PostMapping
+    public ResponseEntity<String> create(@RequestBody Caso caso) {
+        casoRepository.save(caso);
+        return ResponseEntity.ok("Caso creado exitosamente");
     }
 
-    @PutMapping("/update/{numCaso}")
-    public ResponseEntity<String> updateCaso(@PathVariable String numCaso, @RequestBody CasoUpdateRequest request) {
-        Caso caso = new Caso();
-        caso.setNumCaso(numCaso);
-        caso.setFechaRecepcion(request.fechaInicio());
-        caso.setEstatus(request.estado());
-        caso.setSintesis(request.descripcion());
-        caso.setIdSolicitante(request.idSolicitante());
-        caso.setIdAmbitoLegal(request.idAmbitoLegal());
-
-        String result = casoService.updateCaso(caso);
-        return ResponseEntity.ok(result);
+    @PutMapping("/{id}")
+    public ResponseEntity<String> update(@PathVariable String id, @RequestBody Caso caso) {
+        if (casoRepository.findById(id).isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        caso.setNumCaso(id);
+        casoRepository.update(caso);
+        return ResponseEntity.ok("Caso actualizado exitosamente");
     }
 
-    @PostMapping("/{numCaso}/beneficiarios")
-    public ResponseEntity<String> addBeneficiario(@PathVariable String numCaso,
-            @RequestBody BeneficiarioRequest request) {
-        String result = casoService.addBeneficiario(numCaso, request);
-        return ResponseEntity.ok(result);
-    }
-
-    @GetMapping("/{numCaso}/detalle")
-    public ResponseEntity<clinica_juridica.backend.dto.response.CasoDetalleResponse> getInfoCompleta(
-            @PathVariable String numCaso) {
-        clinica_juridica.backend.dto.response.CasoDetalleResponse response = casoService.getCasoDetalle(numCaso);
-        return ResponseEntity.ok(response);
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> delete(@PathVariable String id) {
+        if (casoRepository.findById(id).isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        casoRepository.delete(id);
+        return ResponseEntity.ok("Caso eliminado exitosamente");
     }
 }

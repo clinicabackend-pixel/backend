@@ -1,71 +1,51 @@
 package clinica_juridica.backend.models;
 
-import java.math.BigDecimal;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.domain.Persistable;
 import org.springframework.data.relational.core.mapping.Table;
 
+import java.math.BigDecimal;
+import java.util.Objects;
+
 @Table("familias")
-public class Familia {
+public class Familia implements Persistable<String> {
+
     @Id
-    @Column("id_solicitante")
-    private String idSolicitante;
-
-    @Column("ingresos_mes")
-    private BigDecimal ingresosMes;
-
-    @Column("cant_personas")
+    private String cedula;
     private Integer cantPersonas;
-
-    @Column("jefe_familia")
-    private Boolean jefeFamilia;
-
-    @Column("cant_sin_trabajo")
-    private Integer cantSinTrabajo;
-
-    @Column("cant_estudiando")
     private Integer cantEstudiando;
-
-    @Column("cant_ninos")
+    private BigDecimal ingresoMes;
+    private Boolean jefeFamilia;
+    private Integer cantSinTrabajo;
     private Integer cantNinos;
-
-    @Column("cant_trabaja")
     private Integer cantTrabaja;
-
-    @Column("id_nivel_edu")
-    private Integer idNivelEdu;
+    private Integer idNivelEduJefe;
+    private String tiempoEstudio;
 
     public Familia() {
     }
 
-    public Familia(String idSolicitante, BigDecimal ingresosMes, Integer cantPersonas, Boolean jefeFamilia,
-            Integer cantSinTrabajo, Integer cantEstudiando, Integer cantNinos,
-            Integer cantTrabaja, Integer idNivelEdu) {
-        this.idSolicitante = idSolicitante;
-        this.ingresosMes = ingresosMes;
+    public Familia(String cedula, Integer cantPersonas, Integer cantEstudiando, BigDecimal ingresoMes,
+            Boolean jefeFamilia, Integer cantSinTrabajo, Integer cantNinos, Integer cantTrabaja, Integer idNivelEduJefe,
+            String tiempoEstudio) {
+        this.cedula = cedula;
         this.cantPersonas = cantPersonas;
+        this.cantEstudiando = cantEstudiando;
+        this.ingresoMes = ingresoMes;
         this.jefeFamilia = jefeFamilia;
         this.cantSinTrabajo = cantSinTrabajo;
-        this.cantEstudiando = cantEstudiando;
         this.cantNinos = cantNinos;
         this.cantTrabaja = cantTrabaja;
-        this.idNivelEdu = idNivelEdu;
+        this.idNivelEduJefe = idNivelEduJefe;
+        this.tiempoEstudio = tiempoEstudio;
     }
 
-    public String getIdSolicitante() {
-        return idSolicitante;
+    public String getCedula() {
+        return cedula;
     }
 
-    public void setIdSolicitante(String idSolicitante) {
-        this.idSolicitante = idSolicitante;
-    }
-
-    public BigDecimal getIngresosMes() {
-        return ingresosMes;
-    }
-
-    public void setIngresosMes(BigDecimal ingresosMes) {
-        this.ingresosMes = ingresosMes;
+    public void setCedula(String cedula) {
+        this.cedula = cedula;
     }
 
     public Integer getCantPersonas() {
@@ -74,6 +54,22 @@ public class Familia {
 
     public void setCantPersonas(Integer cantPersonas) {
         this.cantPersonas = cantPersonas;
+    }
+
+    public Integer getCantEstudiando() {
+        return cantEstudiando;
+    }
+
+    public void setCantEstudiando(Integer cantEstudiando) {
+        this.cantEstudiando = cantEstudiando;
+    }
+
+    public BigDecimal getIngresoMes() {
+        return ingresoMes;
+    }
+
+    public void setIngresoMes(BigDecimal ingresoMes) {
+        this.ingresoMes = ingresoMes;
     }
 
     public Boolean getJefeFamilia() {
@@ -92,14 +88,6 @@ public class Familia {
         this.cantSinTrabajo = cantSinTrabajo;
     }
 
-    public Integer getCantEstudiando() {
-        return cantEstudiando;
-    }
-
-    public void setCantEstudiando(Integer cantEstudiando) {
-        this.cantEstudiando = cantEstudiando;
-    }
-
     public Integer getCantNinos() {
         return cantNinos;
     }
@@ -116,11 +104,53 @@ public class Familia {
         this.cantTrabaja = cantTrabaja;
     }
 
-    public Integer getIdNivelEdu() {
-        return idNivelEdu;
+    public Integer getIdNivelEduJefe() {
+        return idNivelEduJefe;
     }
 
-    public void setIdNivelEdu(Integer idNivelEdu) {
-        this.idNivelEdu = idNivelEdu;
+    public void setIdNivelEduJefe(Integer idNivelEduJefe) {
+        this.idNivelEduJefe = idNivelEduJefe;
+    }
+
+    public String getTiempoEstudio() {
+        return tiempoEstudio;
+    }
+
+    public void setTiempoEstudio(String tiempoEstudio) {
+        this.tiempoEstudio = tiempoEstudio;
+    }
+
+    @Override
+    public String getId() {
+        return cedula;
+    }
+
+    @Override
+    public boolean isNew() {
+        return true;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        Familia familia = (Familia) o;
+        return Objects.equals(cedula, familia.cedula);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(cedula);
+    }
+
+    @Override
+    public String toString() {
+        return "Familia{" +
+                "cedula='" + cedula + '\'' +
+                ", cantPersonas=" + cantPersonas +
+                ", ingresoMes=" + ingresoMes +
+                '}';
     }
 }

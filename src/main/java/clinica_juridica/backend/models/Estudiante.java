@@ -1,86 +1,24 @@
 package clinica_juridica.backend.models;
 
 import org.springframework.data.annotation.Id;
-import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
-@Table("estudiante")
+@Table("estudiantes")
 public class Estudiante {
     @Id
-    @Column("id_estudiante")
-    private String idEstudiante;
-
-    @Column("nombre")
-    private String nombre;
-
-    @Column("sexo")
-    private String sexo;
-
-    @Column("email")
-    private String email;
-
-    @Column("username")
-    private String username;
-
-    @Column("contrasena")
-    private String contrasena;
-
-    @Column("estatus")
-    private String estatus;
-
-    @Column("culminado")
-    private Boolean culminado;
-
-    @Column("tipo")
-    private String tipo;
+    private String username; // Part of composite key
+    private String termino; // Part of composite key
+    private String tipoDeEstudiante;
+    private Integer nrc;
 
     public Estudiante() {
     }
 
-    public Estudiante(String idEstudiante, String nombre, String sexo, String email,
-            String username, String contrasena, String estatus,
-            Boolean culminado, String tipo) {
-        this.idEstudiante = idEstudiante;
-        this.nombre = nombre;
-        this.sexo = sexo;
-        this.email = email;
+    public Estudiante(String username, String termino, String tipoDeEstudiante, Integer nrc) {
         this.username = username;
-        this.contrasena = contrasena;
-        this.estatus = estatus;
-        this.culminado = culminado;
-        this.tipo = tipo;
-    }
-
-    public String getIdEstudiante() {
-        return idEstudiante;
-    }
-
-    public void setIdEstudiante(String idEstudiante) {
-        this.idEstudiante = idEstudiante;
-    }
-
-    public String getNombre() {
-        return nombre;
-    }
-
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
-
-    public String getSexo() {
-        return sexo;
-    }
-
-    public void setSexo(String sexo) {
-        this.sexo = sexo;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
+        this.termino = termino;
+        this.tipoDeEstudiante = tipoDeEstudiante;
+        this.nrc = nrc;
     }
 
     public String getUsername() {
@@ -91,35 +29,33 @@ public class Estudiante {
         this.username = username;
     }
 
-    public String getContrasena() {
-        return contrasena;
+    public String getTermino() {
+        return termino;
     }
 
-    public void setContrasena(String contrasena) {
-        this.contrasena = contrasena;
+    public void setTermino(String termino) {
+        this.termino = termino;
     }
 
-    public String getEstatus() {
-        return estatus;
+    public String getTipoDeEstudiante() {
+        return tipoDeEstudiante;
     }
 
-    public void setEstatus(String estatus) {
-        this.estatus = estatus;
+    public void setTipoDeEstudiante(String tipoDeEstudiante) {
+        this.tipoDeEstudiante = tipoDeEstudiante;
     }
 
-    public Boolean getCulminado() {
-        return culminado;
+    public Integer getNrc() {
+        return nrc;
     }
 
-    public void setCulminado(Boolean culminado) {
-        this.culminado = culminado;
+    public void setNrc(Integer nrc) {
+        this.nrc = nrc;
     }
 
-    public String getTipo() {
-        return tipo;
-    }
-
-    public void setTipo(String tipo) {
-        this.tipo = tipo;
+    @Override
+    public String toString() {
+        return "Estudiante{username='" + username + "', termino='" + termino + "', tipoDeEstudiante='"
+                + tipoDeEstudiante + "', nrc=" + nrc + "}";
     }
 }

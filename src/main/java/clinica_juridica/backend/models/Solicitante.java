@@ -1,101 +1,61 @@
 package clinica_juridica.backend.models;
 
-import java.time.LocalDate;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.domain.Persistable;
 import org.springframework.data.relational.core.mapping.Table;
 
-@Table("usuarios")
-public class Solicitante {
+import java.time.LocalDate;
+import java.util.Objects;
+
+@Table("solicitantes")
+public class Solicitante implements Persistable<String> {
+
     @Id
-    @Column("id_usuario")
-    private String idSolicitante;
-
-    @Column("nombre")
+    private String cedula;
     private String nombre;
-
-    @Column("sexo")
-    private String sexo;
-
-    @Column("email")
-    private String email;
-
-    @Column("edad")
-    private Integer edad;
-
-    @Column("nacionalidad")
     private String nacionalidad;
-
-    @Column("f_nacimiento")
-    private LocalDate fNacimiento;
-
-    @Column("concubinato")
+    private String sexo;
+    private String email;
     private String concubinato;
-
-    @Column("estado_civil")
-    private String estadoCivil;
-
-    @Column("descripcion_trabajo")
-    private String descripcionTrabajo;
-
-    @Column("id_nivel_edu")
-    private Integer idNivelEdu;
-
-    @Column("id_vivienda")
-    private String idVivienda;
-
-    @Column("id_trabajo")
-    private String idTrabajo;
-
-    @Column("id_parroquia")
-    private Integer idParroquia;
-
-    // idFamilia removed from schema but exists in POJO. It is FK in Familias table
-    // pointing to Usuarios.
-    // So Solicitante does not have id_familia column.
-    // We should probably mark it as transient OR remove it if it's not in the
-    // table.
-    // The schema says: "-- Nota: Se eliminó id_familia porque la tabla Familias se
-    // vincula a esta mediante id_solicitante"
-    // So I will make it Transient or ignore it for now, but to avoid errors, I'll
-    // add @Column(value = "id_familia") which will fail if column missing.
-    // Better to remove it or mark @Transient. I will mark
-    // @org.springframework.data.annotation.Transient
-
-    @org.springframework.data.annotation.Transient
-    private Integer idFamilia;
+    private Integer idEstadoCivil;
+    private String telfCelular;
+    private String telfCasa;
+    private LocalDate fNacimiento;
+    private Integer edad;
+    private Integer idCondicion;
+    private Integer idCondicionActividad;
+    private Integer idNivel;
+    private String tiempoEstudio;
 
     public Solicitante() {
     }
 
-    public Solicitante(String idSolicitante, String nombre, String sexo, String email,
-            Integer edad, String nacionalidad, LocalDate fNacimiento,
-            String concubinato, String estadoCivil, String descripcionTrabajo,
-            Integer idNivelEdu, String idVivienda, String idTrabajo,
-            Integer idFamilia, Integer idParroquia) {
-        this.idSolicitante = idSolicitante;
+    public Solicitante(String cedula, String nombre, String nacionalidad, String sexo, String email, String concubinato,
+            Integer idEstadoCivil, String telfCelular, String telfCasa, LocalDate fNacimiento, Integer edad,
+            Integer idCondicion, Integer idCondicionActividad, Integer idNivel, String tiempoEstudio) {
+        this.cedula = cedula;
         this.nombre = nombre;
+        this.nacionalidad = nacionalidad;
         this.sexo = sexo;
         this.email = email;
-        this.edad = edad;
-        this.nacionalidad = nacionalidad;
-        this.fNacimiento = fNacimiento;
         this.concubinato = concubinato;
-        this.estadoCivil = estadoCivil;
-        this.descripcionTrabajo = descripcionTrabajo;
-        this.idNivelEdu = idNivelEdu;
-        this.idVivienda = idVivienda;
-        this.idTrabajo = idTrabajo;
-        this.idFamilia = idFamilia;
-        this.idParroquia = idParroquia;
+        this.idEstadoCivil = idEstadoCivil;
+        this.telfCelular = telfCelular;
+        this.telfCasa = telfCasa;
+        this.fNacimiento = fNacimiento;
+        this.edad = edad;
+        this.idCondicion = idCondicion;
+        this.idCondicionActividad = idCondicionActividad;
+        this.idNivel = idNivel;
+        this.tiempoEstudio = tiempoEstudio;
     }
 
-    public String getIdSolicitante() {
-        return idSolicitante;
+    public String getCedula() {
+        return cedula;
     }
 
-    public void setIdSolicitante(String idSolicitante) {
-        this.idSolicitante = idSolicitante;
+    public void setCedula(String cedula) {
+        this.cedula = cedula;
     }
 
     public String getNombre() {
@@ -104,6 +64,14 @@ public class Solicitante {
 
     public void setNombre(String nombre) {
         this.nombre = nombre;
+    }
+
+    public String getNacionalidad() {
+        return nacionalidad;
+    }
+
+    public void setNacionalidad(String nacionalidad) {
+        this.nacionalidad = nacionalidad;
     }
 
     public String getSexo() {
@@ -122,20 +90,36 @@ public class Solicitante {
         this.email = email;
     }
 
-    public Integer getEdad() {
-        return edad;
+    public String getConcubinato() {
+        return concubinato;
     }
 
-    public void setEdad(Integer edad) {
-        this.edad = edad;
+    public void setConcubinato(String concubinato) {
+        this.concubinato = concubinato;
     }
 
-    public String getNacionalidad() {
-        return nacionalidad;
+    public Integer getIdEstadoCivil() {
+        return idEstadoCivil;
     }
 
-    public void setNacionalidad(String nacionalidad) {
-        this.nacionalidad = nacionalidad;
+    public void setIdEstadoCivil(Integer idEstadoCivil) {
+        this.idEstadoCivil = idEstadoCivil;
+    }
+
+    public String getTelfCelular() {
+        return telfCelular;
+    }
+
+    public void setTelfCelular(String telfCelular) {
+        this.telfCelular = telfCelular;
+    }
+
+    public String getTelfCasa() {
+        return telfCasa;
+    }
+
+    public void setTelfCasa(String telfCasa) {
+        this.telfCasa = telfCasa;
     }
 
     public LocalDate getFNacimiento() {
@@ -146,67 +130,77 @@ public class Solicitante {
         this.fNacimiento = fNacimiento;
     }
 
-    public String getConcubinato() {
-        return concubinato;
+    public Integer getEdad() {
+        return edad;
     }
 
-    public void setConcubinato(String concubinato) {
-        this.concubinato = concubinato;
+    public void setEdad(Integer edad) {
+        this.edad = edad;
     }
 
-    public String getEstadoCivil() {
-        return estadoCivil;
+    public Integer getIdCondicion() {
+        return idCondicion;
     }
 
-    public void setEstadoCivil(String estadoCivil) {
-        this.estadoCivil = estadoCivil;
+    public void setIdCondicion(Integer idCondicion) {
+        this.idCondicion = idCondicion;
     }
 
-    public String getDescripcionTrabajo() {
-        return descripcionTrabajo;
+    public Integer getIdCondicionActividad() {
+        return idCondicionActividad;
     }
 
-    public void setDescripcionTrabajo(String descripcionTrabajo) {
-        this.descripcionTrabajo = descripcionTrabajo;
+    public void setIdCondicionActividad(Integer idCondicionActividad) {
+        this.idCondicionActividad = idCondicionActividad;
     }
 
-    public Integer getIdNivelEdu() {
-        return idNivelEdu;
+    public Integer getIdNivel() {
+        return idNivel;
     }
 
-    public void setIdNivelEdu(Integer idNivelEdu) {
-        this.idNivelEdu = idNivelEdu;
+    public void setIdNivel(Integer idNivel) {
+        this.idNivel = idNivel;
     }
 
-    public String getIdVivienda() {
-        return idVivienda;
+    public String getTiempoEstudio() {
+        return tiempoEstudio;
     }
 
-    public void setIdVivienda(String idVivienda) {
-        this.idVivienda = idVivienda;
+    public void setTiempoEstudio(String tiempoEstudio) {
+        this.tiempoEstudio = tiempoEstudio;
     }
 
-    public String getIdTrabajo() {
-        return idTrabajo;
+    @Override
+    public String getId() {
+        return cedula;
     }
 
-    public void setIdTrabajo(String idTrabajo) {
-        this.idTrabajo = idTrabajo;
+    @Override
+    public boolean isNew() {
+        return true;
     }
 
-    public Integer getIdFamilia() {
-        return idFamilia;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        Solicitante that = (Solicitante) o;
+        return Objects.equals(cedula, that.cedula);
     }
 
-    public void setIdFamilia(Integer idFamilia) {
-        this.idFamilia = idFamilia;
+    @Override
+    public int hashCode() {
+        return Objects.hash(cedula);
     }
 
-    public Integer getIdParroquia() {
-        return idParroquia;
-    }
-
-    public void setIdParroquia(Integer idParroquia) {
-        this.idParroquia = idParroquia;
+    @Override
+    public String toString() {
+        return "Solicitante{" +
+                "cedula='" + cedula + '\'' +
+                ", nombre='" + nombre + '\'' +
+                ", email='" + email + '\'' +
+                '}';
     }
 }

@@ -1,49 +1,95 @@
 package clinica_juridica.backend.repository;
 
 import clinica_juridica.backend.models.Caso;
-import org.springframework.data.repository.CrudRepository;
-import org.springframework.data.repository.query.Param;
-
-import java.util.List;
-
-import org.springframework.data.jdbc.repository.query.Query;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
-import clinica_juridica.backend.dto.projection.CasoListProjection;
-import clinica_juridica.backend.dto.projection.CasoBasicInfoProjection;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
+import java.util.Optional;
 
 @Repository
-public interface CasoRepository extends CrudRepository<Caso, String> {
+public class CasoRepository {
 
-        @Query("SELECT c.num_caso, al.materia, u.id_usuario as cedula, u.nombre, c.fecha_recepcion as fecha, c.estatus "
-                        +
-                        "FROM casos c " +
-                        "JOIN ambitos_legales al ON c.id_ambito_legal = al.id_ambito_legal " +
-                        "JOIN usuarios u ON c.id_solicitante = u.id_usuario")
-        List<CasoListProjection> findAllWithSolicitanteInfo();
+        private final JdbcTemplate jdbcTemplate;
 
-        @Query("SELECT c.num_caso, al.materia, u.id_usuario as cedula, u.nombre, c.fecha_recepcion as fecha, c.estatus "
-                        +
-                        "FROM casos c " +
-                        "JOIN ambitos_legales al ON c.id_ambito_legal = al.id_ambito_legal " +
-                        "JOIN usuarios u ON c.id_solicitante = u.id_usuario " +
-                        "WHERE c.estatus = :estatus")
-        List<CasoListProjection> findAllByEstatus(@Param("estatus") String estatus);
+        public CasoRepository(JdbcTemplate jdbcTemplate) {
+                this.jdbcTemplate = jdbcTemplate;
+        }
 
-        @Query("SELECT sp_registrar_caso(:#{#caso.idSolicitante}, 1, :#{#caso.idAmbitoLegal}, :#{#caso.fechaRecepcion}, :#{#caso.estatus}, :#{#caso.sintesis}, 0)")
-        String createCaso(@Param("caso") Caso caso);
+        private final RowMapper<Caso> rowMapper = new RowMapper<>() {
+                @Override
+                public Caso mapRow(ResultSet rs, int rowNum) throws SQLException {
+                        Caso caso = new Caso();
+                        caso.setNumCaso(rs.getString("num_caso"));
+                        caso.setFechaRecepcion(rs.getDate("fecha_recepcion") != null
+                                        ? rs.getDate("fecha_recepcion").toLocalDate()
+                                        : null);
+                        caso.setSintesis(rs.getString("sintesis"));
+                        caso.setTramite(rs.getString("tramite"));
+                        caso.setCantBeneficiarios(rs.getObject("cant_beneficiarios", Integer.class));
+                        caso.setEstatus(rs.getString("estatus"));
+                        caso.setCodCasoTribunal(rs.getString("cod_caso_tribunal"));
+                        caso.setFechaResCasoTri(rs.getDate("fecha_res_caso_tri") != null
+                                        ? rs.getDate("fecha_res_caso_tri").toLocalDate()
+                                        : null);
+                        caso.setFechaCreaCasoTri(rs.getDate("fecha_crea_caso_tri") != null
+                                        ? rs.getDate("fecha_crea_caso_tri").toLocalDate()
+                                        : null);
+                        caso.setIdTribunal(rs.getObject("id_tribunal", Integer.class));
+                        caso.setTermino(rs.getString("termino"));
+                        caso.setIdCentro(rs.getObject("id_centro", Integer.class));
+                        caso.setCedula(rs.getString("cedula"));
+                        caso.setUsername(rs.getString("username"));
+                        caso.setComAmbLegal(rs.getObject("com_amb_legal", Integer.class));
+                        return caso;
+                }
+        };
 
-        @Query("SELECT sp_actualizar_caso(:#{#caso.numCaso}, :#{#caso.idSolicitante}, 1, :#{#caso.idAmbitoLegal}, :#{#caso.fechaRecepcion}, :#{#caso.estatus}, :#{#caso.sintesis}, 0)")
-        String updateCaso(@Param("caso") Caso caso);
+        public List<Caso> findAll() {
+                String sql = "SELECT * FROM casos";
+                return jdbcTemplate.query(sql, rowMapper);
+        }
 
-        @Query("SELECT c.num_caso, c.fecha_recepcion, c.estatus, c.sintesis, c.cant_beneficiarios, " +
-                        "u.id_usuario as id_solicitante, u.nombre as nombre_solicitante, al.materia, cen.nombre as nombre_centro "
-                        +
-                        "FROM casos c " +
-                        "JOIN usuarios u ON c.id_solicitante = u.id_usuario " +
-                        "JOIN ambitos_legales al ON c.id_ambito_legal = al.id_ambito_legal " +
-                        "JOIN centros cen ON c.id_centro = cen.id_centro " +
-                        "WHERE c.num_caso = :numCaso")
-        java.util.Optional<CasoBasicInfoProjection> findCasoDetalleBasic(
-                        @Param("numCaso") String numCaso);
+        public Optional<Caso> findById(String numCaso) {
+                String sql = "SELECT * FROM casos WHERE num_caso = ?";
+                List<Caso> result = jdbcTemplate.query(sql, rowMapper, numCaso);
+                return result.stream().findFirst();
+        }
 
+        public int save(Caso c) {
+                String sql = "INSERT INTO casos (num_caso, fecha_recepcion, sintesis, tramite, cant_beneficiarios, estatus, "
+                                +
+                                "cod_caso_tribunal, fecha_res_caso_tri, fecha_crea_caso_tri, id_tribunal, termino, id_centro, "
+                                +
+                                "cedula, username, com_amb_legal) " +
+                                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                return jdbcTemplate.update(sql,
+                                c.getNumCaso(), c.getFechaRecepcion(), c.getSintesis(), c.getTramite(),
+                                c.getCantBeneficiarios(), c.getEstatus(),
+                                c.getCodCasoTribunal(), c.getFechaResCasoTri(), c.getFechaCreaCasoTri(),
+                                c.getIdTribunal(), c.getTermino(), c.getIdCentro(),
+                                c.getCedula(), c.getUsername(), c.getComAmbLegal());
+        }
+
+        public int update(Caso c) {
+                String sql = "UPDATE casos SET fecha_recepcion = ?, sintesis = ?, tramite = ?, cant_beneficiarios = ?, estatus = ?, "
+                                +
+                                "cod_caso_tribunal = ?, fecha_res_caso_tri = ?, fecha_crea_caso_tri = ?, id_tribunal = ?, termino = ?, "
+                                +
+                                "id_centro = ?, cedula = ?, username = ?, com_amb_legal = ? WHERE num_caso = ?";
+                return jdbcTemplate.update(sql,
+                                c.getFechaRecepcion(), c.getSintesis(), c.getTramite(), c.getCantBeneficiarios(),
+                                c.getEstatus(),
+                                c.getCodCasoTribunal(), c.getFechaResCasoTri(), c.getFechaCreaCasoTri(),
+                                c.getIdTribunal(), c.getTermino(),
+                                c.getIdCentro(), c.getCedula(), c.getUsername(), c.getComAmbLegal(), c.getNumCaso());
+        }
+
+        public int delete(String numCaso) {
+                String sql = "DELETE FROM casos WHERE num_caso = ?";
+                return jdbcTemplate.update(sql, numCaso);
+        }
 }
