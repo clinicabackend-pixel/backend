@@ -16,9 +16,9 @@ Esta conversación se ha centrado en alinear el backend del proyecto con el esqu
 - **Ajuste de Modelos Existentes**: Se refactorizaron modelos existentes como `Caso` y `Solicitante` para ser POJOs simples sin anotaciones de JPA (`@Entity`).
 
 ## 3. Implementación de Repositorios con SQL Nativo
-- **Eliminación de CrudRepository**: Se reemplazaron las interfaces de Spring Data Jpa (`CasoRepository`, `SolicitanteRepository`) por clases concretas anotadas con `@Repository`.
-- **JdbcTemplate**: Todos los repositorios (existentes y nuevos) ahora inyectan `JdbcTemplate`.
-- **Operaciones CRUD**: Se implementaron manualmente los métodos `findAll`, `findById`, `save`, `update` y `delete` utilizando sentencias SQL puras (`SELECT`, `INSERT`, `UPDATE`, `DELETE`).
+- **Eliminación de CrudRepository**: Se reemplazaron TODAS las interfaces de Spring Data JPA/JDBC (incluyendo `CasoRepository`, `SolicitanteRepository`, `CentroRepository`, `UsuarioRepository`, etc.) por clases concretas con `JdbcTemplate`.
+- **JdbcTemplate**: Los 34 repositorios del sistema ahora operan con SQL nativo.
+- **Operaciones CRUD**: Se implementaron manualmente los métodos `findAll`, `findById`, `save`, `update` y `delete`.
 - **RowMappers**: Se crearon `RowMapper` específicos para cada modelo para transformar los `ResultSet` de SQL a objetos Java.
 
 ## 4. Actualización de la Capa de Controladores
