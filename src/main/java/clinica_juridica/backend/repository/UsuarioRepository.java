@@ -6,6 +6,7 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
+@SuppressWarnings("null")
 public interface UsuarioRepository extends CrudRepository<Usuario, String> {
     Optional<Usuario> findByUsername(String username);
 }

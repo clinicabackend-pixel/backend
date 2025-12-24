@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
+@SuppressWarnings("null")
 public class MateriaAmbitoLegalRepository {
 
     private final JdbcTemplate jdbcTemplate;

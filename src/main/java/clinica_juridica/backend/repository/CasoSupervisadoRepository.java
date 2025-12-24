@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
+@SuppressWarnings("null")
 public class CasoSupervisadoRepository {
 
     private final JdbcTemplate jdbcTemplate;

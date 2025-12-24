@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
+@SuppressWarnings("null")
 public class SolicitanteRepository {
 
     private final JdbcTemplate jdbcTemplate;

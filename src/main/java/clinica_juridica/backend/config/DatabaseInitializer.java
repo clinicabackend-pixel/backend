@@ -44,6 +44,7 @@ public class DatabaseInitializer implements CommandLineRunner {
         return count != null && count > 0;
     }
 
+    @SuppressWarnings("null")
     private void executeSchema() throws SQLException {
         Resource resource = new ClassPathResource("schema.sql");
         if (resource.exists()) {

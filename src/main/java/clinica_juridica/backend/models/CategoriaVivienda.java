@@ -1,6 +1,5 @@
 package clinica_juridica.backend.models;
 
-import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 
 @Table("categorias_de_vivienda")
