@@ -9,6 +9,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/solicitantes")
+@SuppressWarnings("null")
 public class SolicitanteController {
 
     private final SolicitanteRepository solicitanteRepository;

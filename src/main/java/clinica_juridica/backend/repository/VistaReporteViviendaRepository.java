@@ -8,10 +8,13 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.lang.NonNull;
+
 @Repository
 public interface VistaReporteViviendaRepository extends CrudRepository<VistaReporteVivienda, String> {
 
     @Override
+    @NonNull
     @Query("SELECT * FROM vista_reporte_vivienda")
     List<VistaReporteVivienda> findAll();
 
