@@ -22,4 +22,7 @@ public interface DocumentoRepository extends CrudRepository<Documento, Integer> 
     @Query("INSERT INTO documentos (id_documento, num_caso, fecha_registro, folio_ini, folio_fin, titulo, observacion, username) VALUES (:id, :numCaso, :fechaRegistro, :folioIni, :folioFin, :titulo, :observacion, :username)")
     void saveManual(Integer id, String numCaso, java.time.LocalDate fechaRegistro, Integer folioIni, Integer folioFin,
             String titulo, String observacion, String username);
+
+    @Query("SELECT * FROM documentos WHERE num_caso = :numCaso")
+    List<Documento> findAllByNumCaso(String numCaso);
 }

@@ -22,4 +22,7 @@ public interface AccionRepository extends CrudRepository<Accion, Integer> {
     @Query("INSERT INTO accion (id_accion, num_caso, titulo, descripcion, fecha_registro, fecha_ejecucion, username) VALUES (:id, :numCaso, :titulo, :descripcion, :fechaRegistro, :fechaEjecucion, :username)")
     void saveManual(Integer id, String numCaso, String titulo, String descripcion, java.time.LocalDate fechaRegistro,
             java.time.LocalDate fechaEjecucion, String username);
+
+    @Query("SELECT * FROM accion WHERE num_caso = :numCaso")
+    List<Accion> findAllByNumCaso(String numCaso);
 }

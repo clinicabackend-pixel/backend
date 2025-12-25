@@ -22,4 +22,7 @@ public interface EncuentroRepository extends CrudRepository<Encuentro, Integer> 
     @Query("INSERT INTO encuentros (id_encuentros, num_caso, fecha_atencion, fecha_proxima, orientacion, observacion, username) VALUES (:id, :numCaso, :fechaAtencion, :fechaProxima, :orientacion, :observacion, :username)")
     void saveManual(Integer id, String numCaso, java.time.LocalDate fechaAtencion, java.time.LocalDate fechaProxima,
             String orientacion, String observacion, String username);
+
+    @Query("SELECT * FROM encuentros WHERE num_caso = :numCaso")
+    List<Encuentro> findAllByNumCaso(String numCaso);
 }

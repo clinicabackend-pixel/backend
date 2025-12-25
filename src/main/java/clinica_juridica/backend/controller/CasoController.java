@@ -8,6 +8,12 @@ import java.util.Map;
 
 import java.util.List;
 
+import clinica_juridica.backend.models.Accion;
+import clinica_juridica.backend.models.Encuentro;
+import clinica_juridica.backend.models.Documento;
+import clinica_juridica.backend.models.Prueba;
+import clinica_juridica.backend.dto.CasoDetalleDTO;
+
 @RestController
 @RequestMapping("/api/casos")
 public class CasoController {
@@ -24,6 +30,11 @@ public class CasoController {
             return ResponseEntity.ok(casoService.getCasosByEstatus(estatus));
         }
         return ResponseEntity.ok(casoService.getAll());
+    }
+
+    @GetMapping("/usuario/{username}/abiertos")
+    public ResponseEntity<List<Caso>> getCasosAbiertosPorUsuario(@PathVariable String username) {
+        return ResponseEntity.ok(casoService.getCasosAbiertosPorUsuario(username));
     }
 
     @GetMapping("/{id}")
@@ -66,5 +77,30 @@ public class CasoController {
         }
         casoService.updateEstatus(id, nuevoEstatus);
         return ResponseEntity.ok("Estatus actualizado exitosamente");
+    }
+
+    @GetMapping("/{id}/detalle")
+    public ResponseEntity<CasoDetalleDTO> getDetalle(@PathVariable String id) {
+        return ResponseEntity.ok(casoService.getCasoDetalle(id));
+    }
+
+    @GetMapping("/{id}/acciones")
+    public ResponseEntity<List<Accion>> getAcciones(@PathVariable String id) {
+        return ResponseEntity.ok(casoService.getAcciones(id));
+    }
+
+    @GetMapping("/{id}/encuentros")
+    public ResponseEntity<List<Encuentro>> getEncuentros(@PathVariable String id) {
+        return ResponseEntity.ok(casoService.getEncuentros(id));
+    }
+
+    @GetMapping("/{id}/documentos")
+    public ResponseEntity<List<Documento>> getDocumentos(@PathVariable String id) {
+        return ResponseEntity.ok(casoService.getDocumentos(id));
+    }
+
+    @GetMapping("/{id}/pruebas")
+    public ResponseEntity<List<Prueba>> getPruebas(@PathVariable String id) {
+        return ResponseEntity.ok(casoService.getPruebas(id));
     }
 }

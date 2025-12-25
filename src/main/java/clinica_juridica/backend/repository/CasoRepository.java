@@ -24,6 +24,9 @@ public interface CasoRepository extends CrudRepository<Caso, String> {
     @Query("SELECT * FROM casos WHERE estatus = :estatus")
     List<Caso> findAllByEstatus(String estatus);
 
+    @Query("SELECT c.* FROM casos c INNER JOIN casos_asignados ca ON c.num_caso = ca.num_caso WHERE ca.username = :username AND c.estatus = :estatus")
+    List<Caso> findAllByUsernameAndEstatus(String username, String estatus);
+
     @Modifying
     @Query("UPDATE casos SET estatus = :estatus WHERE num_caso = :numCaso")
     void updateEstatus(String numCaso, String estatus);

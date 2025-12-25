@@ -22,4 +22,7 @@ public interface PruebaRepository extends CrudRepository<Prueba, Integer> {
     @Query("INSERT INTO pruebas (id_prueba, num_caso, fecha, documento, observacion, titulo) VALUES (:id, :numCaso, :fecha, :documento, :observacion, :titulo)")
     void saveManual(Integer id, String numCaso, java.time.LocalDate fecha, String documento, String observacion,
             String titulo);
+
+    @Query("SELECT * FROM pruebas WHERE num_caso = :numCaso")
+    List<Prueba> findAllByNumCaso(String numCaso);
 }

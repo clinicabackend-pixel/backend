@@ -25,4 +25,8 @@ public class DateUtils {
         }
         return LocalDate.parse(dateStr, ISO_FORMATTER);
     }
+
+    public static LocalDate getCurrentDate() {
+        return LocalDate.now();
+    }
 }
