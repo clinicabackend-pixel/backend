@@ -41,7 +41,7 @@ public class CasoController {
             return ResponseEntity.notFound().build();
         }
         caso.setNumCaso(id);
-        casoRepository.update(caso);
+        casoRepository.save(caso); // CrudRepository uses save for update if ID exists
         return ResponseEntity.ok("Caso actualizado exitosamente");
     }
 
@@ -50,7 +50,7 @@ public class CasoController {
         if (casoRepository.findById(id).isEmpty()) {
             return ResponseEntity.notFound().build();
         }
-        casoRepository.delete(id);
+        casoRepository.deleteById(id);
         return ResponseEntity.ok("Caso eliminado exitosamente");
     }
 }

@@ -15,11 +15,9 @@ Esta conversación se ha centrado en alinear el backend del proyecto con el esqu
   - **Operaciones**: `CasoAsignado`, `CasoSupervisado`, `Accion`, `Encuentro`, `Prueba`, `Documento`, etc.
 - **Ajuste de Modelos Existentes**: Se refactorizaron modelos existentes como `Caso` y `Solicitante` para ser POJOs simples sin anotaciones de JPA (`@Entity`).
 
-## 3. Implementación de Repositorios con SQL Nativo
-- **Eliminación de CrudRepository**: Se reemplazaron TODAS las interfaces de Spring Data JPA/JDBC (incluyendo `CasoRepository`, `SolicitanteRepository`, `CentroRepository`, `UsuarioRepository`, etc.) por clases concretas con `JdbcTemplate`.
-- **JdbcTemplate**: Los 34 repositorios del sistema ahora operan con SQL nativo.
-- **Operaciones CRUD**: Se implementaron manualmente los métodos `findAll`, `findById`, `save`, `update` y `delete`.
-- **RowMappers**: Se crearon `RowMapper` específicos para cada modelo para transformar los `ResultSet` de SQL a objetos Java.
+- **Refactorización a Interfaces Compactas**: A petición del usuario ("hacerlo más compacto" y "¿no es mejor USAR @Query?"), se migraron los 34 repositorios de clases manuales con `JdbcTemplate` a interfaces que extienden `CrudRepository`.
+- **Uso de @Query**: Se añadieron anotaciones `@Query("SELECT ...")` explícitas para las operaciones de lectura (`findAll`, `findById`) para mantener la visibilidad del SQL nativo.
+- **Operaciones CRUD**: Se estandarizó el uso de los métodos nativos de Spring Data JDBC (`save`, `deleteById`) para maximizar la limpieza y mantenibilidad del código.
 
 ## 4. Actualización de la Capa de Controladores
 - **Inyección Directa**: Los controladores (`CasoController`, `SolicitanteController`) se actualizaron para llamar directamente a los métodos de los nuevos repositorios `JdbcTemplate`.

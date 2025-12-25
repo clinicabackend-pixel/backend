@@ -41,7 +41,7 @@ public class SolicitanteController {
             return ResponseEntity.notFound().build();
         }
         solicitante.setCedula(id); // Ensure ID consistency
-        solicitanteRepository.update(solicitante);
+        solicitanteRepository.save(solicitante); // CrudRepository uses save for update if ID exists
         return ResponseEntity.ok("Solicitante actualizado exitosamente");
     }
 
@@ -50,7 +50,7 @@ public class SolicitanteController {
         if (solicitanteRepository.findById(id).isEmpty()) {
             return ResponseEntity.notFound().build();
         }
-        solicitanteRepository.delete(id);
+        solicitanteRepository.deleteById(id);
         return ResponseEntity.ok("Solicitante eliminado exitosamente");
     }
 }
