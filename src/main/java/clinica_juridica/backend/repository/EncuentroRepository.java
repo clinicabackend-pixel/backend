@@ -14,4 +14,12 @@ public interface EncuentroRepository extends CrudRepository<Encuentro, Integer> 
     @NonNull
     @Query("SELECT * FROM encuentros")
     List<Encuentro> findAll();
+
+    @Query("SELECT COALESCE(MAX(id_encuentros), 0) FROM encuentros WHERE num_caso = :numCaso")
+    Integer findMaxIdByNumCaso(String numCaso);
+
+    @org.springframework.data.jdbc.repository.query.Modifying
+    @Query("INSERT INTO encuentros (id_encuentros, num_caso, fecha_atencion, fecha_proxima, orientacion, observacion, username) VALUES (:id, :numCaso, :fechaAtencion, :fechaProxima, :orientacion, :observacion, :username)")
+    void saveManual(Integer id, String numCaso, java.time.LocalDate fechaAtencion, java.time.LocalDate fechaProxima,
+            String orientacion, String observacion, String username);
 }

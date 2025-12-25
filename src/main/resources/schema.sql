@@ -225,7 +225,7 @@ CREATE TABLE caracteristicas_viviendas (
   PRIMARY KEY (cedula, id_tipo_cat, id_cat_vivienda),
   CONSTRAINT fk_carac_viv FOREIGN KEY (cedula) REFERENCES viviendas(cedula),
   CONSTRAINT fk_carac_cat FOREIGN KEY (id_cat_vivienda, id_tipo_cat) 
-      REFERENCES categorias_de_vivienda(id_cat_vivienda, id_tipo_cat)
+  REFERENCES categorias_de_vivienda(id_cat_vivienda, id_tipo_cat)
 );
 
 -- 1.7 CASOS
@@ -285,58 +285,65 @@ CREATE TABLE casos_supervisados (
 -- 1.9 DETALLES OPERATIVOS (Tablas hijas de casos)
 -- ----------------------------------------------------------------
 CREATE TABLE estatus_por_caso (
-  id_est_caso SERIAL PRIMARY KEY,
+  id_est_caso INTEGER,
   num_caso VARCHAR(50),
   fecha_cambio DATE,
-  status_ant VARCHAR(50),
+  estatus VARCHAR(50),
+  observacion VARCHAR(200),
+  PRIMARY KEY (num_caso, id_est_caso),
   CONSTRAINT fk_est_caso FOREIGN KEY (num_caso) REFERENCES casos(num_caso)
 );
 
 CREATE TABLE accion (
-  id_accion SERIAL PRIMARY KEY,
+  id_accion INTEGER,
   num_caso VARCHAR(50),
   titulo VARCHAR(150),
   descripcion TEXT,
   fecha_registro DATE,
   fecha_ejecucion DATE,
   username VARCHAR(50),
+  PRIMARY KEY (num_caso, id_accion),
   CONSTRAINT fk_acc_usr FOREIGN KEY (username) REFERENCES usuarios(username),
   CONSTRAINT fk_acc_caso FOREIGN KEY (num_caso) REFERENCES casos(num_caso)
 );
 
 CREATE TABLE acciones_ejecutadas (
-  id_accion_ejecutada SERIAL PRIMARY KEY,
+  id_accion_ejecutada INTEGER,
   id_accion INTEGER, 
   num_caso VARCHAR(50),
   username VARCHAR(50),
+  PRIMARY KEY (num_caso, id_accion_ejecutada),
   CONSTRAINT fk_ejec_usr FOREIGN KEY (username) REFERENCES usuarios(username),
   CONSTRAINT fk_ejec_caso FOREIGN KEY (num_caso) REFERENCES casos(num_caso),
-  CONSTRAINT fk_ejec_acc FOREIGN KEY (id_accion) REFERENCES accion(id_accion)
+  CONSTRAINT fk_ejec_acc FOREIGN KEY (num_caso, id_accion) REFERENCES accion(num_caso, id_accion)
 );
 
 CREATE TABLE encuentros (
-  id_encuentros SERIAL PRIMARY KEY,
+  id_encuentros INTEGER,
   num_caso VARCHAR(50),
   fecha_atencion DATE,
   fecha_proxima DATE,
   orientacion TEXT,
   observacion TEXT,
   username VARCHAR(50),
-  CONSTRAINT fk_enc_usr FOREIGN KEY (username) REFERENCES usuarios(username)
+  PRIMARY KEY (num_caso, id_encuentros),
+  CONSTRAINT fk_enc_usr FOREIGN KEY (username) REFERENCES usuarios(username),
+  CONSTRAINT fk_enc_caso FOREIGN KEY (num_caso) REFERENCES casos(num_caso)
 );
 
 CREATE TABLE encuentros_atendidos (
-  id_encuentro_atendido SERIAL PRIMARY KEY,
+  id_encuentro_atendido INTEGER,
   id_encuentro INTEGER,
   num_caso VARCHAR(50),
   username VARCHAR(50),
-  CONSTRAINT fk_aten_enc FOREIGN KEY (id_encuentro) REFERENCES encuentros(id_encuentros),
+  PRIMARY KEY (num_caso, id_encuentro_atendido),
+  CONSTRAINT fk_aten_enc FOREIGN KEY (num_caso, id_encuentro) REFERENCES encuentros(num_caso, id_encuentros),
   CONSTRAINT fk_aten_usr FOREIGN KEY (username) REFERENCES usuarios(username),
   CONSTRAINT fk_aten_caso FOREIGN KEY (num_caso) REFERENCES casos(num_caso)
 );
 
 CREATE TABLE documentos (
-  id_documento SERIAL PRIMARY KEY,
+  id_documento INTEGER,
   num_caso VARCHAR(50),
   fecha_registro DATE,
   folio_ini INTEGER,
@@ -344,16 +351,18 @@ CREATE TABLE documentos (
   titulo VARCHAR(150),
   observacion TEXT,
   username VARCHAR(50),
+  PRIMARY KEY (num_caso, id_documento),
   CONSTRAINT fk_doc_caso FOREIGN KEY (num_caso) REFERENCES casos(num_caso)
 );
 
 CREATE TABLE pruebas (
-  id_prueba SERIAL PRIMARY KEY,
+  id_prueba INTEGER,
   num_caso VARCHAR(50),
   fecha DATE,
   documento VARCHAR(150),
   observacion TEXT,
   titulo VARCHAR(150),
+  PRIMARY KEY (num_caso, id_prueba),
   CONSTRAINT fk_pru_caso FOREIGN KEY (num_caso) REFERENCES casos(num_caso)
 );
 
@@ -2137,6 +2146,10 @@ BEGIN
         p_ambito_legal,
         NULL, NULL, NULL
     );
+
+    -- 4.1 Insertar estatus inicial en historial (ID = 1)
+    INSERT INTO estatus_por_caso (id_est_caso, num_caso, fecha_cambio, estatus, observacion)
+    VALUES (1, v_num_caso_generado, CURRENT_DATE, 'ABIERTO', 'Creación del caso');
 
     -- 5. Retornar el código generado para que el backend lo sepa
     RETURN v_num_caso_generado;

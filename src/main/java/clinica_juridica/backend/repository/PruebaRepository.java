@@ -14,4 +14,12 @@ public interface PruebaRepository extends CrudRepository<Prueba, Integer> {
     @NonNull
     @Query("SELECT * FROM pruebas")
     List<Prueba> findAll();
+
+    @Query("SELECT COALESCE(MAX(id_prueba), 0) FROM pruebas WHERE num_caso = :numCaso")
+    Integer findMaxIdByNumCaso(String numCaso);
+
+    @org.springframework.data.jdbc.repository.query.Modifying
+    @Query("INSERT INTO pruebas (id_prueba, num_caso, fecha, documento, observacion, titulo) VALUES (:id, :numCaso, :fecha, :documento, :observacion, :titulo)")
+    void saveManual(Integer id, String numCaso, java.time.LocalDate fecha, String documento, String observacion,
+            String titulo);
 }

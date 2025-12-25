@@ -14,4 +14,11 @@ public interface AccionEjecutadaRepository extends CrudRepository<AccionEjecutad
     @NonNull
     @Query("SELECT * FROM acciones_ejecutadas")
     List<AccionEjecutada> findAll();
+
+    @Query("SELECT COALESCE(MAX(id_accion_ejecutada), 0) FROM acciones_ejecutadas WHERE num_caso = :numCaso")
+    Integer findMaxIdByNumCaso(String numCaso);
+
+    @org.springframework.data.jdbc.repository.query.Modifying
+    @Query("INSERT INTO acciones_ejecutadas (id_accion_ejecutada, id_accion, num_caso, username) VALUES (:id, :idAccion, :numCaso, :username)")
+    void saveManual(Integer id, Integer idAccion, String numCaso, String username);
 }

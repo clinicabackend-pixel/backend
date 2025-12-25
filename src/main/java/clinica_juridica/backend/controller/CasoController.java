@@ -4,6 +4,7 @@ import clinica_juridica.backend.models.Caso;
 import clinica_juridica.backend.service.CasoService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import java.util.Map;
 
 import java.util.List;
 
@@ -54,5 +55,16 @@ public class CasoController {
         }
         casoService.delete(id);
         return ResponseEntity.ok("Caso eliminado exitosamente");
+    }
+
+    @PatchMapping("/{id}/estatus")
+    public ResponseEntity<String> updateEstatus(@PathVariable String id,
+            @RequestBody Map<String, String> body) {
+        String nuevoEstatus = body.get("estatus");
+        if (nuevoEstatus == null) {
+            return ResponseEntity.badRequest().body("El campo 'estatus' es obligatorio");
+        }
+        casoService.updateEstatus(id, nuevoEstatus);
+        return ResponseEntity.ok("Estatus actualizado exitosamente");
     }
 }
