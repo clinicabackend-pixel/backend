@@ -1,113 +1,54 @@
-
 package clinica_juridica.backend.service;
 
+import clinica_juridica.backend.models.Caso;
+import clinica_juridica.backend.repository.CasoRepository;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class CasoService {
 
-        public CasoService() {
+        private final CasoRepository casoRepository;
+
+        public CasoService(CasoRepository casoRepository) {
+                this.casoRepository = casoRepository;
         }
 
-        /*
-         * public List<CasoListResponse> findAllWithSolicitanteInfo() {
-         * var casos = casoRepository.findAllWithSolicitanteInfo();
-         * if (casos.isEmpty()) {
-         * return List.of();
-         * }
-         * 
-         * var numCasos =
-         * casos.stream().map(clinica_juridica.backend.dto.projection.CasoListProjection
-         * ::numCaso).toList();
-         * var estudiantesMap =
-         * asignacionRepository.findNombresByNumCasos(numCasos).stream()
-         * .collect(java.util.stream.Collectors.groupingBy(
-         * clinica_juridica.backend.dto.projection.NombreEstudianteProjection::numCaso,
-         * java.util.stream.Collectors.mapping(
-         * p -> new clinica_juridica.backend.dto.response.EstudianteResumidoResponse(
-         * p.idEstudiante(),
-         * p.nombre()),
-         * java.util.stream.Collectors.toList())));
-         * 
-         * return casos.stream().map(c -> new CasoListResponse(
-         * c.numCaso(),
-         * c.materia(),
-         * c.cedula(),
-         * c.nombre(),
-         * c.fecha(),
-         * c.estatus(),
-         * estudiantesMap.getOrDefault(c.numCaso(), List.of()))).toList();
-         * }
-         */
+        public List<Caso> getAll() {
+                return (List<Caso>) casoRepository.findAll();
+        }
 
-        /*
-         * public List<CasoListResponse> getCasosByStatus(String status) {
-         * var casos = casoRepository.findAllByEstatus(status);
-         * if (casos.isEmpty()) {
-         * return List.of();
-         * }
-         * 
-         * var numCasos =
-         * casos.stream().map(clinica_juridica.backend.dto.projection.CasoListProjection
-         * ::numCaso).toList();
-         * var estudiantesMap =
-         * asignacionRepository.findNombresByNumCasos(numCasos).stream()
-         * .collect(java.util.stream.Collectors.groupingBy(
-         * clinica_juridica.backend.dto.projection.NombreEstudianteProjection::numCaso,
-         * java.util.stream.Collectors.mapping(
-         * p -> new clinica_juridica.backend.dto.response.EstudianteResumidoResponse(
-         * p.idEstudiante(),
-         * p.nombre()),
-         * java.util.stream.Collectors.toList())));
-         * 
-         * return casos.stream().map(c -> new CasoListResponse(
-         * c.numCaso(),
-         * c.materia(),
-         * c.cedula(),
-         * c.nombre(),
-         * c.fecha(),
-         * c.estatus(),
-         * estudiantesMap.getOrDefault(c.numCaso(), List.of()))).toList();
-         * }
-         */
+        public List<Caso> getCasosByEstatus(String estatus) {
+                return casoRepository.findAllByEstatus(estatus);
+        }
 
-        /*
-         * public String createCaso(Caso caso) {
-         * return casoRepository.createCaso(caso);
-         * }
-         * public String updateCaso(Caso caso) {
-         * return casoRepository.updateCaso(caso);
-         * }
-         */
+        public Optional<Caso> getById(String id) {
+                return casoRepository.findById(id);
+        }
 
-        /*
-         * public clinica_juridica.backend.dto.response.CasoDetalleResponse
-         * getCasoDetalle(String numCaso) {
-         * var basicInfo = casoRepository.findCasoDetalleBasic(numCaso)
-         * .orElseThrow(() -> new RuntimeException("Caso no encontrado: " + numCaso));
-         * 
-         * var asignaciones = asignacionRepository.findByNumCaso(numCaso);
-         * var beneficiarios = beneficiarioCasoRepository.findByNumCaso(numCaso);
-         * var citas = citaRepository.findByNumCaso(numCaso);
-         * var acciones = accionRepository.findByNumCaso(numCaso);
-         * var expediente =
-         * expedienteTribunalRepository.findByNumCaso(numCaso).orElse(null);
-         * 
-         * return new clinica_juridica.backend.dto.response.CasoDetalleResponse(
-         * basicInfo.numCaso(),
-         * basicInfo.fechaRecepcion(),
-         * basicInfo.estatus(),
-         * basicInfo.sintesis(),
-         * basicInfo.cantBeneficiarios(),
-         * basicInfo.idSolicitante(),
-         * basicInfo.nombreSolicitante(),
-         * basicInfo.materia(),
-         * basicInfo.nombreCentro(),
-         * expediente,
-         * beneficiarios,
-         * asignaciones,
-         * citas,
-         * acciones);
-         * }
-         */
+        public Caso create(Caso caso) {
+                String numCaso = casoRepository.registrarNuevoCaso(
+                                caso.getSintesis(),
+                                caso.getTramite(),
+                                caso.getCantBeneficiarios(),
+                                caso.getIdTribunal(),
+                                caso.getTermino(),
+                                caso.getIdCentro(),
+                                caso.getCedula(),
+                                caso.getUsername(),
+                                caso.getComAmbLegal());
+                caso.setNumCaso(numCaso);
+                return caso;
+        }
+
+        public Caso update(String id, Caso caso) {
+                caso.setNumCaso(id);
+                return casoRepository.save(caso);
+        }
+
+        public void delete(String id) {
+                casoRepository.deleteById(id);
+        }
 }

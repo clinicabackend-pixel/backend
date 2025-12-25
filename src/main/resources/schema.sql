@@ -2142,3 +2142,68 @@ BEGIN
     RETURN v_num_caso_generado;
 END;
 $$ LANGUAGE plpgsql;
+
+
+-- ============================================================
+-- VISTA REPORTE VIVIENDA
+-- ============================================================
+
+
+CREATE VIEW vista_reporte_vivienda AS
+SELECT 
+    v.cedula,
+    s.nombre,
+    -- Tipo 1: Tipo de Vivienda
+    cat1.descripcion AS tipo_vivienda,
+    -- Tipo 2: Material del Piso
+    cat2.descripcion AS material_piso,
+    -- Tipo 3: Material Paredes
+    cat3.descripcion AS material_paredes,
+    -- Tipo 4: Material Techo
+    cat4.descripcion AS material_techo,
+    -- Tipo 5: Agua Potable
+    cat5.descripcion AS servicio_agua,
+    -- Tipo 6: Excretas
+    cat6.descripcion AS eliminacion_excretas,
+    -- Tipo 7: Aseo Urbano
+    cat7.descripcion AS aseo_urbano,
+    -- Vivenda (Datos base)
+    v.cant_habit,
+    v.cant_banos
+FROM viviendas v
+JOIN solicitantes s ON v.cedula = s.cedula
+-- Join para Tipo 1 (Tipo Vivienda)
+LEFT JOIN caracteristicas_viviendas car1 
+    ON v.cedula = car1.cedula AND car1.id_tipo_cat = 1
+LEFT JOIN categorias_de_vivienda cat1 
+    ON car1.id_cat_vivienda = cat1.id_cat_vivienda AND car1.id_tipo_cat = cat1.id_tipo_cat
+-- Join para Tipo 2 (Piso)
+LEFT JOIN caracteristicas_viviendas car2 
+    ON v.cedula = car2.cedula AND car2.id_tipo_cat = 2
+LEFT JOIN categorias_de_vivienda cat2 
+    ON car2.id_cat_vivienda = cat2.id_cat_vivienda AND car2.id_tipo_cat = cat2.id_tipo_cat
+-- Join para Tipo 3 (Paredes)
+LEFT JOIN caracteristicas_viviendas car3 
+    ON v.cedula = car3.cedula AND car3.id_tipo_cat = 3
+LEFT JOIN categorias_de_vivienda cat3 
+    ON car3.id_cat_vivienda = cat3.id_cat_vivienda AND car3.id_tipo_cat = cat3.id_tipo_cat
+-- Join para Tipo 4 (Techo)
+LEFT JOIN caracteristicas_viviendas car4 
+    ON v.cedula = car4.cedula AND car4.id_tipo_cat = 4
+LEFT JOIN categorias_de_vivienda cat4 
+    ON car4.id_cat_vivienda = cat4.id_cat_vivienda AND car4.id_tipo_cat = cat4.id_tipo_cat
+-- Join para Tipo 5 (Agua)
+LEFT JOIN caracteristicas_viviendas car5 
+    ON v.cedula = car5.cedula AND car5.id_tipo_cat = 5
+LEFT JOIN categorias_de_vivienda cat5 
+    ON car5.id_cat_vivienda = cat5.id_cat_vivienda AND car5.id_tipo_cat = cat5.id_tipo_cat
+-- Join para Tipo 6 (Excretas)
+LEFT JOIN caracteristicas_viviendas car6 
+    ON v.cedula = car6.cedula AND car6.id_tipo_cat = 6
+LEFT JOIN categorias_de_vivienda cat6 
+    ON car6.id_cat_vivienda = cat6.id_cat_vivienda AND car6.id_tipo_cat = cat6.id_tipo_cat
+-- Join para Tipo 7 (Aseo)
+LEFT JOIN caracteristicas_viviendas car7 
+    ON v.cedula = car7.cedula AND car7.id_tipo_cat = 7
+LEFT JOIN categorias_de_vivienda cat7 
+    ON car7.id_cat_vivienda = cat7.id_cat_vivienda AND car7.id_tipo_cat = cat7.id_tipo_cat;

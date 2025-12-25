@@ -1,0 +1,20 @@
+package clinica_juridica.backend.repository;
+
+import clinica_juridica.backend.models.VistaReporteVivienda;
+import org.springframework.data.jdbc.repository.query.Query;
+import org.springframework.data.repository.CrudRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+import java.util.Optional;
+
+@Repository
+public interface VistaReporteViviendaRepository extends CrudRepository<VistaReporteVivienda, String> {
+
+    @Override
+    @Query("SELECT * FROM vista_reporte_vivienda")
+    List<VistaReporteVivienda> findAll();
+
+    @Query("SELECT * FROM vista_reporte_vivienda WHERE cedula = :cedula")
+    Optional<VistaReporteVivienda> findByCedula(String cedula);
+}
