@@ -10,7 +10,7 @@ public class AmbitoLegalResponse {
 
     @Schema(description = "Descripción o nombre del ámbito legal", example = "CIVIL")
     private String descripcion;
-    
+
     @Schema(description = "Tipo de nodo (MATERIA, CATEGORIA, SUBCATEGORIA)", example = "MATERIA")
     private String tipo;
 
@@ -24,8 +24,9 @@ public class AmbitoLegalResponse {
         this.id = id;
         this.descripcion = descripcion;
     }
-    
-    public AmbitoLegalResponse(Integer id, String descripcion, String tipo, java.util.List<AmbitoLegalResponse> children) {
+
+    public AmbitoLegalResponse(Integer id, String descripcion, String tipo,
+            java.util.List<AmbitoLegalResponse> children) {
         this.id = id;
         this.descripcion = descripcion;
         this.tipo = tipo;
@@ -47,10 +48,20 @@ public class AmbitoLegalResponse {
     public void setDescripcion(String descripcion) {
         this.descripcion = descripcion;
     }
-    
-    public String getTipo() { return tipo; }
-    public void setTipo(String tipo) { this.tipo = tipo; }
-    
-    public java.util.List<AmbitoLegalResponse> getChildren() { return children; }
-    public void setChildren(java.util.List<AmbitoLegalResponse> children) { this.children = children; }
+
+    public String getTipo() {
+        return tipo;
+    }
+
+    public void setTipo(String tipo) {
+        this.tipo = tipo;
+    }
+
+    public java.util.List<AmbitoLegalResponse> getChildren() {
+        return children;
+    }
+
+    public void setChildren(java.util.List<AmbitoLegalResponse> children) {
+        this.children = children;
+    }
 }

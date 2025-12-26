@@ -45,6 +45,8 @@ public class CasoService {
         private final CasoSupervisadoRepository casoSupervisadoRepository;
         private final AccionEjecutadaRepository accionEjecutadaRepository;
         private final EncuentroAtendidoRepository encuentroAtendidoRepository;
+        private final clinica_juridica.backend.repository.EstudianteRepository estudianteRepository;
+        private final clinica_juridica.backend.repository.ProfesorRepository profesorRepository;
 
         public CasoService(CasoRepository casoRepository,
                         EstatusPorCasoRepository estatusPorCasoRepository,
@@ -55,7 +57,9 @@ public class CasoService {
                         CasoAsignadoRepository casoAsignadoRepository,
                         CasoSupervisadoRepository casoSupervisadoRepository,
                         AccionEjecutadaRepository accionEjecutadaRepository,
-                        EncuentroAtendidoRepository encuentroAtendidoRepository) {
+                        EncuentroAtendidoRepository encuentroAtendidoRepository,
+                        clinica_juridica.backend.repository.EstudianteRepository estudianteRepository,
+                        clinica_juridica.backend.repository.ProfesorRepository profesorRepository) {
                 this.casoRepository = casoRepository;
                 this.estatusPorCasoRepository = estatusPorCasoRepository;
                 this.accionRepository = accionRepository;
@@ -66,6 +70,8 @@ public class CasoService {
                 this.casoSupervisadoRepository = casoSupervisadoRepository;
                 this.accionEjecutadaRepository = accionEjecutadaRepository;
                 this.encuentroAtendidoRepository = encuentroAtendidoRepository;
+                this.estudianteRepository = estudianteRepository;
+                this.profesorRepository = profesorRepository;
         }
 
         public List<CasoSummaryResponse> getAllSummary() {
@@ -289,6 +295,81 @@ public class CasoService {
                 Integer nextId = (maxId == null) ? 1 : maxId + 1;
                 pruebaRepository.saveManual(nextId, numCaso, dto.getFecha(), dto.getDocumento(), dto.getObservacion(),
                                 dto.getTitulo());
+        }
+
+        @Transactional
+        public void deleteDocumento(String numCaso, Integer idDocumento) {
+                if (!casoRepository.existsById(numCaso)) {
+                        throw new RuntimeException("Caso no encontrado: " + numCaso);
+                }
+                documentoRepository.deleteByNumCasoAndIdDocumento(numCaso, idDocumento);
+        }
+
+        @Transactional
+        public void deletePrueba(String numCaso, Integer idPrueba) {
+                if (!casoRepository.existsById(numCaso)) {
+                        throw new RuntimeException("Caso no encontrado: " + numCaso);
+                }
+                pruebaRepository.deleteByNumCasoAndIdPrueba(numCaso, idPrueba);
+        }
+
+        @Transactional
+        public void assignStudent(CasoAsignacionRequest dto) {
+                if (!casoRepository.existsById(dto.getNumCaso())) {
+                        throw new RuntimeException("Caso no encontrado: " + dto.getNumCaso());
+                }
+
+                // Validar que el estudiante exista en el término indicado
+                if (!estudianteRepository.existsByUsernameAndTermino(dto.getUsername(), dto.getTermino())) {
+                        throw new RuntimeException("El usuario '" + dto.getUsername()
+                                        + "' no está registrado como estudiante en el término '" + dto.getTermino()
+                                        + "'.");
+                }
+
+                casoAsignadoRepository.saveManual(dto.getNumCaso(), dto.getUsername(), dto.getTermino());
+        }
+
+        @Transactional
+        public void assignSupervisor(CasoSupervisionRequest dto) {
+                if (!casoRepository.existsById(dto.getNumCaso())) {
+                        throw new RuntimeException("Caso no encontrado: " + dto.getNumCaso());
+                }
+
+                // Validar que el profesor existe en el término indicado
+                if (!profesorRepository.existsByUsernameAndTermino(dto.getUsername(), dto.getTermino())) {
+                        throw new RuntimeException("El usuario '" + dto.getUsername()
+                                        + "' no está registrado como profesor en el término '" + dto.getTermino()
+                                        + "'.");
+                }
+
+                casoSupervisadoRepository.saveManual(dto.getNumCaso(), dto.getUsername(), dto.getTermino());
+        }
+
+        @Transactional
+        public void updateAccionFechaEjecucion(String numCaso, Integer idAccion, AccionExecutionDateRequest dto) {
+                Caso caso = casoRepository.findById(numCaso)
+                                .orElseThrow(() -> new RuntimeException("Caso no encontrado: " + numCaso));
+
+                // Actualizar fecha
+                accionRepository.updateFechaEjecucion(numCaso, idAccion, dto.getFechaEjecucion());
+
+                // Actualizar lista de ejecutantes si se proporciona
+                if (dto.getUsernames() != null) {
+                        for (String username : dto.getUsernames()) {
+                                // Validar que el estudiante esté registrado en el término del caso
+                                if (!estudianteRepository.existsByUsernameAndTermino(username, caso.getTermino())) {
+                                        throw new RuntimeException("El estudiante '" + username
+                                                        + "' no está registrado en el término '" + caso.getTermino()
+                                                        + "'.");
+                                }
+
+                                // Insertar solo si no existe previamente (evitar duplicados en el historial)
+                                if (!accionEjecutadaRepository.existsByNumCasoAndIdAccionAndUsername(numCaso, idAccion,
+                                                username)) {
+                                        accionEjecutadaRepository.saveManual(idAccion, numCaso, username);
+                                }
+                        }
+                }
         }
 
         @Transactional

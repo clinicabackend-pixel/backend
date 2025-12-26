@@ -187,6 +187,20 @@ public class CasoController {
         return ResponseEntity.ok(casoService.getPruebas(id));
     }
 
+    @Operation(summary = "Actualizar fecha de ejecución de acción", description = "Modifica la fecha de ejecución de una acción específica.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Fecha actualizada exitosamente"),
+            @ApiResponse(responseCode = "404", description = "Caso accción no encontrada")
+    })
+    @PatchMapping("/{id}/acciones/{idAccion}/fecha-ejecucion")
+    public ResponseEntity<Void> updateAccionFechaEjecucion(
+            @Parameter(description = "ID del caso") @PathVariable String id,
+            @Parameter(description = "ID de la acción") @PathVariable Integer idAccion,
+            @RequestBody AccionExecutionDateRequest request) {
+        casoService.updateAccionFechaEjecucion(id, idAccion, request);
+        return ResponseEntity.ok().build();
+    }
+
     @Operation(summary = "Eliminar acción", description = "Elimina una acción específica de un caso.")
     @ApiResponse(responseCode = "204", description = "Acción eliminada exitosamente")
     @DeleteMapping("/{id}/acciones/{idAccion}")
@@ -197,6 +211,44 @@ public class CasoController {
         return ResponseEntity.noContent().build();
     }
 
+    @Operation(summary = "Asignar estudiante a caso", description = "Asigna un estudiante a un caso específico validando su registro en el término indicado.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Asignación exitosa"),
+            @ApiResponse(responseCode = "400", description = "Error de validación (Estudiante no encontrado/Término incorrecto)"),
+            @ApiResponse(responseCode = "404", description = "Caso no encontrado")
+    })
+    @PostMapping("/{id}/asignacion")
+    public ResponseEntity<String> assignStudent(
+            @Parameter(description = "ID del caso") @PathVariable String id,
+            @RequestBody CasoAsignacionRequest request) {
+        try {
+            request.setNumCaso(id);
+            casoService.assignStudent(request);
+            return ResponseEntity.ok("Estudiante asignado exitosamente");
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @Operation(summary = "Asignar supervisor a caso", description = "Asigna un profesor supervisor a un caso validando su registro.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Asignación de supervisión exitosa"),
+            @ApiResponse(responseCode = "400", description = "Error de validación"),
+            @ApiResponse(responseCode = "404", description = "Caso no encontrado")
+    })
+    @PostMapping("/{id}/supervision")
+    public ResponseEntity<String> assignSupervisor(
+            @Parameter(description = "ID del caso") @PathVariable String id,
+            @RequestBody CasoSupervisionRequest request) {
+        try {
+            request.setNumCaso(id);
+            casoService.assignSupervisor(request);
+            return ResponseEntity.ok("Supervisor asignado exitosamente");
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
     @Operation(summary = "Eliminar encuentro", description = "Elimina un encuentro específico de un caso.")
     @ApiResponse(responseCode = "204", description = "Encuentro eliminado exitosamente")
     @DeleteMapping("/{id}/encuentros/{idEncuentro}")
@@ -204,6 +256,26 @@ public class CasoController {
             @Parameter(description = "ID del caso") @PathVariable String id,
             @Parameter(description = "ID del encuentro a eliminar") @PathVariable Integer idEncuentro) {
         casoService.deleteEncuentro(id, idEncuentro);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Operation(summary = "Eliminar documento", description = "Elimina un documento específico de un caso.")
+    @ApiResponse(responseCode = "204", description = "Documento eliminado exitosamente")
+    @DeleteMapping("/{id}/documentos/{idDocumento}")
+    public ResponseEntity<Void> deleteDocumento(
+            @Parameter(description = "ID del caso") @PathVariable String id,
+            @Parameter(description = "ID del documento a eliminar") @PathVariable Integer idDocumento) {
+        casoService.deleteDocumento(id, idDocumento);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Operation(summary = "Eliminar prueba", description = "Elimina una prueba específica de un caso.")
+    @ApiResponse(responseCode = "204", description = "Prueba eliminada exitosamente")
+    @DeleteMapping("/{id}/pruebas/{idPrueba}")
+    public ResponseEntity<Void> deletePrueba(
+            @Parameter(description = "ID del caso") @PathVariable String id,
+            @Parameter(description = "ID de la prueba a eliminar") @PathVariable Integer idPrueba) {
+        casoService.deletePrueba(id, idPrueba);
         return ResponseEntity.noContent().build();
     }
 }

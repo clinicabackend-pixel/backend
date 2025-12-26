@@ -6,6 +6,7 @@ import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
+import org.springframework.data.jdbc.repository.query.Modifying;
 import java.util.List;
 
 @Repository
@@ -15,7 +16,7 @@ public interface EncuentroAtendidoRepository extends CrudRepository<EncuentroAte
     @Query("SELECT * FROM encuentros_atendidos")
     List<EncuentroAtendido> findAll();
 
-    @org.springframework.data.jdbc.repository.query.Modifying
+    @Modifying
     @Query("INSERT INTO encuentros_atendidos (id_encuentro, num_caso, username) VALUES (:idEncuentro, :numCaso, :username)")
     void saveManual(Integer idEncuentro, String numCaso, String username);
 }

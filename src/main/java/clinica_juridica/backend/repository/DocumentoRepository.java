@@ -5,7 +5,7 @@ import org.springframework.lang.NonNull;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
-
+import org.springframework.data.jdbc.repository.query.Modifying;
 import java.util.List;
 
 @Repository
@@ -18,11 +18,15 @@ public interface DocumentoRepository extends CrudRepository<Documento, Integer> 
     @Query("SELECT COALESCE(MAX(id_documento), 0) FROM documentos WHERE num_caso = :numCaso")
     Integer findMaxIdByNumCaso(String numCaso);
 
-    @org.springframework.data.jdbc.repository.query.Modifying
+    @Modifying
     @Query("INSERT INTO documentos (id_documento, num_caso, fecha_registro, folio_ini, folio_fin, titulo, observacion, username) VALUES (:id, :numCaso, :fechaRegistro, :folioIni, :folioFin, :titulo, :observacion, :username)")
     void saveManual(Integer id, String numCaso, java.time.LocalDate fechaRegistro, Integer folioIni, Integer folioFin,
             String titulo, String observacion, String username);
 
     @Query("SELECT * FROM documentos WHERE num_caso = :numCaso")
     List<Documento> findAllByNumCaso(String numCaso);
+
+    @Modifying
+    @Query("DELETE FROM documentos WHERE num_caso = :numCaso AND id_documento = :id")
+    void deleteByNumCasoAndIdDocumento(String numCaso, Integer id);
 }

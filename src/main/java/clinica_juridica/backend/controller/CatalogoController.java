@@ -28,6 +28,12 @@ public class CatalogoController {
         return ResponseEntity.ok(catalogoService.getAmbitosLegalesTree());
     }
 
+    @Operation(summary = "Catálogo de Viviendas", description = "Retorna la jerarquía de tipos y categorías de vivienda con estatus.")
+    @GetMapping("/viviendas")
+    public ResponseEntity<List<clinica_juridica.backend.dto.response.TipoViviendaResponse>> getViviendas() {
+        return ResponseEntity.ok(catalogoService.getViviendas());
+    }
+
     @Operation(summary = "Listar Tribunales", description = "Retorna la lista de todos los tribunales disponibles.")
     @GetMapping("/tribunales")
     public ResponseEntity<List<clinica_juridica.backend.dto.response.TribunalResponse>> getTribunales() {

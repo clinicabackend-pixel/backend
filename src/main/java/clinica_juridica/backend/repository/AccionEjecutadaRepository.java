@@ -23,4 +23,7 @@ public interface AccionEjecutadaRepository extends CrudRepository<AccionEjecutad
     @Modifying
     @Query("DELETE FROM acciones_ejecutadas WHERE num_caso = :numCaso AND id_accion = :idAccion")
     void deleteByNumCasoAndIdAccion(String numCaso, Integer idAccion);
+
+    @Query("SELECT COUNT(*) > 0 FROM acciones_ejecutadas WHERE num_caso = :numCaso AND id_accion = :idAccion AND username = :username")
+    boolean existsByNumCasoAndIdAccionAndUsername(String numCaso, Integer idAccion, String username);
 }
