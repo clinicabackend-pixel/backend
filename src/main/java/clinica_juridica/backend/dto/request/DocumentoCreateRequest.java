@@ -1,8 +1,8 @@
-package clinica_juridica.backend.dto;
+package clinica_juridica.backend.dto.request;
 
 import java.time.LocalDate;
 
-public class CreateDocumentoDTO {
+public class DocumentoCreateRequest {
     private LocalDate fechaRegistro;
     private Integer folioIni;
     private Integer folioFin;

@@ -1,9 +1,9 @@
-package clinica_juridica.backend.dto;
+package clinica_juridica.backend.dto.request;
 
 import java.time.LocalDate;
 import java.util.List;
 
-public class CreateAccionDTO {
+public class AccionCreateRequest {
     private String titulo;
     private String descripcion;
     private LocalDate fechaRegistro;

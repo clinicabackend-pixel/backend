@@ -266,7 +266,7 @@ CREATE TABLE casos_asignados (
   username VARCHAR(50),
   termino VARCHAR(20),
   PRIMARY KEY (num_caso, username, termino),
-  CONSTRAINT fk_asig_caso FOREIGN KEY (num_caso) REFERENCES casos(num_caso),
+  CONSTRAINT fk_asig_caso FOREIGN KEY (num_caso) REFERENCES casos(num_caso) ON DELETE CASCADE,
   CONSTRAINT fk_asig_est FOREIGN KEY (username, termino) REFERENCES estudiantes(username, termino)
 );
 
@@ -275,7 +275,7 @@ CREATE TABLE casos_supervisados (
   username VARCHAR(50),
   termino VARCHAR(20),
   PRIMARY KEY (num_caso, username, termino),
-  CONSTRAINT fk_sup_caso FOREIGN KEY (num_caso) REFERENCES casos(num_caso),
+  CONSTRAINT fk_sup_caso FOREIGN KEY (num_caso) REFERENCES casos(num_caso) ON DELETE CASCADE,
   CONSTRAINT fk_sup_prof FOREIGN KEY (username) REFERENCES profesores(username),
   CONSTRAINT fk_sup_sem FOREIGN KEY (termino) REFERENCES semestre(termino)
 );
@@ -289,7 +289,7 @@ CREATE TABLE estatus_por_caso (
   estatus VARCHAR(50),
   observacion VARCHAR(200),
   PRIMARY KEY (num_caso, id_est_caso),
-  CONSTRAINT fk_est_caso FOREIGN KEY (num_caso) REFERENCES casos(num_caso)
+  CONSTRAINT fk_est_caso FOREIGN KEY (num_caso) REFERENCES casos(num_caso) ON DELETE CASCADE
 );
 
 CREATE TABLE accion (
@@ -302,7 +302,7 @@ CREATE TABLE accion (
   username VARCHAR(50),
   PRIMARY KEY (num_caso, id_accion),
   CONSTRAINT fk_acc_usr FOREIGN KEY (username) REFERENCES usuarios(username),
-  CONSTRAINT fk_acc_caso FOREIGN KEY (num_caso) REFERENCES casos(num_caso)
+  CONSTRAINT fk_acc_caso FOREIGN KEY (num_caso) REFERENCES casos(num_caso) ON DELETE CASCADE
 );
 
 CREATE TABLE acciones_ejecutadas (
@@ -311,7 +311,7 @@ CREATE TABLE acciones_ejecutadas (
   username VARCHAR(50),
   PRIMARY KEY (num_caso, id_accion, username),
   CONSTRAINT fk_ejec_usr FOREIGN KEY (username) REFERENCES usuarios(username),
-  CONSTRAINT fk_ejec_caso FOREIGN KEY (num_caso) REFERENCES casos(num_caso),
+  CONSTRAINT fk_ejec_caso FOREIGN KEY (num_caso) REFERENCES casos(num_caso) ON DELETE CASCADE,
   CONSTRAINT fk_ejec_acc FOREIGN KEY (num_caso, id_accion) REFERENCES accion(num_caso, id_accion) ON DELETE CASCADE
 );
 
@@ -325,7 +325,7 @@ CREATE TABLE encuentros (
   username VARCHAR(50),
   PRIMARY KEY (num_caso, id_encuentros),
   CONSTRAINT fk_enc_usr FOREIGN KEY (username) REFERENCES usuarios(username),
-  CONSTRAINT fk_enc_caso FOREIGN KEY (num_caso) REFERENCES casos(num_caso)
+  CONSTRAINT fk_enc_caso FOREIGN KEY (num_caso) REFERENCES casos(num_caso) ON DELETE CASCADE
 );
 
 CREATE TABLE encuentros_atendidos (
@@ -335,7 +335,7 @@ CREATE TABLE encuentros_atendidos (
   PRIMARY KEY (num_caso, id_encuentro, username),
   CONSTRAINT fk_aten_enc FOREIGN KEY (num_caso, id_encuentro) REFERENCES encuentros(num_caso, id_encuentros) ON DELETE CASCADE,
   CONSTRAINT fk_aten_usr FOREIGN KEY (username) REFERENCES usuarios(username),
-  CONSTRAINT fk_aten_caso FOREIGN KEY (num_caso) REFERENCES casos(num_caso)
+  CONSTRAINT fk_aten_caso FOREIGN KEY (num_caso) REFERENCES casos(num_caso) ON DELETE CASCADE
 );
 
 CREATE TABLE documentos (
@@ -348,7 +348,7 @@ CREATE TABLE documentos (
   observacion TEXT,
   username VARCHAR(50),
   PRIMARY KEY (num_caso, id_documento),
-  CONSTRAINT fk_doc_caso FOREIGN KEY (num_caso) REFERENCES casos(num_caso)
+  CONSTRAINT fk_doc_caso FOREIGN KEY (num_caso) REFERENCES casos(num_caso) ON DELETE CASCADE
 );
 
 CREATE TABLE pruebas (
@@ -359,7 +359,7 @@ CREATE TABLE pruebas (
   observacion TEXT,
   titulo VARCHAR(150),
   PRIMARY KEY (num_caso, id_prueba),
-  CONSTRAINT fk_pru_caso FOREIGN KEY (num_caso) REFERENCES casos(num_caso)
+  CONSTRAINT fk_pru_caso FOREIGN KEY (num_caso) REFERENCES casos(num_caso) ON DELETE CASCADE
 );
 
 -- ================================================================

@@ -13,17 +13,18 @@ import clinica_juridica.backend.models.Accion;
 import clinica_juridica.backend.models.Encuentro;
 import clinica_juridica.backend.models.Documento;
 import clinica_juridica.backend.models.Prueba;
-import clinica_juridica.backend.dto.CasoDetalleDTO;
+import clinica_juridica.backend.dto.response.CasoDetalleResponse;
 import clinica_juridica.backend.repository.AccionRepository;
 import clinica_juridica.backend.repository.EncuentroRepository;
 import clinica_juridica.backend.repository.DocumentoRepository;
 import clinica_juridica.backend.repository.PruebaRepository;
-import clinica_juridica.backend.dto.CasoAsignadoDTO;
-import clinica_juridica.backend.dto.CasoSupervisadoDTO;
+import clinica_juridica.backend.dto.projection.CasoAsignadoProjection;
+import clinica_juridica.backend.dto.projection.CasoSupervisadoProjection;
 import clinica_juridica.backend.repository.CasoAsignadoRepository;
 import clinica_juridica.backend.repository.CasoSupervisadoRepository;
 import clinica_juridica.backend.repository.AccionEjecutadaRepository;
 import clinica_juridica.backend.repository.EncuentroAtendidoRepository;
+import clinica_juridica.backend.dto.request.*;
 
 @Service
 @SuppressWarnings("null")
@@ -94,7 +95,7 @@ public class CasoService {
         }
 
         @Transactional
-        public void update(String id, clinica_juridica.backend.dto.UpdateCasoDTO dto) {
+        public void update(String id, CasoUpdateRequest dto) {
                 if (!casoRepository.existsById(id)) {
                         throw new RuntimeException("Caso no encontrado: " + id);
                 }
@@ -125,7 +126,7 @@ public class CasoService {
         }
 
         @Transactional
-        public void createAccion(String numCaso, clinica_juridica.backend.dto.CreateAccionDTO dto) {
+        public void createAccion(String numCaso, AccionCreateRequest dto) {
                 if (!casoRepository.existsById(numCaso)) {
                         throw new RuntimeException("Caso no encontrado: " + numCaso);
                 }
@@ -159,7 +160,7 @@ public class CasoService {
         }
 
         @Transactional
-        public void createEncuentro(String numCaso, clinica_juridica.backend.dto.CreateEncuentroDTO dto) {
+        public void createEncuentro(String numCaso, EncuentroCreateRequest dto) {
                 if (!casoRepository.existsById(numCaso)) {
                         throw new RuntimeException("Caso no encontrado: " + numCaso);
                 }
@@ -176,7 +177,7 @@ public class CasoService {
         }
 
         @Transactional
-        public void createDocumento(String numCaso, clinica_juridica.backend.dto.CreateDocumentoDTO dto) {
+        public void createDocumento(String numCaso, DocumentoCreateRequest dto) {
                 if (!casoRepository.existsById(numCaso)) {
                         throw new RuntimeException("Caso no encontrado: " + numCaso);
                 }
@@ -188,7 +189,7 @@ public class CasoService {
         }
 
         @Transactional
-        public void createPrueba(String numCaso, clinica_juridica.backend.dto.CreatePruebaDTO dto) {
+        public void createPrueba(String numCaso, PruebaCreateRequest dto) {
                 if (!casoRepository.existsById(numCaso)) {
                         throw new RuntimeException("Caso no encontrado: " + numCaso);
                 }
@@ -214,18 +215,11 @@ public class CasoService {
                 return pruebaRepository.findAllByNumCaso(id);
         }
 
-        public List<CasoAsignadoDTO> getAsignados(String id) {
-                return casoAsignadoRepository.findAllByNumCaso(id);
-        }
-
-        public List<CasoSupervisadoDTO> getSupervisores(String id) {
-                return casoSupervisadoRepository.findAllByNumCaso(id);
-        }
-
-        public CasoDetalleDTO getCasoDetalle(String id) {
+        @Transactional
+        public CasoDetalleResponse getCasoDetalle(String id) {
                 Caso caso = casoRepository.findById(id)
                                 .orElseThrow(() -> new RuntimeException("Caso no encontrado: " + id));
-                return new CasoDetalleDTO(
+                return new CasoDetalleResponse(
                                 caso,
                                 getAcciones(id),
                                 getEncuentros(id),
@@ -233,5 +227,13 @@ public class CasoService {
                                 getPruebas(id),
                                 getAsignados(id),
                                 getSupervisores(id));
+        }
+
+        public List<CasoAsignadoProjection> getAsignados(String id) {
+                return casoAsignadoRepository.findAllByNumCaso(id);
+        }
+
+        public List<CasoSupervisadoProjection> getSupervisores(String id) {
+                return casoSupervisadoRepository.findAllByNumCaso(id);
         }
 }

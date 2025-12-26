@@ -1,6 +1,6 @@
-package clinica_juridica.backend.dto;
+package clinica_juridica.backend.dto.request;
 
-public class LoginRequest {
+public class AuthLoginRequest {
     private String username;
     private String password;
 

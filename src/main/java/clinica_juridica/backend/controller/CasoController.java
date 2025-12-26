@@ -12,8 +12,8 @@ import clinica_juridica.backend.models.Accion;
 import clinica_juridica.backend.models.Encuentro;
 import clinica_juridica.backend.models.Documento;
 import clinica_juridica.backend.models.Prueba;
-import clinica_juridica.backend.dto.CasoDetalleDTO;
-import clinica_juridica.backend.dto.UpdateCasoDTO;
+import clinica_juridica.backend.dto.response.CasoDetalleResponse;
+import clinica_juridica.backend.dto.request.*;
 
 @RestController
 @RequestMapping("/api/casos")
@@ -53,7 +53,7 @@ public class CasoController {
 
     @PutMapping("/{id}")
     public ResponseEntity<String> update(@PathVariable String id,
-            @RequestBody UpdateCasoDTO dto) {
+            @RequestBody CasoUpdateRequest dto) {
         try {
             casoService.update(id, dto);
             return ResponseEntity.ok("Caso actualizado exitosamente");
@@ -83,36 +83,32 @@ public class CasoController {
     }
 
     @GetMapping("/{id}/detalle")
-    public ResponseEntity<CasoDetalleDTO> getDetalle(@PathVariable String id) {
-        return ResponseEntity.ok(casoService.getCasoDetalle(id));
+    public CasoDetalleResponse getCasoDetalle(@PathVariable String id) {
+        return casoService.getCasoDetalle(id);
     }
 
     @PostMapping("/{id}/acciones")
-    public ResponseEntity<Void> createAccion(@PathVariable String id,
-            @RequestBody clinica_juridica.backend.dto.CreateAccionDTO dto) {
+    public void createAccion(@PathVariable String id,
+            @RequestBody AccionCreateRequest dto) {
         casoService.createAccion(id, dto);
-        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/{id}/encuentros")
-    public ResponseEntity<Void> createEncuentro(@PathVariable String id,
-            @RequestBody clinica_juridica.backend.dto.CreateEncuentroDTO dto) {
+    public void createEncuentro(@PathVariable String id,
+            @RequestBody EncuentroCreateRequest dto) {
         casoService.createEncuentro(id, dto);
-        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/{id}/documentos")
-    public ResponseEntity<Void> createDocumento(@PathVariable String id,
-            @RequestBody clinica_juridica.backend.dto.CreateDocumentoDTO dto) {
+    public void createDocumento(@PathVariable String id,
+            @RequestBody DocumentoCreateRequest dto) {
         casoService.createDocumento(id, dto);
-        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/{id}/pruebas")
-    public ResponseEntity<Void> createPrueba(@PathVariable String id,
-            @RequestBody clinica_juridica.backend.dto.CreatePruebaDTO dto) {
+    public void createPrueba(@PathVariable String id,
+            @RequestBody PruebaCreateRequest dto) {
         casoService.createPrueba(id, dto);
-        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/{id}/acciones")

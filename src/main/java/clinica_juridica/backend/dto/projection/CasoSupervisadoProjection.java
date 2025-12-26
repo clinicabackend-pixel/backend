@@ -1,12 +1,12 @@
-package clinica_juridica.backend.dto;
+package clinica_juridica.backend.dto.projection;
 
-public class CasoAsignadoDTO {
+public class CasoSupervisadoProjection {
     private String numCaso;
     private String username;
     private String termino;
     private String nombre; // Nombre del usuario
 
-    public CasoAsignadoDTO(String numCaso, String username, String termino, String nombre) {
+    public CasoSupervisadoProjection(String numCaso, String username, String termino, String nombre) {
         this.numCaso = numCaso;
         this.username = username;
         this.termino = termino;

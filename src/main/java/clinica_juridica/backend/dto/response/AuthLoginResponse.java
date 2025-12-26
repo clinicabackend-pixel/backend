@@ -1,9 +1,9 @@
-package clinica_juridica.backend.dto;
+package clinica_juridica.backend.dto.response;
 
-public class AuthResponse {
+public class AuthLoginResponse {
     private String jwt;
 
-    public AuthResponse(String jwt) {
+    public AuthLoginResponse(String jwt) {
         this.jwt = jwt;
     }
 

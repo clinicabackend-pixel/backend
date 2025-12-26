@@ -1,8 +1,8 @@
-package clinica_juridica.backend.dto;
+package clinica_juridica.backend.dto.request;
 
 import java.time.LocalDate;
 
-public class CreatePruebaDTO {
+public class PruebaCreateRequest {
     private LocalDate fecha;
     private String documento;
     private String observacion;
