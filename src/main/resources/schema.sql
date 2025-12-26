@@ -240,11 +240,9 @@ CREATE TABLE casos (
   cod_caso_tribunal VARCHAR(50),
   fecha_res_caso_tri DATE,
   fecha_crea_caso_tri DATE,
-  
   id_tribunal INTEGER,
   termino VARCHAR(20),
   id_centro INTEGER,
-  
   cedula VARCHAR(20),
   username VARCHAR(50),
   com_amb_legal INTEGER,
@@ -257,7 +255,7 @@ CREATE TABLE casos (
   CONSTRAINT fk_caso_sol FOREIGN KEY (cedula) REFERENCES solicitantes(cedula),
   
   CONSTRAINT chk_caso_estatus CHECK (estatus IN ('ABIERTO', 'EN TRÁMITE', 'EN PAUSA', 'CERRADO')),
-  CONSTRAINT chk_caso_tramite CHECK (tramite IN ('ASESORÍA', 'CONCILIACIÓN Y MEDIACIÓN', 'REDACCIÓN DE DOC.'))
+  CONSTRAINT chk_caso_tramite CHECK (tramite IN ('ASESORÍA', 'CONCILIACIÓN Y MEDIACIÓN', 'REDACCIÓN DE DOCUMENTOS'))
 );
 CREATE INDEX idx_casos_mix ON casos(id_centro, termino, username, cedula);
 
@@ -308,14 +306,13 @@ CREATE TABLE accion (
 );
 
 CREATE TABLE acciones_ejecutadas (
-  id_accion_ejecutada INTEGER,
   id_accion INTEGER, 
   num_caso VARCHAR(50),
   username VARCHAR(50),
-  PRIMARY KEY (num_caso, id_accion_ejecutada),
+  PRIMARY KEY (num_caso, id_accion, username),
   CONSTRAINT fk_ejec_usr FOREIGN KEY (username) REFERENCES usuarios(username),
   CONSTRAINT fk_ejec_caso FOREIGN KEY (num_caso) REFERENCES casos(num_caso),
-  CONSTRAINT fk_ejec_acc FOREIGN KEY (num_caso, id_accion) REFERENCES accion(num_caso, id_accion)
+  CONSTRAINT fk_ejec_acc FOREIGN KEY (num_caso, id_accion) REFERENCES accion(num_caso, id_accion) ON DELETE CASCADE
 );
 
 CREATE TABLE encuentros (
@@ -332,12 +329,11 @@ CREATE TABLE encuentros (
 );
 
 CREATE TABLE encuentros_atendidos (
-  id_encuentro_atendido INTEGER,
   id_encuentro INTEGER,
   num_caso VARCHAR(50),
   username VARCHAR(50),
-  PRIMARY KEY (num_caso, id_encuentro_atendido),
-  CONSTRAINT fk_aten_enc FOREIGN KEY (num_caso, id_encuentro) REFERENCES encuentros(num_caso, id_encuentros),
+  PRIMARY KEY (num_caso, id_encuentro, username),
+  CONSTRAINT fk_aten_enc FOREIGN KEY (num_caso, id_encuentro) REFERENCES encuentros(num_caso, id_encuentros) ON DELETE CASCADE,
   CONSTRAINT fk_aten_usr FOREIGN KEY (username) REFERENCES usuarios(username),
   CONSTRAINT fk_aten_caso FOREIGN KEY (num_caso) REFERENCES casos(num_caso)
 );

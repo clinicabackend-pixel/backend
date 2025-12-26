@@ -5,6 +5,7 @@ import org.springframework.lang.NonNull;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
+import org.springframework.data.jdbc.repository.query.Modifying;
 
 import java.util.List;
 
@@ -25,4 +26,8 @@ public interface AccionRepository extends CrudRepository<Accion, Integer> {
 
     @Query("SELECT * FROM accion WHERE num_caso = :numCaso")
     List<Accion> findAllByNumCaso(String numCaso);
+
+    @Modifying
+    @Query("DELETE FROM accion WHERE num_caso = :numCaso AND id_accion = :id")
+    void deleteByNumCasoAndIdAccion(String numCaso, Integer id);
 }

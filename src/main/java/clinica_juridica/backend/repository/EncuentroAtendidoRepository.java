@@ -15,10 +15,7 @@ public interface EncuentroAtendidoRepository extends CrudRepository<EncuentroAte
     @Query("SELECT * FROM encuentros_atendidos")
     List<EncuentroAtendido> findAll();
 
-    @Query("SELECT COALESCE(MAX(id_encuentro_atendido), 0) FROM encuentros_atendidos WHERE num_caso = :numCaso")
-    Integer findMaxIdByNumCaso(String numCaso);
-
     @org.springframework.data.jdbc.repository.query.Modifying
-    @Query("INSERT INTO encuentros_atendidos (id_encuentro_atendido, id_encuentro, num_caso, username) VALUES (:id, :idEncuentro, :numCaso, :username)")
-    void saveManual(Integer id, Integer idEncuentro, String numCaso, String username);
+    @Query("INSERT INTO encuentros_atendidos (id_encuentro, num_caso, username) VALUES (:idEncuentro, :numCaso, :username)")
+    void saveManual(Integer idEncuentro, String numCaso, String username);
 }

@@ -9,14 +9,34 @@ public class CasoDetalleDTO {
     private List<Encuentro> encuentros;
     private List<Documento> documentos;
     private List<Prueba> pruebas;
+    private List<CasoAsignadoDTO> asignados;
+    private List<CasoSupervisadoDTO> supervisores;
 
     public CasoDetalleDTO(Caso caso, List<Accion> acciones, List<Encuentro> encuentros, List<Documento> documentos,
-            List<Prueba> pruebas) {
+            List<Prueba> pruebas, List<CasoAsignadoDTO> asignados, List<CasoSupervisadoDTO> supervisores) {
         this.caso = caso;
         this.acciones = acciones;
         this.encuentros = encuentros;
         this.documentos = documentos;
         this.pruebas = pruebas;
+        this.asignados = asignados;
+        this.supervisores = supervisores;
+    }
+
+    public List<CasoAsignadoDTO> getAsignados() {
+        return asignados;
+    }
+
+    public void setAsignados(List<CasoAsignadoDTO> asignados) {
+        this.asignados = asignados;
+    }
+
+    public List<CasoSupervisadoDTO> getSupervisores() {
+        return supervisores;
+    }
+
+    public void setSupervisores(List<CasoSupervisadoDTO> supervisores) {
+        this.supervisores = supervisores;
     }
 
     public Caso getCaso() {

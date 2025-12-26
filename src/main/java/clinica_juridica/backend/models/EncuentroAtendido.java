@@ -1,12 +1,10 @@
 package clinica_juridica.backend.models;
 
-import org.springframework.data.annotation.Id;
+
 import org.springframework.data.relational.core.mapping.Table;
 
 @Table("encuentros_atendidos")
 public class EncuentroAtendido {
-    @Id
-    private Integer idEncuentroAtendido;
     private Integer idEncuentro;
     private String numCaso;
     private String username;
@@ -14,19 +12,10 @@ public class EncuentroAtendido {
     public EncuentroAtendido() {
     }
 
-    public EncuentroAtendido(Integer idEncuentroAtendido, Integer idEncuentro, String numCaso, String username) {
-        this.idEncuentroAtendido = idEncuentroAtendido;
+    public EncuentroAtendido(Integer idEncuentro, String numCaso, String username) {
         this.idEncuentro = idEncuentro;
         this.numCaso = numCaso;
         this.username = username;
-    }
-
-    public Integer getIdEncuentroAtendido() {
-        return idEncuentroAtendido;
-    }
-
-    public void setIdEncuentroAtendido(Integer idEncuentroAtendido) {
-        this.idEncuentroAtendido = idEncuentroAtendido;
     }
 
     public Integer getIdEncuentro() {
@@ -55,6 +44,7 @@ public class EncuentroAtendido {
 
     @Override
     public String toString() {
-        return "EncuentroAtendido{idEncuentroAtendido=" + idEncuentroAtendido + "}";
+        return "EncuentroAtendido{idEncuentro=" + idEncuentro + ", numCaso='" + numCaso + "', username='" + username
+                + "'}";
     }
 }

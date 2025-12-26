@@ -8,10 +8,15 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+import clinica_juridica.backend.dto.CasoSupervisadoDTO;
+
 @Repository
 public interface CasoSupervisadoRepository extends CrudRepository<CasoSupervisado, Integer> {
     @Override
     @NonNull
     @Query("SELECT * FROM casos_supervisados")
     List<CasoSupervisado> findAll();
+
+    @Query("SELECT cs.num_caso, cs.username, cs.termino, u.nombre FROM casos_supervisados cs INNER JOIN usuarios u ON cs.username = u.username WHERE cs.num_caso = :numCaso AND cs.termino = (SELECT MAX(termino) FROM casos_supervisados WHERE num_caso = :numCaso)")
+    List<CasoSupervisadoDTO> findAllByNumCaso(String numCaso);
 }
