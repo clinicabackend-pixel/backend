@@ -1,31 +1,27 @@
-package clinica_juridica.backend.models;
+package clinica_juridica.backend.dto.response;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.relational.core.mapping.Table;
-import java.time.LocalDate;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.time.LocalDate;
 
-@Table("pruebas")
-@Schema(description = "Entidad que representa una prueba o evidencia en un caso")
-public class Prueba {
-    @Id
-    @Schema(description = "Identificador único de la prueba")
+@Schema(description = "Respuesta de una prueba registrada")
+public class PruebaResponse {
+    @Schema(description = "ID de la prueba")
     private Integer idPrueba;
-    @Schema(description = "Número del caso asociado")
+    @Schema(description = "Número de caso")
     private String numCaso;
-    @Schema(description = "Fecha de la prueba")
+    @Schema(description = "Fecha")
     private LocalDate fecha;
-    @Schema(description = "Nombre o descripción del documento probatorio")
+    @Schema(description = "Título o documento de prueba")
     private String documento;
-    @Schema(description = "Observaciones adicionales")
+    @Schema(description = "Observación")
     private String observacion;
-    @Schema(description = "Título de la prueba")
+    @Schema(description = "Título")
     private String titulo;
 
-    public Prueba() {
+    public PruebaResponse() {
     }
 
-    public Prueba(Integer idPrueba, String numCaso, LocalDate fecha, String documento, String observacion,
+    public PruebaResponse(Integer idPrueba, String numCaso, LocalDate fecha, String documento, String observacion,
             String titulo) {
         this.idPrueba = idPrueba;
         this.numCaso = numCaso;
@@ -81,10 +77,5 @@ public class Prueba {
 
     public void setTitulo(String titulo) {
         this.titulo = titulo;
-    }
-
-    @Override
-    public String toString() {
-        return "Prueba{idPrueba=" + idPrueba + ", titulo='" + titulo + "'}";
     }
 }

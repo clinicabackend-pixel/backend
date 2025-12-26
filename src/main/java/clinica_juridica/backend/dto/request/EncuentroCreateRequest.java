@@ -2,13 +2,21 @@ package clinica_juridica.backend.dto.request;
 
 import java.time.LocalDate;
 import java.util.List;
+import io.swagger.v3.oas.annotations.media.Schema;
 
+@Schema(description = "Solicitud para registrar un nuevo encuentro")
 public class EncuentroCreateRequest {
+    @Schema(description = "Fecha de atención", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDate fechaAtencion;
+    @Schema(description = "Fecha de la próxima cita")
     private LocalDate fechaProxima;
+    @Schema(description = "Orientación brindada")
     private String orientacion;
+    @Schema(description = "Observaciones adicionales")
     private String observacion;
+    @Schema(description = "Usuario responsable")
     private String username; // The one who registers
+    @Schema(description = "Lista de usuarios atendidos")
     private List<String> atendidos; // List of usernames who attended
 
     public LocalDate getFechaAtencion() {

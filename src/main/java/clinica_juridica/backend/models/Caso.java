@@ -3,28 +3,45 @@ package clinica_juridica.backend.models;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.domain.Persistable;
 import org.springframework.data.relational.core.mapping.Table;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDate;
 import java.util.Objects;
 
 @Table("casos")
+@Schema(description = "Entidad que representa un caso legal")
 public class Caso implements Persistable<String> {
 
     @Id
+    @Schema(description = "Identificador único del caso (Número de caso)", example = "C-2023-001")
     private String numCaso;
+    @Schema(description = "Fecha de recepción del caso")
     private LocalDate fechaRecepcion;
+    @Schema(description = "Resumen o síntesis del caso")
     private String sintesis;
+    @Schema(description = "Trámite legal asociado")
     private String tramite;
+    @Schema(description = "Cantidad de beneficiarios implicados")
     private Integer cantBeneficiarios;
+    @Schema(description = "Estatus actual del caso", example = "ABIERTO")
     private String estatus;
+    @Schema(description = "Código del caso en el tribunal (si aplica)")
     private String codCasoTribunal;
+    @Schema(description = "Fecha de resolución del caso en tribunal")
     private LocalDate fechaResCasoTri;
+    @Schema(description = "Fecha de creación del caso en tribunal")
     private LocalDate fechaCreaCasoTri;
+    @Schema(description = "ID del tribunal asociado")
     private Integer idTribunal;
+    @Schema(description = "Término legal")
     private String termino;
+    @Schema(description = "ID del centro asociado")
     private Integer idCentro;
+    @Schema(description = "Cédula del cliente")
     private String cedula;
+    @Schema(description = "Nombre de usuario del abogado/estudiante asignado")
     private String username;
+    @Schema(description = "Competencia de ámbito legal")
     private Integer comAmbLegal;
 
     public Caso() {

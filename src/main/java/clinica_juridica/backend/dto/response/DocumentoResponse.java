@@ -1,19 +1,15 @@
-package clinica_juridica.backend.models;
+package clinica_juridica.backend.dto.response;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.relational.core.mapping.Table;
-import java.time.LocalDate;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.time.LocalDate;
 
-@Table("documentos")
-@Schema(description = "Entidad que representa un documento legal o administrativo")
-public class Documento {
-    @Id
-    @Schema(description = "Identificador único del documento")
+@Schema(description = "Respuesta de un documento registrado")
+public class DocumentoResponse {
+    @Schema(description = "ID del documento")
     private Integer idDocumento;
-    @Schema(description = "Número del caso asociado")
+    @Schema(description = "Número de caso")
     private String numCaso;
-    @Schema(description = "Fecha de registro del documento")
+    @Schema(description = "Fecha de registro")
     private LocalDate fechaRegistro;
     @Schema(description = "Folio inicial")
     private Integer folioIni;
@@ -21,16 +17,16 @@ public class Documento {
     private Integer folioFin;
     @Schema(description = "Título del documento")
     private String titulo;
-    @Schema(description = "Observaciones sobre el documento")
+    @Schema(description = "Observación")
     private String observacion;
-    @Schema(description = "Usuario que registró el documento")
+    @Schema(description = "Usuario que registró")
     private String username;
 
-    public Documento() {
+    public DocumentoResponse() {
     }
 
-    public Documento(Integer idDocumento, String numCaso, LocalDate fechaRegistro, Integer folioIni, Integer folioFin,
-            String titulo, String observacion, String username) {
+    public DocumentoResponse(Integer idDocumento, String numCaso, LocalDate fechaRegistro, Integer folioIni,
+            Integer folioFin, String titulo, String observacion, String username) {
         this.idDocumento = idDocumento;
         this.numCaso = numCaso;
         this.fechaRegistro = fechaRegistro;
@@ -103,10 +99,5 @@ public class Documento {
 
     public void setUsername(String username) {
         this.username = username;
-    }
-
-    @Override
-    public String toString() {
-        return "Documento{idDocumento=" + idDocumento + ", titulo='" + titulo + "'}";
     }
 }

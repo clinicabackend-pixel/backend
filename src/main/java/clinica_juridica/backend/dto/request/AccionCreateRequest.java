@@ -2,13 +2,21 @@ package clinica_juridica.backend.dto.request;
 
 import java.time.LocalDate;
 import java.util.List;
+import io.swagger.v3.oas.annotations.media.Schema;
 
+@Schema(description = "Solicitud para registrar una nueva acción en un caso")
 public class AccionCreateRequest {
+    @Schema(description = "Título de la acción", requiredMode = Schema.RequiredMode.REQUIRED)
     private String titulo;
+    @Schema(description = "Descripción detallada")
     private String descripcion;
+    @Schema(description = "Fecha de registro")
     private LocalDate fechaRegistro;
+    @Schema(description = "Fecha de ejecución")
     private LocalDate fechaEjecucion;
+    @Schema(description = "Usuario que registra")
     private String username; // The one who registers
+    @Schema(description = "Lista de usuarios ejecutantes")
     private List<String> ejecutantes; // List of usernames who executed it
 
     public String getTitulo() {

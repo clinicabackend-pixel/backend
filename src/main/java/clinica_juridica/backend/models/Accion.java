@@ -3,16 +3,25 @@ package clinica_juridica.backend.models;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 import java.time.LocalDate;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 @Table("accion")
+@Schema(description = "Entidad que representa una acción realizada en un caso")
 public class Accion {
     @Id
+    @Schema(description = "Identificador único de la acción")
     private Integer idAccion;
+    @Schema(description = "Número del caso asociado")
     private String numCaso;
+    @Schema(description = "Título de la acción")
     private String titulo;
+    @Schema(description = "Descripción detallada de la acción")
     private String descripcion;
+    @Schema(description = "Fecha de registro de la acción")
     private LocalDate fechaRegistro;
+    @Schema(description = "Fecha de ejecución de la acción")
     private LocalDate fechaEjecucion;
+    @Schema(description = "Usuario que registró la acción")
     private String username;
 
     public Accion() {

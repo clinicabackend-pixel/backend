@@ -1,6 +1,7 @@
 package clinica_juridica.backend.repository;
 
 import clinica_juridica.backend.models.Caso;
+import clinica_juridica.backend.dto.response.CasoSummaryResponse;
 import org.springframework.lang.NonNull;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -24,8 +25,15 @@ public interface CasoRepository extends CrudRepository<Caso, String> {
         @Query("SELECT * FROM casos WHERE estatus = :estatus")
         List<Caso> findAllByEstatus(String estatus);
 
-        @Query("SELECT c.* FROM casos c INNER JOIN casos_asignados ca ON c.num_caso = ca.num_caso WHERE ca.username = :username AND c.estatus = :estatus")
-        List<Caso> findAllByUsernameAndEstatus(String username, String estatus);
+        @Query("SELECT c.num_caso, c.fecha_recepcion, c.sintesis, c.estatus, ca.username, c.termino, c.cedula, s.nombre AS nombre_solicitante "
+                        +
+                        "FROM casos c " +
+                        "LEFT JOIN casos_asignados ca ON c.num_caso = ca.num_caso " +
+                        "LEFT JOIN solicitantes s ON c.cedula = s.cedula " +
+                        "WHERE (:estatus IS NULL OR c.estatus = :estatus) " +
+                        "AND (:username IS NULL OR ca.username = :username) " +
+                        "AND (:termino IS NULL OR c.termino = :termino)")
+        List<CasoSummaryResponse> findAllByFilters(String estatus, String username, String termino);
 
         @Modifying
         @Query("UPDATE casos SET estatus = :estatus WHERE num_caso = :numCaso")

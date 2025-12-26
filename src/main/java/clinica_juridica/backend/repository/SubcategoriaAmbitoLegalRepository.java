@@ -14,4 +14,7 @@ public interface SubcategoriaAmbitoLegalRepository extends CrudRepository<Subcat
     @NonNull
     @Query("SELECT * FROM subcategoria_ambito_legal")
     List<SubcategoriaAmbitoLegal> findAll();
+
+    @Query("SELECT * FROM subcategoria_ambito_legal WHERE cod_cat_amb_legal = :codCatAmbLegal")
+    List<SubcategoriaAmbitoLegal> findByCodCatAmbLegal(Integer codCatAmbLegal);
 }

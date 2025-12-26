@@ -1,11 +1,17 @@
 package clinica_juridica.backend.dto.request;
 
 import java.time.LocalDate;
+import io.swagger.v3.oas.annotations.media.Schema;
 
+@Schema(description = "Solicitud para registrar una nueva prueba")
 public class PruebaCreateRequest {
+    @Schema(description = "Fecha de la prueba")
     private LocalDate fecha;
+    @Schema(description = "Nombre o descripción del documento probatorio")
     private String documento;
+    @Schema(description = "Observaciones adicionales")
     private String observacion;
+    @Schema(description = "Título de la prueba", requiredMode = Schema.RequiredMode.REQUIRED)
     private String titulo;
 
     public LocalDate getFecha() {

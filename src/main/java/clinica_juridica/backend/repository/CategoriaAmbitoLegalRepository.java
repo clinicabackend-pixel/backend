@@ -14,4 +14,7 @@ public interface CategoriaAmbitoLegalRepository extends CrudRepository<Categoria
     @NonNull
     @Query("SELECT * FROM categoria_ambito_legal")
     List<CategoriaAmbitoLegal> findAll();
+
+    @Query("SELECT * FROM categoria_ambito_legal WHERE cod_mat_amb_legal = :codMatAmbLegal")
+    List<CategoriaAmbitoLegal> findByCodMatAmbLegal(Integer codMatAmbLegal);
 }

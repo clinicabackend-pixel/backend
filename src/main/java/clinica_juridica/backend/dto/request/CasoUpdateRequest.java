@@ -1,13 +1,21 @@
 package clinica_juridica.backend.dto.request;
 
 import java.time.LocalDate;
+import io.swagger.v3.oas.annotations.media.Schema;
 
+@Schema(description = "Solicitud para actualizar un caso existente")
 public class CasoUpdateRequest {
+    @Schema(description = "Nueva síntesis del caso")
     private String sintesis;
+    @Schema(description = "Código del caso en tribunal")
     private String codCasoTribunal;
+    @Schema(description = "Fecha de resolución en tribunal")
     private LocalDate fechaResCasoTri;
+    @Schema(description = "Fecha de creación en tribunal")
     private LocalDate fechaCreaCasoTri;
+    @Schema(description = "ID del tribunal asociado")
     private Integer idTribunal;
+    @Schema(description = "Competencia de ámbito legal")
     private Integer comAmbLegal;
 
     public String getSintesis() {

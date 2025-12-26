@@ -3,16 +3,25 @@ package clinica_juridica.backend.models;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 import java.time.LocalDate;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 @Table("encuentros")
+@Schema(description = "Entidad que representa un encuentro o cita en un caso")
 public class Encuentro {
     @Id
+    @Schema(description = "Identificador único del encuentro")
     private Integer idEncuentros;
+    @Schema(description = "Número del caso asociado")
     private String numCaso;
+    @Schema(description = "Fecha de atención")
     private LocalDate fechaAtencion;
+    @Schema(description = "Fecha de la próxima cita")
     private LocalDate fechaProxima;
+    @Schema(description = "Orientación brindada")
     private String orientacion;
+    @Schema(description = "Observaciones adicionales")
     private String observacion;
+    @Schema(description = "Usuario responsable del encuentro")
     private String username;
 
     public Encuentro() {

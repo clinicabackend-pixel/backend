@@ -14,4 +14,7 @@ public interface AmbitoLegalRepository extends CrudRepository<AmbitoLegal, Integ
     @NonNull
     @Query("SELECT * FROM ambito_legal")
     List<AmbitoLegal> findAll();
+
+    @Query("SELECT * FROM ambito_legal WHERE cod_sub_amb_legal = :codSubAmbLegal")
+    List<AmbitoLegal> findByCodSubAmbLegal(Integer codSubAmbLegal);
 }
