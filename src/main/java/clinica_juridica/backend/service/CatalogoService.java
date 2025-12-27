@@ -15,7 +15,18 @@ import clinica_juridica.backend.repository.MateriaAmbitoLegalRepository;
 import clinica_juridica.backend.repository.SubcategoriaAmbitoLegalRepository;
 import clinica_juridica.backend.repository.TipoCategoriaViviendaRepository;
 import clinica_juridica.backend.repository.TribunalRepository;
+import clinica_juridica.backend.dto.response.CondicionActividadResponse;
+import clinica_juridica.backend.dto.response.CondicionLaboralResponse;
+import clinica_juridica.backend.dto.response.NivelEducativoResponse;
+import clinica_juridica.backend.models.CondicionActividad;
+import clinica_juridica.backend.models.CondicionLaboral;
+import clinica_juridica.backend.models.NivelEducativo;
+import clinica_juridica.backend.models.TipoCategoriaVivienda;
+import clinica_juridica.backend.repository.CondicionActividadRepository;
+import clinica_juridica.backend.repository.CondicionLaboralRepository;
+import clinica_juridica.backend.repository.NivelEducativoRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.List;
@@ -31,6 +42,9 @@ public class CatalogoService {
         private final TribunalRepository tribunalRepository;
         private final TipoCategoriaViviendaRepository tipoCategoriaViviendaRepository;
         private final CategoriaViviendaRepository categoriaViviendaRepository;
+        private final NivelEducativoRepository nivelEducativoRepository;
+        private final CondicionLaboralRepository condicionLaboralRepository;
+        private final CondicionActividadRepository condicionActividadRepository;
 
         public CatalogoService(MateriaAmbitoLegalRepository materiaRepository,
                         CategoriaAmbitoLegalRepository categoriaRepository,
@@ -38,7 +52,10 @@ public class CatalogoService {
                         AmbitoLegalRepository ambitoRepository,
                         TribunalRepository tribunalRepository,
                         TipoCategoriaViviendaRepository tipoCategoriaViviendaRepository,
-                        CategoriaViviendaRepository categoriaViviendaRepository) {
+                        CategoriaViviendaRepository categoriaViviendaRepository,
+                        NivelEducativoRepository nivelEducativoRepository,
+                        CondicionLaboralRepository condicionLaboralRepository,
+                        CondicionActividadRepository condicionActividadRepository) {
                 this.materiaRepository = materiaRepository;
                 this.categoriaRepository = categoriaRepository;
                 this.subcategoriaRepository = subcategoriaRepository;
@@ -46,6 +63,9 @@ public class CatalogoService {
                 this.tribunalRepository = tribunalRepository;
                 this.tipoCategoriaViviendaRepository = tipoCategoriaViviendaRepository;
                 this.categoriaViviendaRepository = categoriaViviendaRepository;
+                this.nivelEducativoRepository = nivelEducativoRepository;
+                this.condicionLaboralRepository = condicionLaboralRepository;
+                this.condicionActividadRepository = condicionActividadRepository;
         }
 
         public List<AmbitoLegalResponse> getAmbitosLegalesTree() {
@@ -114,9 +134,15 @@ public class CatalogoService {
                                 .toList();
         }
 
-        public List<TipoViviendaResponse> getViviendas() {
+        public List<TipoViviendaResponse> getViviendas(String estatus) {
                 var tipos = tipoCategoriaViviendaRepository.findAll();
-                var categorias = categoriaViviendaRepository.findAll();
+                List<CategoriaVivienda> categorias;
+
+                if (estatus != null && !estatus.isBlank()) {
+                        categorias = categoriaViviendaRepository.findAllByEstatus(estatus);
+                } else {
+                        categorias = categoriaViviendaRepository.findAll();
+                }
 
                 var catMap = categorias.stream().collect(
                                 Collectors.groupingBy(
@@ -134,5 +160,121 @@ public class CatalogoService {
                                                 t.getTipoCategoria(),
                                                 catMap.getOrDefault(t.getIdTipoCat(), Collections.emptyList())))
                                 .toList();
+        }
+
+        public List<NivelEducativoResponse> getNivelesEducativos(String estatus) {
+                List<NivelEducativo> list;
+                if (estatus != null && !estatus.isBlank()) {
+                        list = nivelEducativoRepository.findAllByEstatus(estatus);
+                } else {
+                        list = nivelEducativoRepository.findAll();
+                }
+                return list.stream()
+                                .map(n -> new NivelEducativoResponse(
+                                                n.getIdNivelEdu(),
+                                                n.getNivel()))
+                                .toList();
+        }
+
+        public List<CondicionLaboralResponse> getCondicionesLaborales(String estatus) {
+                List<CondicionLaboral> list;
+                if (estatus != null && !estatus.isBlank()) {
+                        list = condicionLaboralRepository.findAllByEstatus(estatus);
+                } else {
+                        list = condicionLaboralRepository.findAll();
+                }
+                return list.stream()
+                                .map(c -> new CondicionLaboralResponse(
+                                                c.getIdCondicion(),
+                                                c.getCondicion()))
+                                .toList();
+        }
+
+        public List<CondicionActividadResponse> getCondicionesActividad(String estatus) {
+                List<CondicionActividad> list;
+                if (estatus != null && !estatus.isBlank()) {
+                        list = condicionActividadRepository.findAllByEstatus(estatus);
+                } else {
+                        list = condicionActividadRepository.findAll();
+                }
+                return list.stream()
+                                .map(c -> new CondicionActividadResponse(
+                                                c.getIdCondicionActividad(),
+                                                c.getNombreActividad()))
+                                .toList();
+        }
+
+        @Transactional
+        public void updateNivelEducativoStatus(Integer id, String estatus) {
+                nivelEducativoRepository.updateStatus(id, estatus);
+        }
+
+        @Transactional
+        public void updateCondicionLaboralStatus(Integer id, String estatus) {
+                condicionLaboralRepository.updateStatus(id, estatus);
+        }
+
+        @Transactional
+        public void updateCondicionActividadStatus(Integer id, String estatus) {
+                condicionActividadRepository.updateStatus(id, estatus);
+        }
+
+        @Transactional
+        public void updateCategoriaViviendaStatus(Integer idTipo, Integer idCat, String estatus) {
+                categoriaViviendaRepository.updateStatus(idTipo, idCat, estatus);
+        }
+
+        @Transactional
+        public void createNivelEducativo(String nombre) {
+                // ID is Serial, auto-generated.
+                NivelEducativo nuevo = new NivelEducativo(null, nombre, "ACTIVO");
+                nivelEducativoRepository.save(nuevo);
+        }
+
+        @Transactional
+        public void createCondicionLaboral(String nombre) {
+                CondicionLaboral nuevo = new CondicionLaboral(null, nombre, "ACTIVO");
+                condicionLaboralRepository.save(nuevo);
+        }
+
+        @Transactional
+        public void createCondicionActividad(String nombre) {
+                CondicionActividad nuevo = new CondicionActividad(null, nombre, "ACTIVO");
+                condicionActividadRepository.save(nuevo);
+        }
+
+        @Transactional
+        public void createTipoVivienda(String nombreTipo) {
+                if (nombreTipo == null) {
+                        throw new IllegalArgumentException("nombreTipo cannot be null");
+                }
+                // Check if exists
+                var existing = tipoCategoriaViviendaRepository.findByTipoCategoria(nombreTipo);
+                if (existing != null) {
+                        throw new IllegalArgumentException("El tipo de vivienda ya existe: " + nombreTipo);
+                }
+
+                Integer maxId = tipoCategoriaViviendaRepository.findMaxId();
+                Integer idTipo = (maxId != null ? maxId : 0) + 1;
+                TipoCategoriaVivienda nuevoTipo = new TipoCategoriaVivienda(idTipo, nombreTipo);
+                tipoCategoriaViviendaRepository.save(nuevoTipo);
+        }
+
+        @Transactional
+        public void createVivienda(Integer idTipo, String descripcion) {
+                if (idTipo == null) {
+                        throw new IllegalArgumentException("idTipo cannot be null");
+                }
+                // 1. Verify Tipo exists
+                var tipoOptional = tipoCategoriaViviendaRepository.findById(idTipo);
+                if (tipoOptional.isEmpty()) {
+                        throw new IllegalArgumentException("El Tipo de Vivienda con ID " + idTipo + " no existe.");
+                }
+
+                // 2. Create Categoria
+                Integer maxId = categoriaViviendaRepository.findMaxIdByTipo(idTipo);
+                Integer idCat = (maxId != null ? maxId : 0) + 1;
+                CategoriaVivienda nuevaCat = new CategoriaVivienda(idCat, idTipo, descripcion, "ACTIVO");
+                categoriaViviendaRepository.save(nuevaCat);
         }
 }

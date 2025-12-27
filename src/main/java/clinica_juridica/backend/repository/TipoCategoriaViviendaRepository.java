@@ -14,4 +14,10 @@ public interface TipoCategoriaViviendaRepository extends CrudRepository<TipoCate
     @NonNull
     @Query("SELECT * FROM tipos_categorias_viviendas")
     List<TipoCategoriaVivienda> findAll();
+
+    @Query("SELECT * FROM tipos_categorias_viviendas WHERE tipo_categoria = :nombre")
+    TipoCategoriaVivienda findByTipoCategoria(String nombre);
+
+    @Query("SELECT COALESCE(MAX(id_tipo_cat), 0) FROM tipos_categorias_viviendas")
+    Integer findMaxId();
 }

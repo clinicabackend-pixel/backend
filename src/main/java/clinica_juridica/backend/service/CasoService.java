@@ -314,9 +314,9 @@ public class CasoService {
         }
 
         @Transactional
-        public void assignStudent(CasoAsignacionRequest dto) {
-                if (!casoRepository.existsById(dto.getNumCaso())) {
-                        throw new RuntimeException("Caso no encontrado: " + dto.getNumCaso());
+        public void assignStudent(String numCaso, CasoAsignacionRequest dto) {
+                if (!casoRepository.existsById(numCaso)) {
+                        throw new RuntimeException("Caso no encontrado: " + numCaso);
                 }
 
                 // Validar que el estudiante exista en el término indicado
@@ -326,13 +326,13 @@ public class CasoService {
                                         + "'.");
                 }
 
-                casoAsignadoRepository.saveManual(dto.getNumCaso(), dto.getUsername(), dto.getTermino());
+                casoAsignadoRepository.saveManual(numCaso, dto.getUsername(), dto.getTermino());
         }
 
         @Transactional
-        public void assignSupervisor(CasoSupervisionRequest dto) {
-                if (!casoRepository.existsById(dto.getNumCaso())) {
-                        throw new RuntimeException("Caso no encontrado: " + dto.getNumCaso());
+        public void assignSupervisor(String numCaso, CasoSupervisionRequest dto) {
+                if (!casoRepository.existsById(numCaso)) {
+                        throw new RuntimeException("Caso no encontrado: " + numCaso);
                 }
 
                 // Validar que el profesor existe en el término indicado
@@ -342,7 +342,7 @@ public class CasoService {
                                         + "'.");
                 }
 
-                casoSupervisadoRepository.saveManual(dto.getNumCaso(), dto.getUsername(), dto.getTermino());
+                casoSupervisadoRepository.saveManual(numCaso, dto.getUsername(), dto.getTermino());
         }
 
         @Transactional

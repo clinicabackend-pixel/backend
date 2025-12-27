@@ -14,4 +14,11 @@ public interface CondicionLaboralRepository extends CrudRepository<CondicionLabo
     @NonNull
     @Query("SELECT * FROM condicion_laboral")
     List<CondicionLaboral> findAll();
+
+    @Query("SELECT * FROM condicion_laboral WHERE estatus = :estatus")
+    List<CondicionLaboral> findAllByEstatus(String estatus);
+
+    @org.springframework.data.jdbc.repository.query.Modifying
+    @Query("UPDATE condicion_laboral SET estatus = :estatus WHERE id_condicion = :id")
+    void updateStatus(Integer id, String estatus);
 }

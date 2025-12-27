@@ -1,0 +1,32 @@
+package clinica_juridica.backend.dto.response;
+
+import io.swagger.v3.oas.annotations.media.Schema;
+
+@Schema(description = "Respuesta con información de situación/condición de actividad")
+public class CondicionActividadResponse {
+    @Schema(description = "ID de la condición de actividad")
+    private Integer id;
+    @Schema(description = "Nombre de la actividad")
+    private String nombre;
+
+    public CondicionActividadResponse(Integer id, String nombre) {
+        this.id = id;
+        this.nombre = nombre;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public String getNombre() {
+        return nombre;
+    }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+}

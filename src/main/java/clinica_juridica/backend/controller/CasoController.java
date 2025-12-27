@@ -222,8 +222,7 @@ public class CasoController {
             @Parameter(description = "ID del caso") @PathVariable String id,
             @RequestBody CasoAsignacionRequest request) {
         try {
-            request.setNumCaso(id);
-            casoService.assignStudent(request);
+            casoService.assignStudent(id, request);
             return ResponseEntity.ok("Estudiante asignado exitosamente");
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -241,8 +240,7 @@ public class CasoController {
             @Parameter(description = "ID del caso") @PathVariable String id,
             @RequestBody CasoSupervisionRequest request) {
         try {
-            request.setNumCaso(id);
-            casoService.assignSupervisor(request);
+            casoService.assignSupervisor(id, request);
             return ResponseEntity.ok("Supervisor asignado exitosamente");
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());

@@ -14,4 +14,11 @@ public interface CondicionActividadRepository extends CrudRepository<CondicionAc
     @NonNull
     @Query("SELECT * FROM condicion_actividad")
     List<CondicionActividad> findAll();
+
+    @Query("SELECT * FROM condicion_actividad WHERE estatus = :estatus")
+    List<CondicionActividad> findAllByEstatus(String estatus);
+
+    @org.springframework.data.jdbc.repository.query.Modifying
+    @Query("UPDATE condicion_actividad SET estatus = :estatus WHERE id_condicion_actividad = :id")
+    void updateStatus(Integer id, String estatus);
 }

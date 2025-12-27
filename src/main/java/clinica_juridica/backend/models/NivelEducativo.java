@@ -13,16 +13,17 @@ public class NivelEducativo {
     @Column("nivel")
     private String nivel;
 
-    @Column("anio")
-    private Integer anio;
+
+    @Column("estatus")
+    private String estatus;
 
     public NivelEducativo() {
     }
 
-    public NivelEducativo(Integer idNivelEdu, String nivel, Integer anio) {
+    public NivelEducativo(Integer idNivelEdu, String nivel, String estatus) {
         this.idNivelEdu = idNivelEdu;
         this.nivel = nivel;
-        this.anio = anio;
+        this.estatus = estatus;
     }
 
     public Integer getIdNivelEdu() {
@@ -41,11 +42,12 @@ public class NivelEducativo {
         this.nivel = nivel;
     }
 
-    public Integer getAnio() {
-        return anio;
+
+    public String getEstatus() {
+        return estatus;
     }
 
-    public void setAnio(Integer anio) {
-        this.anio = anio;
+    public void setEstatus(String estatus) {
+        this.estatus = estatus;
     }
 }
