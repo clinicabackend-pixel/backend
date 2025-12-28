@@ -26,9 +26,12 @@ public class CustomUserDetailsService implements UserDetailsService {
         // Assuming 'tipo' stored in DB matches "ESTUDIANTE", "PROFESOR", "COORDINADOR"
         String roleName = "ROLE_" + usuario.getTipo().toUpperCase();
 
+        boolean isEnabled = "ACTIVO".equalsIgnoreCase(usuario.getStatus());
+
         return User.builder()
                 .username(usuario.getUsername())
                 .password(usuario.getContrasena())
+                .disabled(!isEnabled) // Spring Security checks this
                 .authorities(roleName)
                 .build();
     }

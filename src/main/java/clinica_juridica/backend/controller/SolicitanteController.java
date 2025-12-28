@@ -3,6 +3,7 @@ package clinica_juridica.backend.controller;
 import clinica_juridica.backend.models.Solicitante;
 import clinica_juridica.backend.repository.SolicitanteRepository;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -13,7 +14,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RestController
 @RequestMapping("/api/solicitantes")
 @SuppressWarnings("null")
-@Tag(name = "Solicitantes", description = "API para la gestión de solicitantes. Roles requeridos: Usuario autenticado.")
+@Tag(name = "Solicitantes", description = "API para la gestión de solicitantes. Roles: Todos pueden Crear/Ver/Editar. Solo COORDINADOR puede eliminar.")
 public class SolicitanteController {
 
     private final SolicitanteRepository solicitanteRepository;
@@ -23,13 +24,15 @@ public class SolicitanteController {
     }
 
     @GetMapping
-    @Operation(summary = "Obtener todos los solicitantes", description = "Devuelve una lista de todos los solicitantes registrados.")
+    @Operation(summary = "Obtener todos los solicitantes", description = "Devuelve una lista de todos los solicitantes registrados. Roles: COORDINADOR, PROFESOR, ESTUDIANTE.")
+    @PreAuthorize("hasAnyRole('COORDINADOR', 'PROFESOR', 'ESTUDIANTE')")
     public ResponseEntity<List<Solicitante>> getAll() {
         return ResponseEntity.ok(solicitanteRepository.findAll());
     }
 
     @GetMapping("/{id}")
-    @Operation(summary = "Obtener solicitante por ID", description = "Busca un solicitante específico por su cédula/ID.")
+    @Operation(summary = "Obtener solicitante por ID", description = "Busca un solicitante específico por su cédula/ID. Roles: COORDINADOR, PROFESOR, ESTUDIANTE.")
+    @PreAuthorize("hasAnyRole('COORDINADOR', 'PROFESOR', 'ESTUDIANTE')")
     public ResponseEntity<Solicitante> getById(@PathVariable String id) {
         return solicitanteRepository.findById(id)
                 .map(ResponseEntity::ok)
@@ -37,14 +40,16 @@ public class SolicitanteController {
     }
 
     @PostMapping
-    @Operation(summary = "Crear solicitante", description = "Registra un nuevo solicitante en el sistema.")
+    @Operation(summary = "Crear solicitante", description = "Registra un nuevo solicitante en el sistema. Roles: COORDINADOR, PROFESOR, ESTUDIANTE.")
+    @PreAuthorize("hasAnyRole('COORDINADOR', 'PROFESOR', 'ESTUDIANTE')")
     public ResponseEntity<String> create(@RequestBody Solicitante solicitante) {
         solicitanteRepository.save(solicitante);
         return ResponseEntity.ok("Solicitante creado exitosamente");
     }
 
     @PutMapping("/{id}")
-    @Operation(summary = "Actualizar solicitante", description = "Actualiza los datos de un solicitante existente.")
+    @Operation(summary = "Actualizar solicitante", description = "Actualiza los datos de un solicitante existente. Roles: COORDINADOR, PROFESOR, ESTUDIANTE.")
+    @PreAuthorize("hasAnyRole('COORDINADOR', 'PROFESOR', 'ESTUDIANTE')")
     public ResponseEntity<String> update(@PathVariable String id, @RequestBody Solicitante solicitante) {
         if (solicitanteRepository.findById(id).isEmpty()) {
             return ResponseEntity.notFound().build();
@@ -55,7 +60,8 @@ public class SolicitanteController {
     }
 
     @DeleteMapping("/{id}")
-    @Operation(summary = "Eliminar solicitante", description = "Elimina un solicitante del sistema.")
+    @Operation(summary = "Eliminar solicitante", description = "Elimina un solicitante del sistema. Roles: COORDINADOR.")
+    @PreAuthorize("hasRole('COORDINADOR')")
     public ResponseEntity<String> delete(@PathVariable String id) {
         if (solicitanteRepository.findById(id).isEmpty()) {
             return ResponseEntity.notFound().build();

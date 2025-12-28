@@ -23,34 +23,13 @@ public class UsuarioPerfilController {
         this.usuarioPerfilService = usuarioPerfilService;
     }
 
-    @GetMapping("/personal")
-    @Operation(summary = "Obtener personal", description = "Devuelve una lista de todos los usuarios (Estudiantes, Profesores, Coordinadores).")
-    public ResponseEntity<Iterable<UsuarioResponse>> getAllPersonal() {
+    @GetMapping
+    @Operation(summary = "Obtener lista de usuarios", description = "Devuelve una lista de todos los usuarios (Estudiantes, Profesores, Coordinadores).")
+    public ResponseEntity<Iterable<UsuarioResponse>> getAllUsuarios() {
         Iterable<Usuario> personal = usuarioPerfilService.findAllUsuarios();
         Iterable<UsuarioResponse> response = StreamSupport.stream(personal.spliterator(), false)
                 .map(p -> new UsuarioResponse(p.getCedula(), p.getNombre(), "N/A", p.getEmail(),
                         p.getUsername(), p.getStatus(), p.getTipo()))
-                .toList();
-        return ResponseEntity.ok(response);
-    }
-
-    @GetMapping("/solicitantes")
-    @Operation(summary = "Obtener solicitantes (Vista de reporte)", description = "Devuelve una lista de solicitantes con formato de reporte.")
-    public ResponseEntity<Iterable<SolicitanteResponse>> getAllSolicitantes() {
-        Iterable<Solicitante> solicitantes = usuarioPerfilService.findAllSolicitantes();
-        Iterable<SolicitanteResponse> response = StreamSupport.stream(
-                solicitantes.spliterator(),
-                false)
-                .map(s -> new SolicitanteResponse(
-                        s.getCedula(),
-                        s.getNombre(),
-                        s.getSexo(),
-                        s.getFNacimiento(),
-                        s.getIdEstadoCivil() != null ? s.getIdEstadoCivil().toString() : null,
-                        null,
-                        s.getIdNivel(),
-                        null,
-                        s.getIdCondicion() != null ? s.getIdCondicion().toString() : null))
                 .toList();
         return ResponseEntity.ok(response);
     }
