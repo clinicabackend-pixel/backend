@@ -11,7 +11,7 @@ import java.util.List;
 public class CasoDetalleResponse {
 
     @Schema(description = "Información principal del caso")
-    private Caso caso;
+    private CasoResponse caso; // Changed from Caso to CasoResponse
 
     @Schema(description = "Lista de acciones realizadas")
     private List<AccionResponse> acciones;
@@ -31,10 +31,30 @@ public class CasoDetalleResponse {
     @Schema(description = "Lista de supervisores asignados")
     private List<CasoSupervisadoProjection> supervisores;
 
-    public CasoDetalleResponse(Caso caso, List<AccionResponse> acciones, List<EncuentroResponse> encuentros,
+    public CasoDetalleResponse(Caso caso, String nombreTribunal, List<AccionResponse> acciones,
+            List<EncuentroResponse> encuentros,
             List<DocumentoResponse> documentos, List<PruebaResponse> pruebas,
             List<CasoAsignadoProjection> asignados, List<CasoSupervisadoProjection> supervisores) {
-        this.caso = caso;
+
+        // Map Caso entity to CasoResponse DTO
+        this.caso = new CasoResponse(
+                caso.getNumCaso(),
+                caso.getFechaRecepcion(),
+                caso.getSintesis(),
+                caso.getTramite(),
+                caso.getCantBeneficiarios(),
+                caso.getEstatus(),
+                caso.getCodCasoTribunal(),
+                caso.getFechaResCasoTri(),
+                caso.getFechaCreaCasoTri(),
+                caso.getIdTribunal(),
+                nombreTribunal,
+                caso.getTermino(),
+                caso.getIdCentro(),
+                caso.getCedula(),
+                caso.getUsername(),
+                caso.getComAmbLegal());
+
         this.acciones = acciones;
         this.encuentros = encuentros;
         this.documentos = documentos;
@@ -43,11 +63,11 @@ public class CasoDetalleResponse {
         this.supervisores = supervisores;
     }
 
-    public Caso getCaso() {
+    public CasoResponse getCaso() {
         return caso;
     }
 
-    public void setCaso(Caso caso) {
+    public void setCaso(CasoResponse caso) {
         this.caso = caso;
     }
 

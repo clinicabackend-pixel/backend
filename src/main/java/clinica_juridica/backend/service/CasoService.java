@@ -47,7 +47,9 @@ public class CasoService {
         private final AccionEjecutadaRepository accionEjecutadaRepository;
         private final EncuentroAtendidoRepository encuentroAtendidoRepository;
         private final clinica_juridica.backend.repository.EstudianteRepository estudianteRepository;
+
         private final clinica_juridica.backend.repository.ProfesorRepository profesorRepository;
+        private final clinica_juridica.backend.repository.TribunalRepository tribunalRepository; // Added repository
 
         public CasoService(CasoRepository casoRepository,
                         EstatusPorCasoRepository estatusPorCasoRepository,
@@ -60,7 +62,8 @@ public class CasoService {
                         AccionEjecutadaRepository accionEjecutadaRepository,
                         EncuentroAtendidoRepository encuentroAtendidoRepository,
                         clinica_juridica.backend.repository.EstudianteRepository estudianteRepository,
-                        clinica_juridica.backend.repository.ProfesorRepository profesorRepository) {
+                        clinica_juridica.backend.repository.ProfesorRepository profesorRepository,
+                        clinica_juridica.backend.repository.TribunalRepository tribunalRepository) {
                 this.casoRepository = casoRepository;
                 this.estatusPorCasoRepository = estatusPorCasoRepository;
                 this.accionRepository = accionRepository;
@@ -73,6 +76,7 @@ public class CasoService {
                 this.encuentroAtendidoRepository = encuentroAtendidoRepository;
                 this.estudianteRepository = estudianteRepository;
                 this.profesorRepository = profesorRepository;
+                this.tribunalRepository = tribunalRepository;
         }
 
         public List<CasoSummaryResponse> getAllSummary() {
@@ -401,8 +405,16 @@ public class CasoService {
                 Caso caso = casoRepository.findById(id)
                                 .orElseThrow(() -> new RuntimeException("Caso no encontrado: " + id));
 
+                String nombreTribunal = null;
+                if (caso.getIdTribunal() != null) {
+                        nombreTribunal = tribunalRepository.findById(caso.getIdTribunal())
+                                        .map(t -> t.getNombreTribunal())
+                                        .orElse(null);
+                }
+
                 return new CasoDetalleResponse(
                                 caso,
+                                nombreTribunal,
                                 getAcciones(id),
                                 getEncuentros(id),
                                 getDocumentos(id),

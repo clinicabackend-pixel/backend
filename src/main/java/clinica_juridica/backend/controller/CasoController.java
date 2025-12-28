@@ -4,7 +4,6 @@ import clinica_juridica.backend.service.CasoService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import java.util.Map;
 
 import java.util.List;
 
@@ -37,7 +36,7 @@ public class CasoController {
     public ResponseEntity<List<CasoSummaryResponse>> getAll(
             @Parameter(description = "Estatus del caso para filtrar") @RequestParam(required = false) String estatus,
             @Parameter(description = "Nombre de usuario para filtrar sus casos asignados") @RequestParam(required = false) String username,
-            @Parameter(description = "Término o semestre (ej: 2024-1)") @RequestParam(required = false) String termino) {
+            @Parameter(description = "Término o semestre (ej: 2024-15)") @RequestParam(required = false) String termino) {
 
         // Normalizar strings vacíos a null para que la query funcione correctamente
         String estatusFilter = (estatus != null && !estatus.isBlank()) ? estatus : null;
@@ -114,9 +113,9 @@ public class CasoController {
     @PreAuthorize("hasAnyRole('COORDINADOR', 'PROFESOR')")
     public ResponseEntity<String> updateEstatus(
             @Parameter(description = "ID del caso") @PathVariable String id,
-            @RequestBody Map<String, String> body) {
-        String nuevoEstatus = body.get("estatus");
-        if (nuevoEstatus == null) {
+            @RequestBody CasoEstatusUpdateRequest request) {
+        String nuevoEstatus = request.getEstatus();
+        if (nuevoEstatus == null || nuevoEstatus.isBlank()) {
             return ResponseEntity.badRequest().body("El campo 'estatus' es obligatorio");
         }
         casoService.updateEstatus(id, nuevoEstatus);
