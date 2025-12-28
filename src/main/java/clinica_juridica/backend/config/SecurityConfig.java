@@ -29,7 +29,8 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**").permitAll() // Allow public access to auth endpoints
+                        .requestMatchers("/auth/**", "/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html")
+                        .permitAll() // Allow public access to auth and swagger
                         .anyRequest().authenticated()) // Require authentication for everything else
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(
