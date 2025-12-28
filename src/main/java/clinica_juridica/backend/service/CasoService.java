@@ -26,6 +26,7 @@ import clinica_juridica.backend.repository.CasoSupervisadoRepository;
 import clinica_juridica.backend.repository.AccionEjecutadaRepository;
 import clinica_juridica.backend.repository.EncuentroAtendidoRepository;
 import clinica_juridica.backend.dto.request.*;
+import clinica_juridica.backend.dto.request.AccionUpdateRequest;
 import clinica_juridica.backend.dto.response.AccionResponse;
 import clinica_juridica.backend.dto.response.DocumentoResponse;
 import clinica_juridica.backend.dto.response.EncuentroResponse;
@@ -346,15 +347,38 @@ public class CasoService {
         }
 
         @Transactional
-        public void updateAccionFechaEjecucion(String numCaso, Integer idAccion, AccionExecutionDateRequest dto) {
-                Caso caso = casoRepository.findById(numCaso)
-                                .orElseThrow(() -> new RuntimeException("Caso no encontrado: " + numCaso));
+        public void updateAccion(String numCaso, Integer idAccion, AccionUpdateRequest dto) {
+                if (!casoRepository.existsById(numCaso)) {
+                        throw new RuntimeException("Caso no encontrado: " + numCaso);
+                }
 
-                // Actualizar fecha
-                accionRepository.updateFechaEjecucion(numCaso, idAccion, dto.getFechaEjecucion());
+                Accion accion = accionRepository.findByNumCasoAndIdAccion(numCaso, idAccion)
+                                .orElseThrow(() -> new RuntimeException("Acción no encontrada: " + idAccion));
+
+                // Actualizar campos permitidos (White List via DTO)
+                if (dto.getTitulo() != null) {
+                        accion.setTitulo(dto.getTitulo());
+                }
+                if (dto.getDescripcion() != null) {
+                        accion.setDescripcion(dto.getDescripcion());
+                }
+                if (dto.getFechaEjecucion() != null) {
+                        accion.setFechaEjecucion(dto.getFechaEjecucion());
+                }
+
+                accionRepository.save(accion);
 
                 // Actualizar lista de ejecutantes si se proporciona
                 if (dto.getUsernames() != null) {
+                        // Nota: Aquí estamos asumiendo que se agregan nuevos ejecutantes.
+                        // Si se quisiera reemplazar totalmente la lista, habría que borrar los
+                        // anteriores primero.
+                        // Basado en el código anterior, validamos y agregamos los que no existan.
+
+                        // Necesitamos el "termino" del caso para validar estudiantes
+                        Caso caso = casoRepository.findById(numCaso)
+                                        .orElseThrow(() -> new RuntimeException("Caso no encontrado: " + numCaso));
+
                         for (String username : dto.getUsernames()) {
                                 // Validar que el estudiante esté registrado en el término del caso
                                 if (!estudianteRepository.existsByUsernameAndTermino(username, caso.getTermino())) {

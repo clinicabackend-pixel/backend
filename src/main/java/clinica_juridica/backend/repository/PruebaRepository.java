@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import org.springframework.data.jdbc.repository.query.Modifying;
 import java.util.List;
+import java.time.LocalDate;
 
 @Repository
 public interface PruebaRepository extends CrudRepository<Prueba, Integer> {
@@ -21,7 +22,7 @@ public interface PruebaRepository extends CrudRepository<Prueba, Integer> {
 
     @Modifying
     @Query("INSERT INTO pruebas (id_prueba, num_caso, fecha, documento, observacion, titulo) VALUES (:id, :numCaso, :fecha, :documento, :observacion, :titulo)")
-    void saveManual(Integer id, String numCaso, java.time.LocalDate fecha, String documento, String observacion,
+    void saveManual(Integer id, String numCaso, LocalDate fecha, String documento, String observacion,
             String titulo);
 
     @Query("SELECT * FROM pruebas WHERE num_caso = :numCaso")

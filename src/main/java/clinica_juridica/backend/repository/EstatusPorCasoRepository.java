@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.data.jdbc.repository.query.Modifying;
 
 import java.util.List;
+import java.time.LocalDate;
 
 @Repository
 public interface EstatusPorCasoRepository extends CrudRepository<EstatusPorCaso, Integer> {
@@ -21,5 +22,5 @@ public interface EstatusPorCasoRepository extends CrudRepository<EstatusPorCaso,
 
     @Modifying
     @Query("INSERT INTO estatus_por_caso (id_est_caso, num_caso, fecha_cambio, estatus, observacion) VALUES (:idEstCaso, :numCaso, :fechaCambio, :estatus, NULL)")
-    void saveNewStatus(Integer idEstCaso, String numCaso, java.time.LocalDate fechaCambio, String estatus);
+    void saveNewStatus(Integer idEstCaso, String numCaso, LocalDate fechaCambio, String estatus);
 }

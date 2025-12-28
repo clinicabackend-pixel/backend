@@ -2,6 +2,7 @@ package clinica_juridica.backend.controller;
 
 import clinica_juridica.backend.service.CasoService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
@@ -27,11 +28,12 @@ public class CasoController {
         this.casoService = casoService;
     }
 
-    @Operation(summary = "Obtener casos (Resumen)", description = "Recupera una lista ligera de casos filtrada por estatus, usuario asignado o término (semestre).")
+    @Operation(summary = "Obtener casos (Resumen)", description = "Recupera una lista ligera de casos filtrada por estatus, usuario asignado o término (semestre). Roles requeridos: COORDINADOR, PROFESOR.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Lista de casos recuperada exitosamente")
     })
     @GetMapping
+    @PreAuthorize("hasAnyRole('COORDINADOR', 'PROFESOR')")
     public ResponseEntity<List<CasoSummaryResponse>> getAll(
             @Parameter(description = "Estatus del caso para filtrar") @RequestParam(required = false) String estatus,
             @Parameter(description = "Nombre de usuario para filtrar sus casos asignados") @RequestParam(required = false) String username,
@@ -60,20 +62,22 @@ public class CasoController {
         }
     }
 
-    @Operation(summary = "Crear nuevo caso", description = "Crea un nuevo caso legal en el sistema.")
+    @Operation(summary = "Crear nuevo caso", description = "Crea un nuevo caso legal en el sistema. Roles requeridos: COORDINADOR.")
     @ApiResponse(responseCode = "200", description = "Caso creado exitosamente")
     @PostMapping
+    @PreAuthorize("hasRole('COORDINADOR')")
     public ResponseEntity<String> create(@RequestBody CasoCreateRequest request) {
         casoService.create(request);
         return ResponseEntity.ok("Caso creado exitosamente");
     }
 
-    @Operation(summary = "Actualizar caso", description = "Actualiza la información de un caso existente.")
+    @Operation(summary = "Actualizar caso", description = "Actualiza la información de un caso existente. Roles requeridos: COORDINADOR.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Caso actualizado exitosamente"),
             @ApiResponse(responseCode = "404", description = "Caso no encontrado")
     })
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('COORDINADOR')")
     public ResponseEntity<String> update(
             @Parameter(description = "ID del caso a actualizar") @PathVariable String id,
             @RequestBody CasoUpdateRequest dto) {
@@ -85,12 +89,13 @@ public class CasoController {
         }
     }
 
-    @Operation(summary = "Eliminar caso", description = "Elimina un caso del sistema por su ID.")
+    @Operation(summary = "Eliminar caso", description = "Elimina un caso del sistema por su ID. Roles requeridos: COORDINADOR.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Caso eliminado exitosamente"),
             @ApiResponse(responseCode = "404", description = "Caso no encontrado")
     })
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('COORDINADOR')")
     public ResponseEntity<String> delete(
             @Parameter(description = "ID del caso a eliminar") @PathVariable String id) {
         if (casoService.getById(id).isEmpty()) {
@@ -100,12 +105,13 @@ public class CasoController {
         return ResponseEntity.ok("Caso eliminado exitosamente");
     }
 
-    @Operation(summary = "Actualizar estatus del caso", description = "Actualiza el estatus de un caso específico.")
+    @Operation(summary = "Actualizar estatus del caso", description = "Actualiza el estatus de un caso específico. Roles requeridos: COORDINADOR, PROFESOR.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Estatus actualizado exitosamente"),
             @ApiResponse(responseCode = "400", description = "Solicitud incorrecta, falta el campo 'estatus'")
     })
     @PatchMapping("/{id}/estatus")
+    @PreAuthorize("hasAnyRole('COORDINADOR', 'PROFESOR')")
     public ResponseEntity<String> updateEstatus(
             @Parameter(description = "ID del caso") @PathVariable String id,
             @RequestBody Map<String, String> body) {
@@ -187,17 +193,17 @@ public class CasoController {
         return ResponseEntity.ok(casoService.getPruebas(id));
     }
 
-    @Operation(summary = "Actualizar fecha de ejecución de acción", description = "Modifica la fecha de ejecución de una acción específica.")
+    @Operation(summary = "Actualizar acción", description = "Actualiza los datos de una acción específica (Título, Descripción, Fecha Ejecución).")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Fecha actualizada exitosamente"),
-            @ApiResponse(responseCode = "404", description = "Caso accción no encontrada")
+            @ApiResponse(responseCode = "200", description = "Acción actualizada exitosamente"),
+            @ApiResponse(responseCode = "404", description = "Caso o Acción no encontrada")
     })
-    @PatchMapping("/{id}/acciones/{idAccion}/fecha-ejecucion")
-    public ResponseEntity<Void> updateAccionFechaEjecucion(
+    @PatchMapping("/{id}/acciones/{idAccion}")
+    public ResponseEntity<Void> updateAccion(
             @Parameter(description = "ID del caso") @PathVariable String id,
             @Parameter(description = "ID de la acción") @PathVariable Integer idAccion,
-            @RequestBody AccionExecutionDateRequest request) {
-        casoService.updateAccionFechaEjecucion(id, idAccion, request);
+            @RequestBody AccionUpdateRequest request) {
+        casoService.updateAccion(id, idAccion, request);
         return ResponseEntity.ok().build();
     }
 
@@ -211,13 +217,14 @@ public class CasoController {
         return ResponseEntity.noContent().build();
     }
 
-    @Operation(summary = "Asignar estudiante a caso", description = "Asigna un estudiante a un caso específico validando su registro en el término indicado.")
+    @Operation(summary = "Asignar estudiante a caso", description = "Asigna un estudiante a un caso específico validando su registro en el término indicado. Roles requeridos: COORDINADOR.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Asignación exitosa"),
             @ApiResponse(responseCode = "400", description = "Error de validación (Estudiante no encontrado/Término incorrecto)"),
             @ApiResponse(responseCode = "404", description = "Caso no encontrado")
     })
     @PostMapping("/{id}/asignacion")
+    @PreAuthorize("hasRole('COORDINADOR')")
     public ResponseEntity<String> assignStudent(
             @Parameter(description = "ID del caso") @PathVariable String id,
             @RequestBody CasoAsignacionRequest request) {
@@ -229,13 +236,14 @@ public class CasoController {
         }
     }
 
-    @Operation(summary = "Asignar supervisor a caso", description = "Asigna un profesor supervisor a un caso validando su registro.")
+    @Operation(summary = "Asignar supervisor a caso", description = "Asigna un profesor supervisor a un caso validando su registro. Roles requeridos: COORDINADOR.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Asignación de supervisión exitosa"),
             @ApiResponse(responseCode = "400", description = "Error de validación"),
             @ApiResponse(responseCode = "404", description = "Caso no encontrado")
     })
     @PostMapping("/{id}/supervision")
+    @PreAuthorize("hasRole('COORDINADOR')")
     public ResponseEntity<String> assignSupervisor(
             @Parameter(description = "ID del caso") @PathVariable String id,
             @RequestBody CasoSupervisionRequest request) {

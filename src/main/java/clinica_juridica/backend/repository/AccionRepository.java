@@ -34,4 +34,7 @@ public interface AccionRepository extends CrudRepository<Accion, Integer> {
     @Modifying
     @Query("UPDATE accion SET fecha_ejecucion = :fecha WHERE num_caso = :numCaso AND id_accion = :id")
     void updateFechaEjecucion(String numCaso, Integer id, java.time.LocalDate fecha);
+
+    @Query("SELECT * FROM accion WHERE num_caso = :numCaso AND id_accion = :id")
+    java.util.Optional<Accion> findByNumCasoAndIdAccion(String numCaso, Integer id);
 }

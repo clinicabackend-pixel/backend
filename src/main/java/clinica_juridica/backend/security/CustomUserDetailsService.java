@@ -8,8 +8,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
 
@@ -24,6 +22,14 @@ public class CustomUserDetailsService implements UserDetailsService {
         Usuario usuario = usuarioRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado: " + username));
 
-        return new User(usuario.getUsername(), usuario.getContrasena(), new ArrayList<>());
+        // Convert the String 'tipo' to a Spring Security Authority
+        // Assuming 'tipo' stored in DB matches "ESTUDIANTE", "PROFESOR", "COORDINADOR"
+        String roleName = "ROLE_" + usuario.getTipo().toUpperCase();
+
+        return User.builder()
+                .username(usuario.getUsername())
+                .password(usuario.getContrasena())
+                .authorities(roleName)
+                .build();
     }
 }

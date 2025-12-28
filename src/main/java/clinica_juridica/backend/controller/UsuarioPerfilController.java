@@ -9,8 +9,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 @RestController
 @RequestMapping("/api/usuarios")
+@Tag(name = "Usuarios", description = "API para la consulta de perfiles de usuario. Roles requeridos: Usuario autenticado.")
 public class UsuarioPerfilController {
 
     private final UsuarioPerfilService usuarioPerfilService;
@@ -20,6 +24,7 @@ public class UsuarioPerfilController {
     }
 
     @GetMapping("/personal")
+    @Operation(summary = "Obtener personal", description = "Devuelve una lista de todos los usuarios (Estudiantes, Profesores, Coordinadores).")
     public ResponseEntity<Iterable<UsuarioResponse>> getAllPersonal() {
         Iterable<Usuario> personal = usuarioPerfilService.findAllUsuarios();
         Iterable<UsuarioResponse> response = StreamSupport.stream(personal.spliterator(), false)
@@ -30,6 +35,7 @@ public class UsuarioPerfilController {
     }
 
     @GetMapping("/solicitantes")
+    @Operation(summary = "Obtener solicitantes (Vista de reporte)", description = "Devuelve una lista de solicitantes con formato de reporte.")
     public ResponseEntity<Iterable<SolicitanteResponse>> getAllSolicitantes() {
         Iterable<Solicitante> solicitantes = usuarioPerfilService.findAllSolicitantes();
         Iterable<SolicitanteResponse> response = StreamSupport.stream(
