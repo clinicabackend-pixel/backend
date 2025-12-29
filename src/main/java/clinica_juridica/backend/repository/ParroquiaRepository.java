@@ -20,4 +20,7 @@ public interface ParroquiaRepository extends CrudRepository<Parroquia, Integer> 
     @NonNull
     @Query("SELECT * FROM parroquias WHERE id_parroquia = :id")
     Optional<Parroquia> findById(@NonNull Integer id);
+
+    @Query("SELECT * FROM parroquias WHERE id_municipio = :idMunicipio")
+    List<Parroquia> findAllByIdMunicipio(Integer idMunicipio);
 }

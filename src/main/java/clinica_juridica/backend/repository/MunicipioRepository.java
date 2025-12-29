@@ -20,4 +20,7 @@ public interface MunicipioRepository extends CrudRepository<Municipio, Integer> 
     @NonNull
     @Query("SELECT * FROM municipios WHERE id_municipio = :id")
     Optional<Municipio> findById(@NonNull Integer id);
+
+    @Query("SELECT * FROM municipios WHERE id_estado = :idEstado")
+    List<Municipio> findAllByIdEstado(Integer idEstado);
 }

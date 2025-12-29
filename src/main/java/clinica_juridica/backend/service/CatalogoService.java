@@ -25,6 +25,12 @@ import clinica_juridica.backend.models.TipoCategoriaVivienda;
 import clinica_juridica.backend.repository.CondicionActividadRepository;
 import clinica_juridica.backend.repository.CondicionLaboralRepository;
 import clinica_juridica.backend.repository.NivelEducativoRepository;
+import clinica_juridica.backend.repository.EstadoRepository;
+import clinica_juridica.backend.repository.MunicipioRepository;
+import clinica_juridica.backend.repository.ParroquiaRepository;
+import clinica_juridica.backend.dto.response.EstadoResponse;
+import clinica_juridica.backend.dto.response.MunicipioResponse;
+import clinica_juridica.backend.dto.response.ParroquiaResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,6 +51,9 @@ public class CatalogoService {
         private final NivelEducativoRepository nivelEducativoRepository;
         private final CondicionLaboralRepository condicionLaboralRepository;
         private final CondicionActividadRepository condicionActividadRepository;
+        private final EstadoRepository estadoRepository;
+        private final MunicipioRepository municipioRepository;
+        private final ParroquiaRepository parroquiaRepository;
 
         public CatalogoService(MateriaAmbitoLegalRepository materiaRepository,
                         CategoriaAmbitoLegalRepository categoriaRepository,
@@ -55,7 +64,10 @@ public class CatalogoService {
                         CategoriaViviendaRepository categoriaViviendaRepository,
                         NivelEducativoRepository nivelEducativoRepository,
                         CondicionLaboralRepository condicionLaboralRepository,
-                        CondicionActividadRepository condicionActividadRepository) {
+                        CondicionActividadRepository condicionActividadRepository,
+                        EstadoRepository estadoRepository,
+                        MunicipioRepository municipioRepository,
+                        ParroquiaRepository parroquiaRepository) {
                 this.materiaRepository = materiaRepository;
                 this.categoriaRepository = categoriaRepository;
                 this.subcategoriaRepository = subcategoriaRepository;
@@ -66,6 +78,9 @@ public class CatalogoService {
                 this.nivelEducativoRepository = nivelEducativoRepository;
                 this.condicionLaboralRepository = condicionLaboralRepository;
                 this.condicionActividadRepository = condicionActividadRepository;
+                this.estadoRepository = estadoRepository;
+                this.municipioRepository = municipioRepository;
+                this.parroquiaRepository = parroquiaRepository;
         }
 
         public List<AmbitoLegalResponse> getAmbitosLegalesTree() {
@@ -201,6 +216,26 @@ public class CatalogoService {
                                 .map(c -> new CondicionActividadResponse(
                                                 c.getIdCondicionActividad(),
                                                 c.getNombreActividad()))
+                                .toList();
+        }
+
+        public List<EstadoResponse> getEstados() {
+                return estadoRepository.findAll().stream()
+                                .map(e -> new EstadoResponse(e.getIdEstado(), e.getNombreEstado()))
+                                .toList();
+        }
+
+        public List<MunicipioResponse> getMunicipios(Integer idEstado) {
+                return municipioRepository.findAllByIdEstado(idEstado).stream()
+                                .map(m -> new MunicipioResponse(m.getIdMunicipio(), m.getNombreMunicipio(),
+                                                m.getIdEstado()))
+                                .toList();
+        }
+
+        public List<ParroquiaResponse> getParroquias(Integer idMunicipio) {
+                return parroquiaRepository.findAllByIdMunicipio(idMunicipio).stream()
+                                .map(p -> new ParroquiaResponse(p.getIdParroquia(), p.getParroquia(),
+                                                p.getIdMunicipio()))
                                 .toList();
         }
 

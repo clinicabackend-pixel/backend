@@ -19,6 +19,9 @@ import clinica_juridica.backend.dto.response.CondicionLaboralResponse;
 import clinica_juridica.backend.dto.response.NivelEducativoResponse;
 import clinica_juridica.backend.dto.response.TipoViviendaResponse;
 import clinica_juridica.backend.dto.response.TribunalResponse;
+import clinica_juridica.backend.dto.response.EstadoResponse;
+import clinica_juridica.backend.dto.response.MunicipioResponse;
+import clinica_juridica.backend.dto.response.ParroquiaResponse;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -73,6 +76,26 @@ public class CatalogoController {
     public ResponseEntity<List<CondicionActividadResponse>> getCondicionesActividad(
             @Parameter(description = "Estatus para filtrar (ACTIVO/INACTIVO)") @RequestParam(required = false) String estatus) {
         return ResponseEntity.ok(catalogoService.getCondicionesActividad(estatus));
+    }
+
+    @Operation(summary = "Catálogo de Estados", description = "Retorna la lista de estados.")
+    @GetMapping("/estados")
+    public ResponseEntity<List<EstadoResponse>> getEstados() {
+        return ResponseEntity.ok(catalogoService.getEstados());
+    }
+
+    @Operation(summary = "Catálogo de Municipios", description = "Retorna la lista de municipios por estado.")
+    @GetMapping("/municipios")
+    public ResponseEntity<List<MunicipioResponse>> getMunicipios(
+            @Parameter(description = "ID del Estado") @RequestParam Integer idEstado) {
+        return ResponseEntity.ok(catalogoService.getMunicipios(idEstado));
+    }
+
+    @Operation(summary = "Catálogo de Parroquias", description = "Retorna la lista de parroquias por municipio.")
+    @GetMapping("/parroquias")
+    public ResponseEntity<List<ParroquiaResponse>> getParroquias(
+            @Parameter(description = "ID del Municipio") @RequestParam Integer idMunicipio) {
+        return ResponseEntity.ok(catalogoService.getParroquias(idMunicipio));
     }
 
     @Operation(summary = "Actualizar Estatus de Nivel Educativo", description = "Actualiza el estatus (ACTIVO/INACTIVO) de un nivel educativo.")
