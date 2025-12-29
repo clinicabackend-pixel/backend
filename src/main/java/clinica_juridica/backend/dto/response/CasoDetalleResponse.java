@@ -31,10 +31,14 @@ public class CasoDetalleResponse {
     @Schema(description = "Lista de supervisores asignados")
     private List<CasoSupervisadoProjection> supervisores;
 
+    @Schema(description = "Lista de beneficiarios asociados")
+    private List<BeneficiarioResponse> beneficiarios;
+
     public CasoDetalleResponse(Caso caso, String nombreTribunal, List<AccionResponse> acciones,
             List<EncuentroResponse> encuentros,
             List<DocumentoResponse> documentos, List<PruebaResponse> pruebas,
-            List<CasoAsignadoProjection> asignados, List<CasoSupervisadoProjection> supervisores) {
+            List<CasoAsignadoProjection> asignados, List<CasoSupervisadoProjection> supervisores,
+            List<BeneficiarioResponse> beneficiarios) {
 
         // Map Caso entity to CasoResponse DTO
         this.caso = new CasoResponse(
@@ -60,7 +64,7 @@ public class CasoDetalleResponse {
         this.documentos = documentos;
         this.pruebas = pruebas;
         this.asignados = asignados;
-        this.supervisores = supervisores;
+        this.beneficiarios = beneficiarios;
     }
 
     public CasoResponse getCaso() {
@@ -117,5 +121,13 @@ public class CasoDetalleResponse {
 
     public void setSupervisores(List<CasoSupervisadoProjection> supervisores) {
         this.supervisores = supervisores;
+    }
+
+    public List<BeneficiarioResponse> getBeneficiarios() {
+        return beneficiarios;
+    }
+
+    public void setBeneficiarios(List<BeneficiarioResponse> beneficiarios) {
+        this.beneficiarios = beneficiarios;
     }
 }

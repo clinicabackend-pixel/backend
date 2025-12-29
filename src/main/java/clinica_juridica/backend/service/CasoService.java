@@ -26,6 +26,9 @@ import clinica_juridica.backend.repository.CasoSupervisadoRepository;
 import clinica_juridica.backend.repository.AccionEjecutadaRepository;
 import clinica_juridica.backend.repository.EncuentroAtendidoRepository;
 import clinica_juridica.backend.dto.request.*;
+
+import clinica_juridica.backend.repository.BeneficiariosCasosRepository;
+import clinica_juridica.backend.dto.response.BeneficiarioResponse;
 import clinica_juridica.backend.dto.request.AccionUpdateRequest;
 import clinica_juridica.backend.dto.response.AccionResponse;
 import clinica_juridica.backend.dto.response.DocumentoResponse;
@@ -49,7 +52,8 @@ public class CasoService {
         private final clinica_juridica.backend.repository.EstudianteRepository estudianteRepository;
 
         private final clinica_juridica.backend.repository.ProfesorRepository profesorRepository;
-        private final clinica_juridica.backend.repository.TribunalRepository tribunalRepository; // Added repository
+        private final clinica_juridica.backend.repository.TribunalRepository tribunalRepository;
+        private final BeneficiariosCasosRepository beneficiariosCasosRepository;
 
         public CasoService(CasoRepository casoRepository,
                         EstatusPorCasoRepository estatusPorCasoRepository,
@@ -63,7 +67,8 @@ public class CasoService {
                         EncuentroAtendidoRepository encuentroAtendidoRepository,
                         clinica_juridica.backend.repository.EstudianteRepository estudianteRepository,
                         clinica_juridica.backend.repository.ProfesorRepository profesorRepository,
-                        clinica_juridica.backend.repository.TribunalRepository tribunalRepository) {
+                        clinica_juridica.backend.repository.TribunalRepository tribunalRepository,
+                        BeneficiariosCasosRepository beneficiariosCasosRepository) {
                 this.casoRepository = casoRepository;
                 this.estatusPorCasoRepository = estatusPorCasoRepository;
                 this.accionRepository = accionRepository;
@@ -77,6 +82,7 @@ public class CasoService {
                 this.estudianteRepository = estudianteRepository;
                 this.profesorRepository = profesorRepository;
                 this.tribunalRepository = tribunalRepository;
+                this.beneficiariosCasosRepository = beneficiariosCasosRepository;
         }
 
         public List<CasoSummaryResponse> getAllSummary() {
@@ -128,6 +134,18 @@ public class CasoService {
                 // returns String currently.
                 Caso caso = new Caso();
                 caso.setNumCaso(numCaso);
+
+                // Registrar beneficiarios si existen
+                if (request.getBeneficiarios() != null) {
+                        for (BeneficiarioCreateRequest ben : request.getBeneficiarios()) {
+                                beneficiariosCasosRepository.saveManual(
+                                                ben.getCedula(),
+                                                numCaso,
+                                                ben.getTipoBeneficiario(),
+                                                ben.getParentesco());
+                        }
+                }
+
                 return caso;
         }
 
@@ -420,7 +438,18 @@ public class CasoService {
                                 getDocumentos(id),
                                 getPruebas(id),
                                 getAsignados(id),
-                                getSupervisores(id));
+                                getSupervisores(id),
+                                getBeneficiarios(id));
+        }
+
+        public List<BeneficiarioResponse> getBeneficiarios(String id) {
+                return beneficiariosCasosRepository.findAllByNumCaso(id).stream()
+                                .map(b -> new BeneficiarioResponse(
+                                                b.getCedula(),
+                                                b.getNumCaso(),
+                                                b.getTipoBeneficiario(),
+                                                b.getParentesco()))
+                                .toList();
         }
 
         public List<CasoAsignadoProjection> getAsignados(String id) {

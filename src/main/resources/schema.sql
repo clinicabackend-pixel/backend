@@ -259,6 +259,21 @@ CREATE TABLE casos (
 );
 CREATE INDEX idx_casos_mix ON casos(id_centro, termino, username, cedula);
 
+
+CREATE TABLE beneficiarios_casos (
+    cedula VARCHAR(20) NOT NULL,
+    num_caso VARCHAR(20) NOT NULL,
+    tipo_beneficiario VARCHAR(50),
+    parentesco VARCHAR(50),
+    
+    -- Clave Primaria Compuesta (Evita duplicados de la misma persona en el mismo caso)
+    CONSTRAINT pk_beneficiarios_casos PRIMARY KEY (cedula, num_caso),
+    
+    -- Claves Foráneas (Asegúrate que las tablas referenciadas existan)
+    CONSTRAINT fk_ben_casos_cedula FOREIGN KEY (cedula) REFERENCES solicitantes(cedula),
+    CONSTRAINT fk_ben_casos_numcaso FOREIGN KEY (num_caso) REFERENCES casos(num_caso)
+);
+
 -- 1.8 ASIGNACIÓN Y SUPERVISIÓN
 -- ----------------------------------------------------------------
 CREATE TABLE casos_asignados (
@@ -266,7 +281,7 @@ CREATE TABLE casos_asignados (
   username VARCHAR(50),
   termino VARCHAR(20),
   PRIMARY KEY (num_caso, username, termino),
-  CONSTRAINT fk_asig_caso FOREIGN KEY (num_caso) REFERENCES casos(num_caso) ON DELETE CASCADE,
+  CONSTRAINT fk_asig_caso FOREIGN KEY (num_caso) REFERENCES casos(num_caso),
   CONSTRAINT fk_asig_est FOREIGN KEY (username, termino) REFERENCES estudiantes(username, termino)
 );
 
@@ -275,7 +290,7 @@ CREATE TABLE casos_supervisados (
   username VARCHAR(50),
   termino VARCHAR(20),
   PRIMARY KEY (num_caso, username, termino),
-  CONSTRAINT fk_sup_caso FOREIGN KEY (num_caso) REFERENCES casos(num_caso) ON DELETE CASCADE,
+  CONSTRAINT fk_sup_caso FOREIGN KEY (num_caso) REFERENCES casos(num_caso),
   CONSTRAINT fk_sup_prof FOREIGN KEY (username) REFERENCES profesores(username),
   CONSTRAINT fk_sup_sem FOREIGN KEY (termino) REFERENCES semestre(termino)
 );
@@ -289,7 +304,7 @@ CREATE TABLE estatus_por_caso (
   estatus VARCHAR(50),
   observacion VARCHAR(200),
   PRIMARY KEY (num_caso, id_est_caso),
-  CONSTRAINT fk_est_caso FOREIGN KEY (num_caso) REFERENCES casos(num_caso) ON DELETE CASCADE
+  CONSTRAINT fk_est_caso FOREIGN KEY (num_caso) REFERENCES casos(num_caso)
 );
 
 CREATE TABLE accion (
@@ -302,7 +317,7 @@ CREATE TABLE accion (
   username VARCHAR(50),
   PRIMARY KEY (num_caso, id_accion),
   CONSTRAINT fk_acc_usr FOREIGN KEY (username) REFERENCES usuarios(username),
-  CONSTRAINT fk_acc_caso FOREIGN KEY (num_caso) REFERENCES casos(num_caso) ON DELETE CASCADE
+  CONSTRAINT fk_acc_caso FOREIGN KEY (num_caso) REFERENCES casos(num_caso)
 );
 
 CREATE TABLE acciones_ejecutadas (
@@ -311,8 +326,8 @@ CREATE TABLE acciones_ejecutadas (
   username VARCHAR(50),
   PRIMARY KEY (num_caso, id_accion, username),
   CONSTRAINT fk_ejec_usr FOREIGN KEY (username) REFERENCES usuarios(username),
-  CONSTRAINT fk_ejec_caso FOREIGN KEY (num_caso) REFERENCES casos(num_caso) ON DELETE CASCADE,
-  CONSTRAINT fk_ejec_acc FOREIGN KEY (num_caso, id_accion) REFERENCES accion(num_caso, id_accion) ON DELETE CASCADE
+  CONSTRAINT fk_ejec_caso FOREIGN KEY (num_caso) REFERENCES casos(num_caso),
+  CONSTRAINT fk_ejec_acc FOREIGN KEY (num_caso, id_accion) REFERENCES accion(num_caso, id_accion)
 );
 
 CREATE TABLE encuentros (
@@ -325,7 +340,7 @@ CREATE TABLE encuentros (
   username VARCHAR(50),
   PRIMARY KEY (num_caso, id_encuentros),
   CONSTRAINT fk_enc_usr FOREIGN KEY (username) REFERENCES usuarios(username),
-  CONSTRAINT fk_enc_caso FOREIGN KEY (num_caso) REFERENCES casos(num_caso) ON DELETE CASCADE
+  CONSTRAINT fk_enc_caso FOREIGN KEY (num_caso) REFERENCES casos(num_caso)
 );
 
 CREATE TABLE encuentros_atendidos (
@@ -333,9 +348,9 @@ CREATE TABLE encuentros_atendidos (
   num_caso VARCHAR(50),
   username VARCHAR(50),
   PRIMARY KEY (num_caso, id_encuentro, username),
-  CONSTRAINT fk_aten_enc FOREIGN KEY (num_caso, id_encuentro) REFERENCES encuentros(num_caso, id_encuentros) ON DELETE CASCADE,
+  CONSTRAINT fk_aten_enc FOREIGN KEY (num_caso, id_encuentro) REFERENCES encuentros(num_caso, id_encuentros),
   CONSTRAINT fk_aten_usr FOREIGN KEY (username) REFERENCES usuarios(username),
-  CONSTRAINT fk_aten_caso FOREIGN KEY (num_caso) REFERENCES casos(num_caso) ON DELETE CASCADE
+  CONSTRAINT fk_aten_caso FOREIGN KEY (num_caso) REFERENCES casos(num_caso)
 );
 
 CREATE TABLE documentos (
@@ -348,7 +363,7 @@ CREATE TABLE documentos (
   observacion TEXT,
   username VARCHAR(50),
   PRIMARY KEY (num_caso, id_documento),
-  CONSTRAINT fk_doc_caso FOREIGN KEY (num_caso) REFERENCES casos(num_caso) ON DELETE CASCADE
+  CONSTRAINT fk_doc_caso FOREIGN KEY (num_caso) REFERENCES casos(num_caso)
 );
 
 CREATE TABLE pruebas (
@@ -359,7 +374,7 @@ CREATE TABLE pruebas (
   observacion TEXT,
   titulo VARCHAR(150),
   PRIMARY KEY (num_caso, id_prueba),
-  CONSTRAINT fk_pru_caso FOREIGN KEY (num_caso) REFERENCES casos(num_caso) ON DELETE CASCADE
+  CONSTRAINT fk_pru_caso FOREIGN KEY (num_caso) REFERENCES casos(num_caso)
 );
 
 -- ================================================================
@@ -372,61 +387,65 @@ INSERT INTO materia_ambito_legal (cod_mat_amb_legal, mat_amb_legal) VALUES
 
 -- 2.2 CATEGORÍAS
 INSERT INTO categoria_ambito_legal (cod_cat_amb_legal, cat_amb_legal, cod_mat_amb_legal) VALUES
-(1, 'Sin Categoría', 1), (2, 'Familia', 1),
-(3, 'Sin Categoría', 2), (4, 'Sin Categoría', 3), (5, 'Sin Categoría', 4),
-(6, 'Sin Categoría', 5), (7, 'Sin Categoría', 6);
+(1, 'Personas', 1), (2, 'Familia', 1),
+(3, 'Bienes', 1), (4, 'Contratos', 1),
+(5, 'Sin Categoría', 2), (6, 'Sin Categoría', 3), (7, 'Sin Categoría', 4),
+(8, 'Sin Categoría', 5), (9, 'Sin Categoría', 6);
 
 -- 2.3 SUBCATEGORÍAS
 INSERT INTO subcategoria_ambito_legal (cod_sub_amb_legal, nombre_subcategoria, cod_cat_amb_legal) VALUES
-(1, 'Personas', 1), (2, 'Bienes', 1), (3, 'Contratos', 1), (4, 'Sucesiones', 1),
-(5, 'Tribunales Ordinarios', 2), (6, 'Tribunales Protección NNA', 2),
-(7, 'Sin Subcategoría', 3), (8, 'Sin Subcategoría', 4), (9, 'Sin Subcategoría', 5),
-(10, 'Sin Subcategoría', 6), (11, 'Sin Subcategoría', 7);
+-- FAMILIA (Cat 2)
+(1, 'Tribunales Ordinarios', 2), (2, 'Tribunales Protección NNA', 2), (3, 'Sucesiones', 2),
+-- OTROS CIVIL (Personas=1, Bienes=3, Contratos=4)
+(4, 'Sin Subcategoría', 1), (5, 'Sin Subcategoría', 3), (6, 'Sin Subcategoría', 4),
+-- RESTO MATERIAS
+(7, 'Sin Subcategoría', 5), (8, 'Sin Subcategoría', 6), (9, 'Sin Subcategoría', 7),
+(10, 'Sin Subcategoría', 8), (11, 'Sin Subcategoría', 9);
 
 -- 2.4 ÁMBITOS LEGALES (85 ITEMS)
 INSERT INTO ambito_legal (amb_legal, cod_sub_amb_legal) VALUES
--- CIVIL > PERSONAS
-('Rectificación de Actas', 1), ('Inserción de Actas', 1), ('Solicitud de Naturalización', 1),
-('Justificativo de Soltería', 1), ('Justificativo de Concubinato', 1), ('Invitación al país', 1),
-('Justific. de Dependencia Económica / Pobreza', 1), ('Declaración Jurada de No Poseer Vivienda', 1),
-('Declaración Jurada de Ingresos', 1), ('Concubinato Postmortem', 1), ('Declaración Jurada', 1), ('Justificativo de Testigos', 1),
--- CIVIL > BIENES
-('Título Supletorio', 2), ('Compra venta bienhechuría', 2), ('Partición de comunidad ordinaria', 2),
-('Propiedad Horizontal', 2), ('Cierre de Titularidad', 2), ('Aclaratoria', 2),
--- CIVIL > CONTRATOS
-('Arrendamiento/Comodato', 3), ('Compra-venta de bienes inmuebles', 3), ('Compra-venta bienes muebles (vehículo)', 3),
-('Opción de Compra Venta', 3), ('Finiquito de compra venta', 3), ('Asociaciones / Fundaciones', 3),
-('Cooperativas', 3), ('Poder', 3), ('Cesión de derechos', 3), ('Cobro de Bolívares', 3),
-('Constitución y liquidación de hipoteca', 3), ('Servicios/obras', 3),
--- CIVIL > SUCESIONES
-('Cesión de derechos sucesorales', 4), ('Justificativo Únicos y Universales herederos', 4),
-('Testamento', 4), ('Declaración Sucesoral', 4), ('Partición de comunidad hereditaria', 4),
--- FAMILIA > TRIB. ORDINARIOS
-('Divorcio por separación de hecho (185-A)', 5), ('Separación de cuerpos (189)', 5),
-('Conversión de separación en divorcio', 5), ('Divorcio contencioso', 5),
-('Partición de comunidad conyugal', 5), ('Partición de comunidad concubinaria', 5),
-('Capitulaciones matrimoniales', 5), ('Divorcio Causal No Taxativa Sentencias', 5),
--- FAMILIA > TRIB. PROTECCIÓN NNA
-('Divorcio por separación de hecho (185-A) NNA', 6), ('Separación de cuerpos (189) NNA', 6),
-('Conversión de separación en divorcio NNA', 6), ('Divorcio contencioso NNA', 6),
-('Reconocimiento Voluntario Hijo', 6), ('Colocación familiar', 6), ('Curatela', 6),
-('Medidas de protección (Identidad, salud, educación, otros)', 6), ('Autorización para Viajar', 6),
-('Autorización para Vender', 6), ('Autorización para Trabajar', 6),
-('Obligación de Manutención/Convivencia Familiar', 6), ('Rectificación de Actas (NNA)', 6),
-('Inserción de Actas (NNA)', 6), ('Carga Familiar', 6), ('Cambio de Residencia', 6),
-('Ejercicio Unilateral de Patria Potestad', 6), ('Divorcio causal No Taxativa Sentencias (NNA)', 6), ('Tutela', 6),
--- PENAL
+-- CIVIL > PERSONAS (Cat 1 -> Subcat 4)
+('Rectificación de Actas', 4), ('Inserción de Actas', 4), ('Solicitud de Naturalización', 4),
+('Justificativo de Soltería', 4), ('Justificativo de Concubinato', 4), ('Invitación al país', 4),
+('Justific. de Dependencia Económica / Pobreza', 4), ('Declaración Jurada de No Poseer Vivienda', 4),
+('Declaración Jurada de Ingresos', 4), ('Concubinato Postmortem', 4), ('Declaración Jurada', 4), ('Justificativo de Testigos', 4),
+-- CIVIL > BIENES (Cat 3 -> Subcat 5)
+('Título Supletorio', 5), ('Compra venta bienhechuría', 5), ('Partición de comunidad ordinaria', 5),
+('Propiedad Horizontal', 5), ('Cierre de Titularidad', 5), ('Aclaratoria', 5),
+-- CIVIL > CONTRATOS (Cat 4 -> Subcat 6)
+('Arrendamiento/Comodato', 6), ('Compra-venta de bienes inmuebles', 6), ('Compra-venta bienes muebles (vehículo)', 6),
+('Opción de Compra Venta', 6), ('Finiquito de compra venta', 6), ('Asociaciones / Fundaciones', 6),
+('Cooperativas', 6), ('Poder', 6), ('Cesión de derechos', 6), ('Cobro de Bolívares', 6),
+('Constitución y liquidación de hipoteca', 6), ('Servicios/obras', 6),
+-- CIVIL > FAMILIA > SUCESIONES (Cat 2 -> Subcat 3)
+('Cesión de derechos sucesorales', 3), ('Justificativo Únicos y Universales herederos', 3),
+('Testamento', 3), ('Declaración Sucesoral', 3), ('Partición de comunidad hereditaria', 3),
+-- CIVIL > FAMILIA > TRIB. ORDINARIOS (Cat 2 -> Subcat 1)
+('Divorcio por separación de hecho (185-A)', 1), ('Separación de cuerpos (189)', 1),
+('Conversión de separación en divorcio', 1), ('Divorcio contencioso', 1),
+('Partición de comunidad conyugal', 1), ('Partición de comunidad concubinaria', 1),
+('Capitulaciones matrimoniales', 1), ('Divorcio Causal No Taxativa Sentencias', 1),
+-- CIVIL > FAMILIA > TRIB. PROTECCIÓN NNA (Cat 2 -> Subcat 2)
+('Divorcio por separación de hecho (185-A) NNA', 2), ('Separación de cuerpos (189) NNA', 2),
+('Conversión de separación en divorcio NNA', 2), ('Divorcio contencioso NNA', 2),
+('Reconocimiento Voluntario Hijo', 2), ('Colocación familiar', 2), ('Curatela', 2),
+('Medidas de protección (Identidad, salud, educación, otros)', 2), ('Autorización para Viajar', 2),
+('Autorización para Vender', 2), ('Autorización para Trabajar', 2),
+('Obligación de Manutención/Convivencia Familiar', 2), ('Rectificación de Actas (NNA)', 2),
+('Inserción de Actas (NNA)', 2), ('Carga Familiar', 2), ('Cambio de Residencia', 2),
+('Ejercicio Unilateral de Patria Potestad', 2), ('Divorcio causal No Taxativa Sentencias (NNA)', 2), ('Tutela', 2),
+-- PENAL (Cat 5 -> Subcat 7)
 ('Delitos Contra la Propiedad (Robo, Hurto)', 7), ('Contra las Personas (homicidio, lesiones)', 7),
 ('Contra las Buenas Costumbres (Violación)', 7), ('Delitos contra el Honor', 7), ('Violencia Doméstica', 7),
--- LABORAL
+-- LABORAL (Cat 6 -> Subcat 8)
 ('Calificación de Despido', 8), ('Prestaciones Sociales', 8), ('Contratos de Trabajo', 8),
 ('Accidentes de Trabajo', 8), ('Incapacidad laboral', 8), ('Terminación de Relación Laboral', 8),
--- MERCANTIL
+-- MERCANTIL (Cat 7 -> Subcat 9)
 ('Firma Personal', 9), ('Constitución de Compañías', 9), ('Actas de Asamblea', 9),
 ('Compra Venta de Fondo de Comercio / Acciones', 9), ('Letras de Cambio', 9),
--- ADMINISTRATIVA
+-- ADMINISTRATIVA (Cat 8 -> Subcat 10)
 ('Recursos Administrativos', 10),
--- OTROS
+-- OTROS (Cat 9 -> Subcat 11)
 ('Convivencia Ciudadana', 11), ('Derechos Humanos', 11), ('Tránsito', 11), ('Otros', 11), ('Diligencias Seguimiento', 11);
 
 

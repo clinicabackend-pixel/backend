@@ -2,7 +2,6 @@ package clinica_juridica.backend.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
-
 @Schema(description = "Solicitud para la creación de un nuevo caso")
 public class CasoCreateRequest {
         @Schema(description = "Síntesis del caso", requiredMode = Schema.RequiredMode.REQUIRED)
@@ -31,6 +30,9 @@ public class CasoCreateRequest {
 
         @Schema(description = "Competencia de ámbito legal")
         private Integer comAmbLegal;
+
+        @Schema(description = "Lista de beneficiarios asociados al caso")
+        private java.util.List<BeneficiarioCreateRequest> beneficiarios;
 
         public CasoCreateRequest() {
         }
@@ -105,5 +107,13 @@ public class CasoCreateRequest {
 
         public void setComAmbLegal(Integer comAmbLegal) {
                 this.comAmbLegal = comAmbLegal;
+        }
+
+        public java.util.List<BeneficiarioCreateRequest> getBeneficiarios() {
+                return beneficiarios;
+        }
+
+        public void setBeneficiarios(java.util.List<BeneficiarioCreateRequest> beneficiarios) {
+                this.beneficiarios = beneficiarios;
         }
 }
