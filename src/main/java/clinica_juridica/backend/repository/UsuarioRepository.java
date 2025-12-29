@@ -23,4 +23,7 @@ public interface UsuarioRepository extends CrudRepository<Usuario, String> {
 
     @Query("SELECT * FROM usuarios WHERE username = :username")
     Optional<Usuario> findByUsername(String username);
+
+    @Query("SELECT * FROM usuarios WHERE status = :status")
+    List<Usuario> findByStatus(String status);
 }
