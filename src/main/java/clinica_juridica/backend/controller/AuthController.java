@@ -23,7 +23,7 @@ import io.swagger.v3.oas.annotations.Operation; // Added import
 import io.swagger.v3.oas.annotations.tags.Tag; // Added import
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/api/auth")
 @Tag(name = "Autenticación", description = "Endpoints para login y validación de sesión")
 public class AuthController {
 
