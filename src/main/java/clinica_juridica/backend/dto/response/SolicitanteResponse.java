@@ -3,13 +3,19 @@ package clinica_juridica.backend.dto.response;
 import java.time.LocalDate;
 
 public record SolicitanteResponse(
-                String idSolicitante,
+                String cedula,
                 String nombre,
                 String sexo,
-                LocalDate fechaNacimiento,
                 String estadoCivil,
-                Integer idParroquia,
-                Integer idNivelEducativo,
-                String idVivienda,
-                String idTrabajo) {
+                LocalDate fechaNacimiento,
+                Boolean concubinato,
+                String nacionalidad,
+                Boolean trabaja,
+                String condicionTrabajo,
+                String telfCasa,
+                String telfCelular,
+                String email,
+                String comunidadResidencia,
+                String parroquiaResidencia,
+                String tipoVivienda) {
 }
