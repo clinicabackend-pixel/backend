@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 
 @Configuration
+@org.springframework.context.annotation.Profile("!test")
 public class DataSeeder {
 
     @Bean

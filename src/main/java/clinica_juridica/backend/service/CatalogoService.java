@@ -54,6 +54,7 @@ public class CatalogoService {
         private final EstadoRepository estadoRepository;
         private final MunicipioRepository municipioRepository;
         private final ParroquiaRepository parroquiaRepository;
+        private final clinica_juridica.backend.repository.EstadoCivilRepository estadoCivilRepository;
 
         public CatalogoService(MateriaAmbitoLegalRepository materiaRepository,
                         CategoriaAmbitoLegalRepository categoriaRepository,
@@ -67,7 +68,8 @@ public class CatalogoService {
                         CondicionActividadRepository condicionActividadRepository,
                         EstadoRepository estadoRepository,
                         MunicipioRepository municipioRepository,
-                        ParroquiaRepository parroquiaRepository) {
+                        ParroquiaRepository parroquiaRepository,
+                        clinica_juridica.backend.repository.EstadoCivilRepository estadoCivilRepository) {
                 this.materiaRepository = materiaRepository;
                 this.categoriaRepository = categoriaRepository;
                 this.subcategoriaRepository = subcategoriaRepository;
@@ -81,6 +83,7 @@ public class CatalogoService {
                 this.estadoRepository = estadoRepository;
                 this.municipioRepository = municipioRepository;
                 this.parroquiaRepository = parroquiaRepository;
+                this.estadoCivilRepository = estadoCivilRepository;
         }
 
         public List<AmbitoLegalResponse> getAmbitosLegalesTree() {
@@ -236,6 +239,14 @@ public class CatalogoService {
                 return parroquiaRepository.findAllByIdMunicipio(idMunicipio).stream()
                                 .map(p -> new ParroquiaResponse(p.getIdParroquia(), p.getParroquia(),
                                                 p.getIdMunicipio()))
+                                .toList();
+        }
+
+        public List<clinica_juridica.backend.dto.response.EstadoCivilResponse> getEstadosCiviles() {
+                return estadoCivilRepository.findAll().stream()
+                                .map(e -> new clinica_juridica.backend.dto.response.EstadoCivilResponse(
+                                                e.getIdEstadoCivil(),
+                                                e.getDescripcion()))
                                 .toList();
         }
 

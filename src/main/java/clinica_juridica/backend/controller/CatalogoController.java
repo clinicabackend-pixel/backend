@@ -98,6 +98,12 @@ public class CatalogoController {
         return ResponseEntity.ok(catalogoService.getParroquias(idMunicipio));
     }
 
+    @Operation(summary = "Catálogo de Estados Civiles", description = "Retorna la lista de estados civiles.")
+    @GetMapping("/estados-civiles")
+    public ResponseEntity<List<clinica_juridica.backend.dto.response.EstadoCivilResponse>> getEstadosCiviles() {
+        return ResponseEntity.ok(catalogoService.getEstadosCiviles());
+    }
+
     @Operation(summary = "Actualizar Estatus de Nivel Educativo", description = "Actualiza el estatus (ACTIVO/INACTIVO) de un nivel educativo.")
     @PatchMapping("/niveles-educativos/{id}/estatus")
     public ResponseEntity<String> updateNivelEducativoStatus(
