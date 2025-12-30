@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import java.util.List;
+import org.springframework.lang.NonNull;
 
 @RestController
 @RequestMapping("/api/catalogos")
@@ -212,7 +213,7 @@ public class CatalogoController {
     @Operation(summary = "Actualizar Centro", description = "Modifica los datos de un centro existente.")
     @PutMapping("/centros/{id}")
     public ResponseEntity<String> updateCentro(
-            @PathVariable Integer id,
+            @PathVariable @NonNull Integer id,
             @RequestBody CentroRequest request) {
         catalogoService.updateCentro(id, request);
         return ResponseEntity.ok("Centro actualizado correctamente");

@@ -37,6 +37,7 @@ import clinica_juridica.backend.models.Centro;
 import clinica_juridica.backend.repository.CentroRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.lang.NonNull;
 
 import java.util.Collections;
 import java.util.List;
@@ -360,7 +361,7 @@ public class CatalogoService {
         }
 
         @Transactional
-        public void updateCentro(Integer id, CentroRequest request) {
+        public void updateCentro(@NonNull Integer id, CentroRequest request) {
                 Centro centro = centroRepository.findById(id)
                                 .orElseThrow(() -> new RuntimeException("Centro no encontrado con id: " + id));
 
