@@ -1,0 +1,14 @@
+{
+  "properties": [
+    {
+      "name": "app.notification.recipients",
+      "type": "java.lang.String",
+      "description": "Comma-separated list of email recipients for application notifications."
+    },
+    {
+      "name": "app.notification.subject",
+      "type": "java.lang.String",
+      "description": "Subject line for application startup notifications."
+    }
+  ]
+}
