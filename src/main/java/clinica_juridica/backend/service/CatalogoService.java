@@ -242,6 +242,20 @@ public class CatalogoService {
                                 .toList();
         }
 
+        public List<MunicipioResponse> getAllMunicipios() {
+                return municipioRepository.findAll().stream()
+                                .map(m -> new MunicipioResponse(m.getIdMunicipio(), m.getNombreMunicipio(),
+                                                m.getIdEstado()))
+                                .toList();
+        }
+
+        public List<ParroquiaResponse> getAllParroquias() {
+                return parroquiaRepository.findAll().stream()
+                                .map(p -> new ParroquiaResponse(p.getIdParroquia(), p.getParroquia(),
+                                                p.getIdMunicipio()))
+                                .toList();
+        }
+
         public List<clinica_juridica.backend.dto.response.EstadoCivilResponse> getEstadosCiviles() {
                 return estadoCivilRepository.findAll().stream()
                                 .map(e -> new clinica_juridica.backend.dto.response.EstadoCivilResponse(

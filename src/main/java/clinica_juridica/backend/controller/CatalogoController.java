@@ -98,6 +98,18 @@ public class CatalogoController {
         return ResponseEntity.ok(catalogoService.getParroquias(idMunicipio));
     }
 
+    @Operation(summary = "Catálogo Completo de Municipios", description = "Retorna todos los municipios sin filtrar.")
+    @GetMapping("/municipios/all")
+    public ResponseEntity<List<MunicipioResponse>> getAllMunicipios() {
+        return ResponseEntity.ok(catalogoService.getAllMunicipios());
+    }
+
+    @Operation(summary = "Catálogo Completo de Parroquias", description = "Retorna todas las parroquias sin filtrar.")
+    @GetMapping("/parroquias/all")
+    public ResponseEntity<List<ParroquiaResponse>> getAllParroquias() {
+        return ResponseEntity.ok(catalogoService.getAllParroquias());
+    }
+
     @Operation(summary = "Catálogo de Estados Civiles", description = "Retorna la lista de estados civiles.")
     @GetMapping("/estados-civiles")
     public ResponseEntity<List<clinica_juridica.backend.dto.response.EstadoCivilResponse>> getEstadosCiviles() {
