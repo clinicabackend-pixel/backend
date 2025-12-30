@@ -13,11 +13,11 @@ import java.util.Optional;
 public interface SolicitanteRepository extends CrudRepository<Solicitante, String> {
     @Override
     @NonNull
-    @Query("SELECT * FROM solicitante")
+    @Query("SELECT * FROM solicitantes")
     List<Solicitante> findAll();
 
     @Override
     @NonNull
-    @Query("SELECT * FROM solicitante WHERE cedula = :cedula")
+    @Query("SELECT * FROM solicitantes WHERE cedula = :cedula")
     Optional<Solicitante> findById(@NonNull String cedula);
 }

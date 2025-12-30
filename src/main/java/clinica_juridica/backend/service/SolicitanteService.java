@@ -2,6 +2,7 @@ package clinica_juridica.backend.service;
 
 import clinica_juridica.backend.models.Solicitante;
 import clinica_juridica.backend.repository.SolicitanteRepository;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,6 +15,7 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 @Service
+@SuppressWarnings("null")
 public class SolicitanteService {
 
     private final SolicitanteRepository solicitanteRepository;
@@ -28,18 +30,18 @@ public class SolicitanteService {
                 .collect(Collectors.toList());
     }
 
-    public Optional<SolicitanteResponse> getById(String id) {
+    public Optional<SolicitanteResponse> getById(@NonNull String id) {
         return solicitanteRepository.findById(id).map(this::mapToResponse);
     }
 
     @Transactional
-    public void create(SolicitanteRequest request) {
+    public void create(@NonNull SolicitanteRequest request) {
         Solicitante solicitante = mapToEntity(request);
         solicitanteRepository.save(solicitante);
     }
 
     @Transactional
-    public boolean update(String id, SolicitanteRequest request) {
+    public boolean update(@NonNull String id, @NonNull SolicitanteRequest request) {
         if (!solicitanteRepository.existsById(id)) {
             return false;
         }
@@ -49,12 +51,12 @@ public class SolicitanteService {
         return true;
     }
 
-    public boolean exists(String id) {
+    public boolean exists(@NonNull String id) {
         return solicitanteRepository.existsById(id);
     }
 
     @Transactional
-    public boolean delete(String id) {
+    public boolean delete(@NonNull String id) {
         if (!solicitanteRepository.existsById(id)) {
             return false;
         }
