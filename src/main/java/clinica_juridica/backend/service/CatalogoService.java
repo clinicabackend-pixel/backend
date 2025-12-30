@@ -31,6 +31,10 @@ import clinica_juridica.backend.repository.ParroquiaRepository;
 import clinica_juridica.backend.dto.response.EstadoResponse;
 import clinica_juridica.backend.dto.response.MunicipioResponse;
 import clinica_juridica.backend.dto.response.ParroquiaResponse;
+import clinica_juridica.backend.dto.response.CentroResponse;
+import clinica_juridica.backend.dto.request.CentroRequest;
+import clinica_juridica.backend.models.Centro;
+import clinica_juridica.backend.repository.CentroRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -55,6 +59,7 @@ public class CatalogoService {
         private final MunicipioRepository municipioRepository;
         private final ParroquiaRepository parroquiaRepository;
         private final clinica_juridica.backend.repository.EstadoCivilRepository estadoCivilRepository;
+        private final CentroRepository centroRepository;
 
         public CatalogoService(MateriaAmbitoLegalRepository materiaRepository,
                         CategoriaAmbitoLegalRepository categoriaRepository,
@@ -69,7 +74,8 @@ public class CatalogoService {
                         EstadoRepository estadoRepository,
                         MunicipioRepository municipioRepository,
                         ParroquiaRepository parroquiaRepository,
-                        clinica_juridica.backend.repository.EstadoCivilRepository estadoCivilRepository) {
+                        clinica_juridica.backend.repository.EstadoCivilRepository estadoCivilRepository,
+                        CentroRepository centroRepository) {
                 this.materiaRepository = materiaRepository;
                 this.categoriaRepository = categoriaRepository;
                 this.subcategoriaRepository = subcategoriaRepository;
@@ -84,6 +90,7 @@ public class CatalogoService {
                 this.municipioRepository = municipioRepository;
                 this.parroquiaRepository = parroquiaRepository;
                 this.estadoCivilRepository = estadoCivilRepository;
+                this.centroRepository = centroRepository;
         }
 
         public List<AmbitoLegalResponse> getAmbitosLegalesTree() {
@@ -336,5 +343,31 @@ public class CatalogoService {
                 Integer idCat = (maxId != null ? maxId : 0) + 1;
                 CategoriaVivienda nuevaCat = new CategoriaVivienda(idCat, idTipo, descripcion, "ACTIVO");
                 categoriaViviendaRepository.save(nuevaCat);
+        }
+
+        public List<CentroResponse> getCentros() {
+                return centroRepository.findAll().stream()
+                                .map(c -> new CentroResponse(c.getIdCentro(), c.getNombre(), c.getIdParroquia()))
+                                .toList();
+        }
+
+        @Transactional
+        public void createCentro(CentroRequest request) {
+                Centro centro = new Centro();
+                centro.setNombre(request.nombreCentro());
+                centro.setIdParroquia(request.idParroquia()); // Puede ser nulo
+                centroRepository.save(centro);
+        }
+
+        @Transactional
+        public void updateCentro(Integer id, CentroRequest request) {
+                Centro centro = centroRepository.findById(id)
+                                .orElseThrow(() -> new RuntimeException("Centro no encontrado con id: " + id));
+
+                centro.setNombre(request.nombreCentro());
+                if (request.idParroquia() != null) {
+                        centro.setIdParroquia(request.idParroquia());
+                }
+                centroRepository.save(centro);
         }
 }
