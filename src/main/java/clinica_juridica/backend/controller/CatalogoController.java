@@ -14,6 +14,8 @@ import io.swagger.v3.oas.annotations.Parameter;
 
 import clinica_juridica.backend.dto.request.CreateCatalogoRequest;
 import clinica_juridica.backend.dto.request.CreateViviendaRequest;
+import clinica_juridica.backend.dto.request.CentroRequest;
+import clinica_juridica.backend.dto.response.CentroResponse;
 import clinica_juridica.backend.dto.response.CondicionActividadResponse;
 import clinica_juridica.backend.dto.response.CondicionLaboralResponse;
 import clinica_juridica.backend.dto.response.NivelEducativoResponse;
@@ -24,8 +26,10 @@ import clinica_juridica.backend.dto.response.MunicipioResponse;
 import clinica_juridica.backend.dto.response.ParroquiaResponse;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import java.util.List;
+import org.springframework.lang.NonNull;
 
 @RestController
 @RequestMapping("/api/catalogos")
@@ -191,5 +195,27 @@ public class CatalogoController {
             @RequestBody CreateViviendaRequest request) {
         catalogoService.createVivienda(request.getIdTipo(), request.getDescripcion());
         return ResponseEntity.ok("Categoría de vivienda creada correctamente");
+    }
+
+    @Operation(summary = "Listar Centros", description = "Retorna la lista de todos los centros asociados.")
+    @GetMapping("/centros")
+    public ResponseEntity<List<CentroResponse>> getCentros() {
+        return ResponseEntity.ok(catalogoService.getCentros());
+    }
+
+    @Operation(summary = "Crear Centro", description = "Crea un nuevo centro.")
+    @PostMapping("/centros")
+    public ResponseEntity<String> createCentro(@RequestBody CentroRequest request) {
+        catalogoService.createCentro(request);
+        return ResponseEntity.ok("Centro creado correctamente");
+    }
+
+    @Operation(summary = "Actualizar Centro", description = "Modifica los datos de un centro existente.")
+    @PutMapping("/centros/{id}")
+    public ResponseEntity<String> updateCentro(
+            @PathVariable @NonNull Integer id,
+            @RequestBody CentroRequest request) {
+        catalogoService.updateCentro(id, request);
+        return ResponseEntity.ok("Centro actualizado correctamente");
     }
 }

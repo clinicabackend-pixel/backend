@@ -18,6 +18,7 @@ public class Solicitante implements Persistable<String> {
     private String email;
     private String concubinato;
     private Integer idEstadoCivil;
+    private Integer idParroquia;
     private String telfCelular;
     private String telfCasa;
     private LocalDate fNacimiento;
@@ -104,6 +105,14 @@ public class Solicitante implements Persistable<String> {
 
     public void setIdEstadoCivil(Integer idEstadoCivil) {
         this.idEstadoCivil = idEstadoCivil;
+    }
+
+    public Integer getIdParroquia() {
+        return idParroquia;
+    }
+
+    public void setIdParroquia(Integer idParroquia) {
+        this.idParroquia = idParroquia;
     }
 
     public String getTelfCelular() {
