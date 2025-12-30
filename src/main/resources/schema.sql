@@ -195,6 +195,7 @@ CREATE TABLE solicitantes (
   id_condicion_actividad INTEGER, -- FK ACTUALIZADA a condicion_actividad
   id_nivel INTEGER,
   tiempo_estudio VARCHAR(50),
+  id_parroquia INTEGER,
   
   CONSTRAINT chk_sol_sexo CHECK (sexo IN ('Masculino', 'Femenino')),
   CONSTRAINT chk_sol_nacionalidad CHECK (nacionalidad IN ('Venezolano', 'Extranjero')),
@@ -206,7 +207,8 @@ CREATE TABLE solicitantes (
   CONSTRAINT fk_sol_civil FOREIGN KEY (id_estado_civil) REFERENCES estado_civil(id_estado_civil),
   
   -- NUEVA RELACIÓN ACTUALIZADA
-  CONSTRAINT fk_sol_actividad FOREIGN KEY (id_condicion_actividad) REFERENCES condicion_actividad(id_condicion_actividad)
+  CONSTRAINT fk_sol_actividad FOREIGN KEY (id_condicion_actividad) REFERENCES condicion_actividad(id_condicion_actividad),
+  CONSTRAINT fk_sol_parroquia FOREIGN KEY (id_parroquia) REFERENCES parroquias(id_parroquia)
 );
 
 -- 1.6 VIVIENDA

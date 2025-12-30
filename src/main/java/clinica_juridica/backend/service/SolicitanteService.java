@@ -95,7 +95,8 @@ public class SolicitanteService {
         s.setTelfCelular(r.telfCelular());
         s.setTelfCasa(r.telfCasa());
         s.setFNacimiento(r.fechaNacimiento());
-        // Map other fields (IDs) if repositories were available to lookup
+        s.setIdEstadoCivil(r.idEstadoCivil());
+        s.setIdParroquia(r.idParroquia());
         return s;
     }
 }
