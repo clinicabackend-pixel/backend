@@ -28,10 +28,12 @@ public interface SolicitanteRepository extends CrudRepository<Solicitante, Strin
     @Query("""
                 INSERT INTO solicitantes (
                     cedula, nombre, sexo, nacionalidad, email, concubinato,
-                    telf_casa, telf_celular, f_nacimiento, id_estado_civil, id_parroquia
+                    telf_casa, telf_celular, f_nacimiento, id_estado_civil, id_parroquia,
+                    id_condicion, id_condicion_actividad
                 ) VALUES (
                     :cedula, :nombre, :sexo, :nacionalidad, :email, :concubinato,
-                    :telfCasa, :telfCelular, :fNacimiento, :idEstadoCivil, :idParroquia
+                    :telfCasa, :telfCelular, :fNacimiento, :idEstadoCivil, :idParroquia,
+                    :idCondicion, :idCondicionActividad
                 )
             """)
     void insertSolicitante(
@@ -45,5 +47,7 @@ public interface SolicitanteRepository extends CrudRepository<Solicitante, Strin
             @Param("telfCelular") String telfCelular,
             @Param("fNacimiento") java.time.LocalDate fNacimiento,
             @Param("idEstadoCivil") Integer idEstadoCivil,
-            @Param("idParroquia") Integer idParroquia);
+            @Param("idParroquia") Integer idParroquia,
+            @Param("idCondicion") Integer idCondicion,
+            @Param("idCondicionActividad") Integer idCondicionActividad);
 }

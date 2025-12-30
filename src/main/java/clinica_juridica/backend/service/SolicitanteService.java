@@ -48,7 +48,9 @@ public class SolicitanteService {
                 s.getTelfCelular(),
                 s.getFNacimiento(),
                 s.getIdEstadoCivil(),
-                s.getIdParroquia());
+                s.getIdParroquia(),
+                s.getIdCondicion(),
+                s.getIdCondicionActividad());
     }
 
     @Transactional
@@ -108,6 +110,8 @@ public class SolicitanteService {
         s.setFNacimiento(r.fechaNacimiento());
         s.setIdEstadoCivil(r.idEstadoCivil());
         s.setIdParroquia(r.idParroquia());
+        s.setIdCondicion(r.idCondicion());
+        s.setIdCondicionActividad(r.idCondicionActividad());
         return s;
     }
 }
