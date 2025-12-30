@@ -191,7 +191,7 @@ CREATE TABLE solicitantes (
   telf_casa VARCHAR(20),
   f_nacimiento DATE,
   edad INTEGER,
-  
+  f_registro DATE DEFAULT CURRENT_DATE,
   id_condicion INTEGER,          -- FK a condicion_laboral
   id_condicion_actividad INTEGER, -- FK ACTUALIZADA a condicion_actividad
   id_nivel INTEGER,
