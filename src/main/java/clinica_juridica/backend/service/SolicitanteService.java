@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 @Service
-@SuppressWarnings("null")
+
 public class SolicitanteService {
 
     private final SolicitanteRepository solicitanteRepository;
@@ -36,8 +36,19 @@ public class SolicitanteService {
 
     @Transactional
     public void create(@NonNull SolicitanteRequest request) {
-        Solicitante solicitante = mapToEntity(request);
-        solicitanteRepository.save(solicitante);
+        Solicitante s = mapToEntity(request);
+        solicitanteRepository.insertSolicitante(
+                s.getCedula(),
+                s.getNombre(),
+                s.getSexo(),
+                s.getNacionalidad(),
+                s.getEmail(),
+                s.getConcubinato(),
+                s.getTelfCasa(),
+                s.getTelfCelular(),
+                s.getFNacimiento(),
+                s.getIdEstadoCivil(),
+                s.getIdParroquia());
     }
 
     @Transactional

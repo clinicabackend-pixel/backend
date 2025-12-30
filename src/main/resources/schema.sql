@@ -175,7 +175,8 @@ CREATE TABLE familias (
   cant_trabaja INTEGER,
   id_nivel_edu_jefe INTEGER,
   tiempo_estudio VARCHAR(50),
-  CONSTRAINT fk_fam_niv FOREIGN KEY (id_nivel_edu_jefe) REFERENCES niveles_educativos(id_nivel)
+  CONSTRAINT fk_fam_niv FOREIGN KEY (id_nivel_edu_jefe) REFERENCES niveles_educativos(id_nivel),
+  CONSTRAINT fk_fam_sol FOREIGN KEY (cedula) REFERENCES solicitantes(cedula)
 );
 
 CREATE TABLE solicitantes (
@@ -201,7 +202,7 @@ CREATE TABLE solicitantes (
   CONSTRAINT chk_sol_nacionalidad CHECK (nacionalidad IN ('Venezolano', 'Extranjero')),
   CONSTRAINT chk_sol_concubinato CHECK (concubinato IN ('SI', 'NO')),
   
-  CONSTRAINT fk_sol_fam FOREIGN KEY (cedula) REFERENCES familias(cedula),
+  -- CONSTRAINT fk_sol_fam REMOVED: Inverted logic, Solicitante created first
   CONSTRAINT fk_sol_cond FOREIGN KEY (id_condicion) REFERENCES condicion_laboral(id_condicion),
   CONSTRAINT fk_sol_niv FOREIGN KEY (id_nivel) REFERENCES niveles_educativos(id_nivel),
   CONSTRAINT fk_sol_civil FOREIGN KEY (id_estado_civil) REFERENCES estado_civil(id_estado_civil),
