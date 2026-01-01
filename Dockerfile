@@ -18,10 +18,10 @@ COPY src src
 RUN ./mvnw clean package -DskipTests
 
 # Runtime stage
-FROM eclipse-temurin:21-jre-jammy
+FROM eclipse-temurin:21-jre
 
 # Create a non-root user for better security
-RUN addgroup --system app && adduser --system --ingroup app app
+RUN groupadd --system app && useradd --system --gid app app
 
 WORKDIR /app
 
@@ -36,6 +36,6 @@ USER app
 
 EXPOSE 8080
 
-ENV JAVA_TOOL_OPTIONS="-Djava.security.egd=file:/dev/./urandom -Xms256m -Xmx512m"
+ENV JAVA_TOOL_OPTIONS="-Djava.security.egd=file:/dev/./urandom -Xms256m -Xmx512m -Djava.net.preferIPv4Stack=true"
 
 CMD ["sh", "-c", "exec java $JAVA_TOOL_OPTIONS -jar /app/app.jar"]
