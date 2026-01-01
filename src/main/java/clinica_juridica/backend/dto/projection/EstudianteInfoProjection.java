@@ -4,6 +4,4 @@ public interface EstudianteInfoProjection {
     String getUsername();
 
     String getNombre();
-
-    String getApellido();
 }
