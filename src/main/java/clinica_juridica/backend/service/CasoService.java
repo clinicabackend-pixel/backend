@@ -146,6 +146,28 @@ public class CasoService {
                         }
                 }
 
+                // Registrar encuentro inicial si hay orientación
+                if (request.getOrientacion() != null && !request.getOrientacion().isEmpty()) {
+                        Encuentro encuentro = new Encuentro();
+                        encuentro.setNumCaso(numCaso);
+                        encuentro.setFechaAtencion(DateUtils.getCurrentDate());
+                        encuentro.setOrientacion(request.getOrientacion());
+                        encuentro.setUsername(request.getUsername());
+                        // Fecha próxima is default null or decided by user? Usually null for initial
+
+                        Encuentro savedEncuentro = encuentroRepository.save(encuentro); // WARNING: Variable name check
+
+                        if (request.getEstudiantesAtencion() != null) {
+                                for (String studentUsername : request.getEstudiantesAtencion()) {
+                                        clinica_juridica.backend.models.EncuentroAtendido atendido = new clinica_juridica.backend.models.EncuentroAtendido(
+                                                        savedEncuentro.getIdEncuentros(),
+                                                        numCaso,
+                                                        studentUsername);
+                                        encuentroAtendidoRepository.save(atendido);
+                                }
+                        }
+                }
+
                 return caso;
         }
 

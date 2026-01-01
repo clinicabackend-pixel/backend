@@ -109,6 +109,28 @@ public class CasoCreateRequest {
                 this.comAmbLegal = comAmbLegal;
         }
 
+        @Schema(description = "Orientación dada en el primer encuentro")
+        private String orientacion;
+
+        @Schema(description = "Lista de usernames de estudiantes que atendieron")
+        private java.util.List<String> estudiantesAtencion;
+
+        public String getOrientacion() {
+                return orientacion;
+        }
+
+        public void setOrientacion(String orientacion) {
+                this.orientacion = orientacion;
+        }
+
+        public java.util.List<String> getEstudiantesAtencion() {
+                return estudiantesAtencion;
+        }
+
+        public void setEstudiantesAtencion(java.util.List<String> estudiantesAtencion) {
+                this.estudiantesAtencion = estudiantesAtencion;
+        }
+
         public java.util.List<BeneficiarioCreateRequest> getBeneficiarios() {
                 return beneficiarios;
         }
