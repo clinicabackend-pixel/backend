@@ -25,7 +25,7 @@ public interface CasoRepository extends CrudRepository<Caso, String> {
         @Query("SELECT * FROM casos WHERE estatus = :estatus")
         List<Caso> findAllByEstatus(String estatus);
 
-        @Query("SELECT c.num_caso, c.fecha_recepcion, c.sintesis, c.estatus, ca.username, c.termino, c.cedula, s.nombre AS nombre_solicitante "
+        @Query("SELECT c.num_caso, c.fecha_recepcion, c.sintesis, c.estatus, ca.username, c.termino, c.cedula, s.nombre AS nombre_solicitante, c.com_amb_legal "
                         +
                         "FROM casos c " +
                         "LEFT JOIN casos_asignados ca ON c.num_caso = ca.num_caso " +

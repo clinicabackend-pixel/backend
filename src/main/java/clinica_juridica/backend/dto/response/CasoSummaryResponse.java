@@ -21,12 +21,14 @@ public class CasoSummaryResponse {
     private String cedula;
     @Schema(description = "Nombre del solicitante")
     private String nombreSolicitante;
+    @Schema(description = "ID del ámbito legal")
+    private Integer comAmbLegal;
 
     public CasoSummaryResponse() {
     }
 
     public CasoSummaryResponse(String numCaso, LocalDate fechaRecepcion, String sintesis, String estatus,
-            String username, String termino, String cedula, String nombreSolicitante) {
+            String username, String termino, String cedula, String nombreSolicitante, Integer comAmbLegal) {
         this.numCaso = numCaso;
         this.fechaRecepcion = fechaRecepcion;
         this.sintesis = sintesis;
@@ -35,6 +37,7 @@ public class CasoSummaryResponse {
         this.termino = termino;
         this.cedula = cedula;
         this.nombreSolicitante = nombreSolicitante;
+        this.comAmbLegal = comAmbLegal;
     }
 
     public String getNumCaso() {
@@ -99,5 +102,13 @@ public class CasoSummaryResponse {
 
     public void setNombreSolicitante(String nombreSolicitante) {
         this.nombreSolicitante = nombreSolicitante;
+    }
+
+    public Integer getComAmbLegal() {
+        return comAmbLegal;
+    }
+
+    public void setComAmbLegal(Integer comAmbLegal) {
+        this.comAmbLegal = comAmbLegal;
     }
 }
