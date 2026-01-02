@@ -11,7 +11,7 @@ import clinica_juridica.backend.repository.SolicitanteRepository;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import java.util.Objects;
 import java.util.List;
 import java.util.Optional;
 
@@ -98,7 +98,8 @@ public class SolicitanteService {
         String nombreEstado = "";
 
         if (s.getIdParroquia() != null) {
-            Optional<Parroquia> pOpt = parroquiaRepository.findById(s.getIdParroquia());
+            Optional<Parroquia> pOpt = parroquiaRepository
+                    .findById(Objects.requireNonNull(s.getIdParroquia()));
             if (pOpt.isPresent()) {
                 nombreParroquia = pOpt.get().getNombreParroquia();
                 Integer idMuni = pOpt.get().getIdMunicipio();
