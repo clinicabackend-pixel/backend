@@ -10,12 +10,11 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 import javax.sql.DataSource;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -30,19 +29,19 @@ public class ReporteControllerTest {
         @Autowired
         private MockMvc mockMvc;
 
-        @MockBean
+        @MockitoBean
         private ReporteService reporteService;
 
-        @MockBean
+        @MockitoBean
         private UsuarioService usuarioService;
 
-        @MockBean
+        @MockitoBean
         private JwtUtil jwtUtil;
 
-        @MockBean
+        @MockitoBean
         private CustomUserDetailsService customUserDetailsService;
 
-        @MockBean
+        @MockitoBean
         private DataSource dataSource;
 
         @Test
