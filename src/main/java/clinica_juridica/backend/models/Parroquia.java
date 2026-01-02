@@ -2,20 +2,22 @@ package clinica_juridica.backend.models;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
+import org.springframework.data.relational.core.mapping.Column;
 
 @Table("parroquias")
 public class Parroquia {
     @Id
     private Integer idParroquia;
-    private String parroquia;
+    @Column("nombre_parroquia")
+    private String nombreParroquia;
     private Integer idMunicipio;
 
     public Parroquia() {
     }
 
-    public Parroquia(Integer idParroquia, String parroquia, Integer idMunicipio) {
+    public Parroquia(Integer idParroquia, String nombreParroquia, Integer idMunicipio) {
         this.idParroquia = idParroquia;
-        this.parroquia = parroquia;
+        this.nombreParroquia = nombreParroquia;
         this.idMunicipio = idMunicipio;
     }
 
@@ -27,12 +29,12 @@ public class Parroquia {
         this.idParroquia = idParroquia;
     }
 
-    public String getParroquia() {
-        return parroquia;
+    public String getNombreParroquia() {
+        return nombreParroquia;
     }
 
-    public void setParroquia(String parroquia) {
-        this.parroquia = parroquia;
+    public void setNombreParroquia(String nombreParroquia) {
+        this.nombreParroquia = nombreParroquia;
     }
 
     public Integer getIdMunicipio() {
@@ -45,7 +47,8 @@ public class Parroquia {
 
     @Override
     public String toString() {
-        return "Parroquia{idParroquia=" + idParroquia + ", parroquia='" + parroquia + "', idMunicipio=" + idMunicipio
+        return "Parroquia{idParroquia=" + idParroquia + ", nombreParroquia='" + nombreParroquia + "', idMunicipio="
+                + idMunicipio
                 + "}";
     }
 }

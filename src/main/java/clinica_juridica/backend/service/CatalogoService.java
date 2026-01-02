@@ -245,7 +245,7 @@ public class CatalogoService {
 
         public List<ParroquiaResponse> getParroquias(Integer idMunicipio) {
                 return parroquiaRepository.findAllByIdMunicipio(idMunicipio).stream()
-                                .map(p -> new ParroquiaResponse(p.getIdParroquia(), p.getParroquia(),
+                                .map(p -> new ParroquiaResponse(p.getIdParroquia(), p.getNombreParroquia(),
                                                 p.getIdMunicipio()))
                                 .toList();
         }
@@ -259,7 +259,7 @@ public class CatalogoService {
 
         public List<ParroquiaResponse> getAllParroquias() {
                 return parroquiaRepository.findAll().stream()
-                                .map(p -> new ParroquiaResponse(p.getIdParroquia(), p.getParroquia(),
+                                .map(p -> new ParroquiaResponse(p.getIdParroquia(), p.getNombreParroquia(),
                                                 p.getIdMunicipio()))
                                 .toList();
         }

@@ -65,9 +65,8 @@ public class CasoController {
     @ApiResponse(responseCode = "200", description = "Caso creado exitosamente")
     @PostMapping
     @PreAuthorize("hasAnyRole('COORDINADOR', 'PROFESOR', 'ESTUDIANTE')")
-    public ResponseEntity<String> create(@RequestBody CasoCreateRequest request) {
-        casoService.create(request);
-        return ResponseEntity.ok("Caso creado exitosamente");
+    public ResponseEntity<CasoDetalleResponse> create(@RequestBody CasoCreateRequest request) {
+        return ResponseEntity.ok(casoService.create(request));
     }
 
     @Operation(summary = "Actualizar caso", description = "Actualiza la información de un caso existente. Roles requeridos: COORDINADOR, PROFESOR, ESTUDIANTE.")

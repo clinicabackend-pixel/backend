@@ -1,6 +1,7 @@
 package clinica_juridica.backend.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.util.List;
 
 @Schema(description = "Solicitud para la creación de un nuevo caso")
 public class CasoCreateRequest {
@@ -32,7 +33,13 @@ public class CasoCreateRequest {
         private Integer comAmbLegal;
 
         @Schema(description = "Lista de beneficiarios asociados al caso")
-        private java.util.List<BeneficiarioCreateRequest> beneficiarios;
+        private List<BeneficiarioCreateRequest> beneficiarios;
+
+        @Schema(description = "Orientación dada en el primer encuentro")
+        private String orientacion;
+
+        @Schema(description = "Lista de usernames de estudiantes que atendieron")
+        private List<String> estudiantesAtencion;
 
         public CasoCreateRequest() {
         }
@@ -109,11 +116,7 @@ public class CasoCreateRequest {
                 this.comAmbLegal = comAmbLegal;
         }
 
-        @Schema(description = "Orientación dada en el primer encuentro")
-        private String orientacion;
 
-        @Schema(description = "Lista de usernames de estudiantes que atendieron")
-        private java.util.List<String> estudiantesAtencion;
 
         public String getOrientacion() {
                 return orientacion;
@@ -123,19 +126,19 @@ public class CasoCreateRequest {
                 this.orientacion = orientacion;
         }
 
-        public java.util.List<String> getEstudiantesAtencion() {
+        public List<String> getEstudiantesAtencion() {
                 return estudiantesAtencion;
         }
 
-        public void setEstudiantesAtencion(java.util.List<String> estudiantesAtencion) {
+        public void setEstudiantesAtencion(List<String> estudiantesAtencion) {
                 this.estudiantesAtencion = estudiantesAtencion;
         }
 
-        public java.util.List<BeneficiarioCreateRequest> getBeneficiarios() {
+        public List<BeneficiarioCreateRequest> getBeneficiarios() {
                 return beneficiarios;
         }
 
-        public void setBeneficiarios(java.util.List<BeneficiarioCreateRequest> beneficiarios) {
+        public void setBeneficiarios(List<BeneficiarioCreateRequest> beneficiarios) {
                 this.beneficiarios = beneficiarios;
         }
 }

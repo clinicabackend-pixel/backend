@@ -39,9 +39,9 @@ public interface CasoRepository extends CrudRepository<Caso, String> {
         @Query("UPDATE casos SET estatus = :estatus WHERE num_caso = :numCaso")
         void updateEstatus(String numCaso, String estatus);
 
-        @Query("SELECT registrar_nuevo_caso(:sintesis, :tramite, :cantBeneficiarios, :idTribunal, :termino, :idCentro, :cedula, :username, :comAmbLegal)")
+        @Query("SELECT registrar_nuevo_caso(:sintesis, :tramite, :cantBeneficiarios, :idTribunal, :idCentro, :cedula, :username, :comAmbLegal)")
         String registrarNuevoCaso(String sintesis, String tramite, Integer cantBeneficiarios, Integer idTribunal,
-                        String termino, Integer idCentro, String cedula, String username, Integer comAmbLegal);
+                        Integer idCentro, String cedula, String username, Integer comAmbLegal);
 
         @Modifying
         @Query("UPDATE casos SET sintesis = :sintesis, cod_caso_tribunal = :codCasoTribunal, fecha_res_caso_tri = :fechaResCasoTri, fecha_crea_caso_tri = :fechaCreaCasoTri, id_tribunal = :idTribunal, com_amb_legal = :comAmbLegal WHERE num_caso = :numCaso")

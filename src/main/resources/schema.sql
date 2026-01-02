@@ -6,19 +6,19 @@
 -- ----------------------------------------------------------------
 CREATE TABLE estados (
   id_estado INTEGER PRIMARY KEY,
-  estado VARCHAR(100) NOT NULL
+  nombre_estado VARCHAR(100) NOT NULL
 );
 
 CREATE TABLE municipios (
   id_municipio INTEGER PRIMARY KEY,
-  municipio VARCHAR(100) NOT NULL,
+  nombre_municipio VARCHAR(100) NOT NULL,
   id_estado INTEGER,
   CONSTRAINT fk_mun_est FOREIGN KEY (id_estado) REFERENCES estados(id_estado)
 );
 
 CREATE TABLE parroquias (
   id_parroquia INTEGER PRIMARY KEY,
-  parroquia VARCHAR(100) NOT NULL,
+  nombre_parroquia VARCHAR(100) NOT NULL,
   id_municipio INTEGER,
   CONSTRAINT fk_parr_mun FOREIGN KEY (id_municipio) REFERENCES municipios(id_municipio)
 );
@@ -164,20 +164,7 @@ CREATE TABLE estudiantes (
 
 -- 1.5 FAMILIAS Y SOLICITANTES
 -- ----------------------------------------------------------------
-CREATE TABLE familias (
-  cedula VARCHAR(20) PRIMARY KEY,
-  cant_personas INTEGER,
-  cant_estudiando INTEGER,
-  ingreso_mes DECIMAL(12,2),
-  jefe_familia BOOLEAN DEFAULT TRUE,
-  cant_sin_trabajo INTEGER,
-  cant_ninos INTEGER,
-  cant_trabaja INTEGER,
-  id_nivel_edu_jefe INTEGER,
-  tiempo_estudio VARCHAR(50),
-  CONSTRAINT fk_fam_niv FOREIGN KEY (id_nivel_edu_jefe) REFERENCES niveles_educativos(id_nivel),
-  CONSTRAINT fk_fam_sol FOREIGN KEY (cedula) REFERENCES solicitantes(cedula)
-);
+
 
 CREATE TABLE solicitantes (
   cedula VARCHAR(20) PRIMARY KEY,
@@ -212,6 +199,20 @@ CREATE TABLE solicitantes (
   CONSTRAINT fk_sol_parroquia FOREIGN KEY (id_parroquia) REFERENCES parroquias(id_parroquia)
 );
 
+CREATE TABLE familias (
+  cedula VARCHAR(20) PRIMARY KEY,
+  cant_personas INTEGER,
+  cant_estudiando INTEGER,
+  ingreso_mes DECIMAL(12,2),
+  jefe_familia BOOLEAN DEFAULT TRUE,
+  cant_sin_trabajo INTEGER,
+  cant_ninos INTEGER,
+  cant_trabaja INTEGER,
+  id_nivel_edu_jefe INTEGER,
+  tiempo_estudio VARCHAR(50),
+  CONSTRAINT fk_fam_niv FOREIGN KEY (id_nivel_edu_jefe) REFERENCES niveles_educativos(id_nivel),
+  CONSTRAINT fk_fam_sol FOREIGN KEY (cedula) REFERENCES solicitantes(cedula)
+);
 -- 1.6 VIVIENDA
 -- ----------------------------------------------------------------
 CREATE TABLE viviendas (
@@ -2100,7 +2101,6 @@ CREATE OR REPLACE FUNCTION registrar_nuevo_caso(
     p_tramite VARCHAR,
     p_cant_beneficiarios INTEGER,
     p_id_tribunal INTEGER,    -- Puede ser NULL
-    p_termino VARCHAR,        -- Ej: '2025-15'
     p_id_centro INTEGER,      -- Ej: 1 (GY) o 2 (CB)
     p_cedula_solicitante VARCHAR,
     p_username_asignado VARCHAR,
@@ -2111,7 +2111,18 @@ DECLARE
     v_ultimo_correlativo INTEGER;
     v_nuevo_correlativo INTEGER;
     v_num_caso_generado VARCHAR(50);
+    v_termino VARCHAR(20);
 BEGIN
+    -- 0. Calcular Término Activo
+    SELECT termino INTO v_termino 
+    FROM semestre 
+    WHERE CURRENT_DATE BETWEEN fecha_inicio AND fecha_fin 
+    LIMIT 1;
+
+    IF v_termino IS NULL THEN
+        RAISE EXCEPTION 'No se encontró un término académico activo para la fecha actual (%)', CURRENT_DATE;
+    END IF;
+
     -- 1. Obtener abreviatura (GY o CB) y validar centro
     SELECT abreviatura INTO v_abreviatura 
     FROM centros WHERE id_centro = p_id_centro;
@@ -2127,12 +2138,12 @@ BEGIN
     INTO v_ultimo_correlativo
     FROM casos 
     WHERE id_centro = p_id_centro 
-      AND termino = p_termino;
+      AND termino = v_termino;
 
     v_nuevo_correlativo := v_ultimo_correlativo + 1;
 
     -- 3. Generar Código (Ej: GY-2025-15-0001)
-    v_num_caso_generado := v_abreviatura || '-' || p_termino || '-' || LPAD(v_nuevo_correlativo::TEXT, 4, '0');
+    v_num_caso_generado := v_abreviatura || '-' || v_termino || '-' || LPAD(v_nuevo_correlativo::TEXT, 4, '0');
 
     -- 4. Insertar (Asignando fecha_recepcion = HOY automáticamente)
     INSERT INTO casos (
@@ -2157,7 +2168,7 @@ BEGIN
         p_cant_beneficiarios,
         'ABIERTO',
         p_id_tribunal,
-        p_termino,
+        v_termino,
         p_id_centro,
         p_cedula_solicitante,
         p_username_asignado,

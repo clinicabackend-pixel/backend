@@ -1,6 +1,12 @@
 package clinica_juridica.backend.service;
 
+import clinica_juridica.backend.models.Estado;
+import clinica_juridica.backend.models.Municipio;
+import clinica_juridica.backend.models.Parroquia;
 import clinica_juridica.backend.models.Solicitante;
+import clinica_juridica.backend.repository.EstadoRepository;
+import clinica_juridica.backend.repository.MunicipioRepository;
+import clinica_juridica.backend.repository.ParroquiaRepository;
 import clinica_juridica.backend.repository.SolicitanteRepository;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
@@ -19,9 +25,18 @@ import java.util.stream.StreamSupport;
 public class SolicitanteService {
 
     private final SolicitanteRepository solicitanteRepository;
+    private final ParroquiaRepository parroquiaRepository;
+    private final MunicipioRepository municipioRepository;
+    private final EstadoRepository estadoRepository;
 
-    public SolicitanteService(SolicitanteRepository solicitanteRepository) {
+    public SolicitanteService(SolicitanteRepository solicitanteRepository,
+            ParroquiaRepository parroquiaRepository,
+            MunicipioRepository municipioRepository,
+            EstadoRepository estadoRepository) {
         this.solicitanteRepository = solicitanteRepository;
+        this.parroquiaRepository = parroquiaRepository;
+        this.municipioRepository = municipioRepository;
+        this.estadoRepository = estadoRepository;
     }
 
     public List<SolicitanteResponse> getAll() {
@@ -78,6 +93,37 @@ public class SolicitanteService {
     }
 
     private SolicitanteResponse mapToResponse(Solicitante s) {
+        String nombreParroquia = "";
+        String nombreMunicipio = "";
+        String nombreEstado = "";
+
+        if (s.getIdParroquia() != null) {
+            Optional<Parroquia> pOpt = parroquiaRepository.findById(s.getIdParroquia());
+            if (pOpt.isPresent()) {
+                nombreParroquia = pOpt.get().getNombreParroquia();
+                Integer idMuni = pOpt.get().getIdMunicipio();
+                if (idMuni != null) {
+                    Optional<Municipio> mOpt = municipioRepository.findById(idMuni);
+                    if (mOpt.isPresent()) {
+                        nombreMunicipio = mOpt.get().getNombreMunicipio();
+                        Integer idEst = mOpt.get().getIdEstado();
+                        if (idEst != null) {
+                            estadoRepository.findById(idEst).ifPresent(estado -> {
+                                // Variable capture workaround if needed, but here simple assignment won't work
+                                // in lambda for local var.
+                                // So we restructure.
+                            });
+                            // Better structure without lambda for local var assignment
+                            Optional<Estado> eOpt = estadoRepository.findById(idEst);
+                            if (eOpt.isPresent()) {
+                                nombreEstado = eOpt.get().getNombreEstado();
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         return new SolicitanteResponse(
                 s.getCedula(),
                 s.getNombre(),
@@ -91,8 +137,9 @@ public class SolicitanteService {
                 s.getTelfCasa(),
                 s.getTelfCelular(),
                 s.getEmail(),
-                "", // Placeholder: Address not in model
-                "", // Placeholder
+                nombreEstado,
+                nombreMunicipio,
+                nombreParroquia,
                 "" // Placeholder
         );
     }

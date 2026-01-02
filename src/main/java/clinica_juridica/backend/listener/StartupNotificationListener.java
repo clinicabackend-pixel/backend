@@ -42,7 +42,7 @@ public class StartupNotificationListener {
                 .filter(s -> !s.isEmpty())
                 .collect(Collectors.toList());
 
-        String message = String.format("La aplicación Backend se ha iniciado correctamente el %s.",
+        String message = String.format("La aplicacion Backend se ha iniciado correctamente el %s.",
                 LocalDateTime.now());
 
         emailService.sendSimpleMessage(recipients, subject, message);

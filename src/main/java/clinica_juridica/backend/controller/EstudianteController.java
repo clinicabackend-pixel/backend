@@ -1,13 +1,12 @@
 package clinica_juridica.backend.controller;
 
-import clinica_juridica.backend.repository.EstudianteRepository;
-import clinica_juridica.backend.repository.SemestreRepository;
-import clinica_juridica.backend.dto.projection.EstudianteInfoProjection;
-import clinica_juridica.backend.models.Semestre;
+import clinica_juridica.backend.dto.response.EstudianteResponse;
+import clinica_juridica.backend.service.EstudianteService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
@@ -15,28 +14,14 @@ import java.util.List;
 @RequestMapping("/api/estudiantes")
 public class EstudianteController {
 
-    private final EstudianteRepository estudianteRepository;
-    private final SemestreRepository semestreRepository;
+    private final EstudianteService estudianteService;
 
-    public EstudianteController(EstudianteRepository estudianteRepository, SemestreRepository semestreRepository) {
-        this.estudianteRepository = estudianteRepository;
-        this.semestreRepository = semestreRepository;
+    public EstudianteController(EstudianteService estudianteService) {
+        this.estudianteService = estudianteService;
     }
 
-    @GetMapping("/activos")
-    public ResponseEntity<List<EstudianteInfoProjection>> getEstudiantesActivos() {
-        Semestre activeSemester = semestreRepository.findActiveSemester();
-
-        if (activeSemester == null) {
-            // Fallback strategy or return empty
-            // For now, let's try to find the "latest" semester by ID/Termino descending if
-            // no active found is too complex,
-            // but let's stick to returning empty list if no active semester implies no
-            // active operations.
-            return ResponseEntity.ok(List.of());
-        }
-
-        List<EstudianteInfoProjection> estudiantes = estudianteRepository.findByTermino(activeSemester.getTermino());
-        return ResponseEntity.ok(estudiantes);
+    @GetMapping
+    public ResponseEntity<List<EstudianteResponse>> getEstudiantes(@RequestParam(required = false) Boolean activo) {
+        return ResponseEntity.ok(estudianteService.getEstudiantes(activo));
     }
 }
