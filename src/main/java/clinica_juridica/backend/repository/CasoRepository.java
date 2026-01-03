@@ -25,13 +25,14 @@ public interface CasoRepository extends CrudRepository<Caso, String> {
         @Query("SELECT * FROM casos WHERE estatus = :estatus")
         List<Caso> findAllByEstatus(String estatus);
 
-        @Query("SELECT c.num_caso, c.fecha_recepcion, c.sintesis, c.estatus, ca.username, c.termino, c.cedula, s.nombre AS nombre_solicitante, c.com_amb_legal "
+        @Query("SELECT DISTINCT c.num_caso, c.fecha_recepcion, c.sintesis, c.estatus, c.termino, c.cedula, s.nombre AS nombre_solicitante, c.com_amb_legal "
                         +
                         "FROM casos c " +
                         "LEFT JOIN casos_asignados ca ON c.num_caso = ca.num_caso " +
+                        "LEFT JOIN casos_supervisados cs ON c.num_caso = cs.num_caso " +
                         "LEFT JOIN solicitantes s ON c.cedula = s.cedula " +
                         "WHERE (:estatus IS NULL OR c.estatus = :estatus) " +
-                        "AND (:username IS NULL OR ca.username = :username) " +
+                        "AND (:username IS NULL OR (ca.username = :username OR cs.username = :username)) " +
                         "AND (:termino IS NULL OR c.termino = :termino)")
         List<CasoSummaryResponse> findAllByFilters(String estatus, String username, String termino);
 

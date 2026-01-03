@@ -61,6 +61,7 @@ public class CatalogoService {
         private final ParroquiaRepository parroquiaRepository;
         private final clinica_juridica.backend.repository.EstadoCivilRepository estadoCivilRepository;
         private final CentroRepository centroRepository;
+        private final clinica_juridica.backend.repository.SemestreRepository semestreRepository;
 
         public CatalogoService(MateriaAmbitoLegalRepository materiaRepository,
                         CategoriaAmbitoLegalRepository categoriaRepository,
@@ -76,7 +77,8 @@ public class CatalogoService {
                         MunicipioRepository municipioRepository,
                         ParroquiaRepository parroquiaRepository,
                         clinica_juridica.backend.repository.EstadoCivilRepository estadoCivilRepository,
-                        CentroRepository centroRepository) {
+                        CentroRepository centroRepository,
+                        clinica_juridica.backend.repository.SemestreRepository semestreRepository) {
                 this.materiaRepository = materiaRepository;
                 this.categoriaRepository = categoriaRepository;
                 this.subcategoriaRepository = subcategoriaRepository;
@@ -92,6 +94,7 @@ public class CatalogoService {
                 this.parroquiaRepository = parroquiaRepository;
                 this.estadoCivilRepository = estadoCivilRepository;
                 this.centroRepository = centroRepository;
+                this.semestreRepository = semestreRepository;
         }
 
         public List<AmbitoLegalResponse> getAmbitosLegalesTree() {
@@ -370,5 +373,13 @@ public class CatalogoService {
                         centro.setIdParroquia(request.idParroquia());
                 }
                 centroRepository.save(centro);
+        }
+
+        public List<clinica_juridica.backend.dto.response.SemestreResponse> getSemestres() {
+                return semestreRepository.findAll().stream()
+                                .map(s -> new clinica_juridica.backend.dto.response.SemestreResponse(
+                                                s.getTermino(),
+                                                s.getNombre()))
+                                .toList();
         }
 }

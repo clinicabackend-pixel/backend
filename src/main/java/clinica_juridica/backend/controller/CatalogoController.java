@@ -218,4 +218,10 @@ public class CatalogoController {
         catalogoService.updateCentro(id, request);
         return ResponseEntity.ok("Centro actualizado correctamente");
     }
+
+    @Operation(summary = "Listar Semestres", description = "Retorna la lista de todos los semestres disponibles.")
+    @GetMapping("/semestres")
+    public ResponseEntity<List<clinica_juridica.backend.dto.response.SemestreResponse>> getSemestres() {
+        return ResponseEntity.ok(catalogoService.getSemestres());
+    }
 }
