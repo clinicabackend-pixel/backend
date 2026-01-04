@@ -1,10 +1,5 @@
-databases:
-  - name: clinica-juridica-db
-    plan: free
-    user: clinica_user
-    databaseName: clinica_juridica
-    region: oregon
-
+# Basic Render service configuration to deploy the Dockerfile-built image.
+# You can connect this repo to Render and it will use the Dockerfile to build the container.
 services:
   - type: web
     name: proyecto-db-backend
@@ -12,26 +7,8 @@ services:
     region: oregon
     plan: free
     dockerfilePath: Dockerfile
-    envVars:
-      - key: PORT
-        value: 8080
-      - key: DB_HOST
-        fromDatabase:
-          name: clinica-juridica-db
-          property: host
-      - key: DB_PORT
-        fromDatabase:
-          name: clinica-juridica-db
-          property: port
-      - key: DB_NAME
-        fromDatabase:
-          name: clinica-juridica-db
-          property: database
-      - key: DB_USERNAME
-        fromDatabase:
-          name: clinica-juridica-db
-          property: user
-      - key: DB_PASSWORD
-        fromDatabase:
-          name: clinica-juridica-db
-          property: password
+    # The service will use the Dockerfile CMD which maps the server port to $PORT
+    # You can add environment variables via the Render dashboard or add them here.
+    # envVars:
+    #  - key: EXAMPLE_KEY
+    #    value: example_value
