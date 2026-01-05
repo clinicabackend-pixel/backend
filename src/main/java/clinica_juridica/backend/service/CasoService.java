@@ -30,6 +30,10 @@ import clinica_juridica.backend.dto.request.BeneficiarioUpdateRequest;
 
 import clinica_juridica.backend.repository.SolicitanteRepository;
 import clinica_juridica.backend.repository.BeneficiariosCasosRepository;
+import clinica_juridica.backend.repository.EstudianteRepository;
+import clinica_juridica.backend.repository.ProfesorRepository;
+import clinica_juridica.backend.repository.TribunalRepository;
+
 import clinica_juridica.backend.dto.response.BeneficiarioResponse;
 import clinica_juridica.backend.dto.request.AccionUpdateRequest;
 import clinica_juridica.backend.dto.response.AccionResponse;
@@ -51,10 +55,10 @@ public class CasoService {
         private final CasoSupervisadoRepository casoSupervisadoRepository;
         private final AccionEjecutadaRepository accionEjecutadaRepository;
         private final EncuentroAtendidoRepository encuentroAtendidoRepository;
-        private final clinica_juridica.backend.repository.EstudianteRepository estudianteRepository;
+        private final EstudianteRepository estudianteRepository;
 
-        private final clinica_juridica.backend.repository.ProfesorRepository profesorRepository;
-        private final clinica_juridica.backend.repository.TribunalRepository tribunalRepository;
+        private final ProfesorRepository profesorRepository;
+        private final TribunalRepository tribunalRepository;
         private final BeneficiariosCasosRepository beneficiariosCasosRepository;
         private final SolicitanteRepository solicitanteRepository;
 
@@ -68,9 +72,9 @@ public class CasoService {
                         CasoSupervisadoRepository casoSupervisadoRepository,
                         AccionEjecutadaRepository accionEjecutadaRepository,
                         EncuentroAtendidoRepository encuentroAtendidoRepository,
-                        clinica_juridica.backend.repository.EstudianteRepository estudianteRepository,
-                        clinica_juridica.backend.repository.ProfesorRepository profesorRepository,
-                        clinica_juridica.backend.repository.TribunalRepository tribunalRepository,
+                        EstudianteRepository estudianteRepository,
+                        ProfesorRepository profesorRepository,
+                        TribunalRepository tribunalRepository,
                         BeneficiariosCasosRepository beneficiariosCasosRepository,
                         SolicitanteRepository solicitanteRepository) {
                 this.casoRepository = casoRepository;

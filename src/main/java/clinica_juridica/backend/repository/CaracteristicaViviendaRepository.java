@@ -21,4 +21,8 @@ public interface CaracteristicaViviendaRepository extends CrudRepository<Caracte
     @org.springframework.data.jdbc.repository.query.Modifying
     @Query("DELETE FROM caracteristicas_viviendas WHERE cedula = :cedula")
     void deleteAllByCedula(@NonNull String cedula);
+
+    @org.springframework.data.jdbc.repository.query.Modifying
+    @Query("INSERT INTO caracteristicas_viviendas (cedula, id_tipo_cat, id_cat_vivienda) VALUES (:cedula, :idTipoCat, :idCatVivienda)")
+    void saveManual(@NonNull String cedula, @NonNull Integer idTipoCat, @NonNull Integer idCatVivienda);
 }

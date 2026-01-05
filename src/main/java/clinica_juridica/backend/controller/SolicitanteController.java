@@ -3,10 +3,20 @@ package clinica_juridica.backend.controller;
 import clinica_juridica.backend.service.SolicitanteService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import clinica_juridica.backend.dto.request.SolicitanteRequest;
 import clinica_juridica.backend.dto.response.SolicitanteResponse;
+import clinica_juridica.backend.dto.response.CasoSummaryResponse;
+import clinica_juridica.backend.service.CasoService;
 
 import java.util.List;
 
@@ -20,10 +30,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 public class SolicitanteController {
 
     private final SolicitanteService solicitanteService;
-    private final clinica_juridica.backend.service.CasoService casoService;
+    private final CasoService casoService;
 
     public SolicitanteController(SolicitanteService solicitanteService,
-            clinica_juridica.backend.service.CasoService casoService) {
+            CasoService casoService) {
         this.solicitanteService = solicitanteService;
         this.casoService = casoService;
     }
@@ -78,7 +88,7 @@ public class SolicitanteController {
     @GetMapping("/{id}/casos-titular")
     @Operation(summary = "Obtener casos como titular", description = "Devuelve los casos donde el solicitante es titular.")
     @PreAuthorize("hasAnyRole('COORDINADOR', 'PROFESOR', 'ESTUDIANTE')")
-    public ResponseEntity<List<clinica_juridica.backend.dto.response.CasoSummaryResponse>> getCasosTitular(
+    public ResponseEntity<List<CasoSummaryResponse>> getCasosTitular(
             @PathVariable String id) {
         return ResponseEntity.ok(casoService.getCasosTitular(id));
     }
@@ -86,7 +96,7 @@ public class SolicitanteController {
     @GetMapping("/{id}/casos-beneficiario")
     @Operation(summary = "Obtener casos como beneficiario", description = "Devuelve los casos donde el solicitante es beneficiario.")
     @PreAuthorize("hasAnyRole('COORDINADOR', 'PROFESOR', 'ESTUDIANTE')")
-    public ResponseEntity<List<clinica_juridica.backend.dto.response.CasoSummaryResponse>> getCasosBeneficiario(
+    public ResponseEntity<List<CasoSummaryResponse>> getCasosBeneficiario(
             @PathVariable String id) {
         return ResponseEntity.ok(casoService.getCasosBeneficiario(id));
     }

@@ -24,6 +24,7 @@ import clinica_juridica.backend.dto.response.TribunalResponse;
 import clinica_juridica.backend.dto.response.EstadoResponse;
 import clinica_juridica.backend.dto.response.MunicipioResponse;
 import clinica_juridica.backend.dto.response.ParroquiaResponse;
+import clinica_juridica.backend.dto.response.EstadoCivilResponse;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -117,7 +118,7 @@ public class CatalogoController {
 
     @Operation(summary = "Catálogo de Estados Civiles", description = "Retorna la lista de estados civiles.")
     @GetMapping("/estados-civiles")
-    public ResponseEntity<List<clinica_juridica.backend.dto.response.EstadoCivilResponse>> getEstadosCiviles() {
+    public ResponseEntity<List<EstadoCivilResponse>> getEstadosCiviles() {
         return ResponseEntity.ok(catalogoService.getEstadosCiviles());
     }
 

@@ -1,7 +1,7 @@
 package clinica_juridica.backend.service;
 
-import clinica_juridica.backend.models.*;
-import clinica_juridica.backend.repository.*;
+import clinica_juridica.backend.models.Tribunal;
+import clinica_juridica.backend.repository.TribunalRepository;
 import org.springframework.stereotype.Service;
 
 @Service

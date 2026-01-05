@@ -1,8 +1,14 @@
 package clinica_juridica.backend.service;
 
 import clinica_juridica.backend.dto.request.UsuarioRequest;
-import clinica_juridica.backend.models.*;
-import clinica_juridica.backend.repository.*;
+import clinica_juridica.backend.models.Coordinador;
+import clinica_juridica.backend.models.Estudiante;
+import clinica_juridica.backend.models.Profesor;
+import clinica_juridica.backend.models.Usuario;
+import clinica_juridica.backend.repository.CoordinadorRepository;
+import clinica_juridica.backend.repository.EstudianteRepository;
+import clinica_juridica.backend.repository.ProfesorRepository;
+import clinica_juridica.backend.repository.UsuarioRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

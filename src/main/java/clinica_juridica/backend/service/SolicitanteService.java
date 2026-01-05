@@ -9,6 +9,8 @@ import clinica_juridica.backend.repository.SolicitanteRepository;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import clinica_juridica.backend.exception.ResourceAlreadyExistsException;
+import java.util.Objects;
 import java.util.List;
 import java.util.Optional;
 
@@ -64,6 +66,14 @@ public class SolicitanteService {
 
     @Transactional
     public void create(@NonNull SolicitanteRequest request) {
+        String cedula = Objects.requireNonNull(request.cedula(), "La cédula no puede ser nula");
+        if (solicitanteRepository.existsById(cedula)) {
+            Optional<Solicitante> existing = solicitanteRepository.findById(cedula);
+            throw new ResourceAlreadyExistsException(
+                    "Ya existe un solicitante con la cédula " + cedula,
+                    existing.map(this::mapToResponse).orElse(null));
+        }
+
         Solicitante s = mapToEntity(request);
         solicitanteRepository.insertSolicitante(
                 s.getCedula(),
