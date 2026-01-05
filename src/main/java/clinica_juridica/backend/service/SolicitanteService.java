@@ -35,25 +35,26 @@ public class SolicitanteService {
     }
 
     public List<SolicitanteResponse> getAll(boolean activeCasesOnly, String role) {
-        Iterable<Solicitante> solicitantes;
+        Iterable<Solicitante> solicitantesIterable;
 
         if ("SOLICITANTE".equalsIgnoreCase(role)) {
-            solicitantes = activeCasesOnly
+            solicitantesIterable = activeCasesOnly
                     ? solicitanteRepository.findSolicitantesConCasosActivos()
                     : solicitanteRepository.findSolicitantesTitulares();
         } else if ("BENEFICIARIO".equalsIgnoreCase(role)) {
-            solicitantes = activeCasesOnly
+            solicitantesIterable = activeCasesOnly
                     ? solicitanteRepository.findBeneficiariosActivos()
                     : solicitanteRepository.findBeneficiarios();
         } else {
-            solicitantes = activeCasesOnly
+            solicitantesIterable = activeCasesOnly
                     ? solicitanteRepository.findParticipantesActivos()
                     : solicitanteRepository.findAll();
         }
 
-        return StreamSupport.stream(solicitantes.spliterator(), false)
-                .map(this::mapToResponse)
+        List<Solicitante> solicitantes = StreamSupport.stream(solicitantesIterable.spliterator(), false)
                 .collect(Collectors.toList());
+
+        return mapToResponseBatch(solicitantes);
     }
 
     public List<SolicitanteResponse> getAll() {
@@ -61,7 +62,7 @@ public class SolicitanteService {
     }
 
     public Optional<SolicitanteResponse> getById(@NonNull String id) {
-        return solicitanteRepository.findById(id).map(this::mapToResponse);
+        return solicitanteRepository.findById(id).map(s -> mapToResponseBatch(List.of(s)).get(0));
     }
 
     @Transactional
@@ -71,7 +72,7 @@ public class SolicitanteService {
             Optional<Solicitante> existing = solicitanteRepository.findById(cedula);
             throw new ResourceAlreadyExistsException(
                     "Ya existe un solicitante con la cédula " + cedula,
-                    existing.map(this::mapToResponse).orElse(null));
+                    existing.map(s -> mapToResponseBatch(List.of(s)).get(0)).orElse(null));
         }
 
         Solicitante s = mapToEntity(request);
@@ -116,44 +117,76 @@ public class SolicitanteService {
         return true;
     }
 
-    private SolicitanteResponse mapToResponse(Solicitante s) {
-        Integer idMuni = null;
-        Integer idEst = null;
+    @SuppressWarnings("null")
+    private List<SolicitanteResponse> mapToResponseBatch(List<Solicitante> solicitantes) {
+        if (solicitantes.isEmpty()) {
+            return List.of();
+        }
 
-        Integer idParroquia = s.getIdParroquia();
-        if (idParroquia != null) {
-            Optional<Parroquia> pOpt = parroquiaRepository.findById(idParroquia);
-            if (pOpt.isPresent()) {
-                idMuni = pOpt.get().getIdMunicipio();
-                if (idMuni != null) {
-                    Optional<Municipio> mOpt = municipioRepository.findById(idMuni);
-                    if (mOpt.isPresent()) {
-                        idEst = mOpt.get().getIdEstado();
+        // 1. Collect all Parroquia IDs
+        List<Integer> parroquiaIds = solicitantes.stream()
+                .map(Solicitante::getIdParroquia)
+                .filter(Objects::nonNull)
+                .distinct()
+                .collect(Collectors.toList());
+
+        // 2. Fetch Parroquias in batch
+        java.util.Map<Integer, Parroquia> parroquiaMap = StreamSupport
+                .stream(parroquiaRepository.findAllById(parroquiaIds).spliterator(), false)
+                .collect(Collectors.toMap(Parroquia::getIdParroquia, java.util.function.Function.identity()));
+
+        // 3. Collect Municipio IDs from fetched Parroquias
+        List<Integer> municipioIds = parroquiaMap.values().stream()
+                .map(Parroquia::getIdMunicipio)
+                .filter(Objects::nonNull)
+                .distinct()
+                .collect(Collectors.toList());
+
+        // 4. Fetch Municipios in batch
+        java.util.Map<Integer, Municipio> municipioMap = StreamSupport
+                .stream(municipioRepository.findAllById(municipioIds).spliterator(), false)
+                .collect(Collectors.toMap(Municipio::getIdMunicipio, java.util.function.Function.identity()));
+
+        // 5. Map to response using in-memory maps
+        return solicitantes.stream().map(s -> {
+            Integer idMuni = null;
+            Integer idEst = null;
+
+            Integer idParroquia = s.getIdParroquia();
+            if (idParroquia != null) {
+                Parroquia p = parroquiaMap.get(idParroquia);
+                if (p != null) {
+                    idMuni = p.getIdMunicipio();
+                    if (idMuni != null) {
+                        Municipio m = municipioMap.get(idMuni);
+                        if (m != null) {
+                            idEst = m.getIdEstado();
+                        }
                     }
                 }
             }
-        }
 
-        return new SolicitanteResponse(
-                s.getCedula(),
-                s.getNombre(),
-                s.getSexo(),
-                "SOLTERO", // Placeholder: Need lookup for idEstadoCivil
-                s.getFNacimiento(),
-                "SI".equals(s.getConcubinato()),
-                s.getNacionalidad(),
-                false, // Placeholder: need logic from idCondicionActividad
-                "FORMAL", // Placeholder
-                s.getTelfCasa(),
-                s.getTelfCelular(),
-                s.getEmail(),
-                s.getIdEstadoCivil(),
-                s.getIdParroquia(),
-                idMuni,
-                idEst,
-                s.getIdCondicion(),
-                s.getIdCondicionActividad(),
-                s.getIdNivel());
+            return new SolicitanteResponse(
+                    s.getCedula(),
+                    s.getNombre(),
+                    s.getSexo(),
+                    "SOLTERO", // Placeholder: Need lookup for idEstadoCivil
+                    s.getFNacimiento(),
+                    "SI".equals(s.getConcubinato()),
+                    s.getNacionalidad(),
+                    false, // Placeholder: need logic from idCondicionActividad
+                    "FORMAL", // Placeholder
+                    s.getTelfCasa(),
+                    s.getTelfCelular(),
+                    s.getEmail(),
+                    s.getIdEstadoCivil(),
+                    s.getIdParroquia(),
+                    idMuni,
+                    idEst,
+                    s.getIdCondicion(),
+                    s.getIdCondicionActividad(),
+                    s.getIdNivel());
+        }).collect(Collectors.toList());
     }
 
     private Solicitante mapToEntity(SolicitanteRequest r) {
