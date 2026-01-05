@@ -17,11 +17,16 @@ public class BeneficiarioResponse {
         @Schema(description = "Parentesco")
         private String parentesco;
 
-        public BeneficiarioResponse(String cedula, String numCaso, String tipoBeneficiario, String parentesco) {
+        @Schema(description = "Nombre del beneficiario")
+        private String nombre;
+
+        public BeneficiarioResponse(String cedula, String numCaso, String tipoBeneficiario, String parentesco,
+                        String nombre) {
                 this.cedula = cedula;
                 this.numCaso = numCaso;
                 this.tipoBeneficiario = tipoBeneficiario;
                 this.parentesco = parentesco;
+                this.nombre = nombre;
         }
 
         public String getCedula() {
@@ -38,5 +43,9 @@ public class BeneficiarioResponse {
 
         public String getParentesco() {
                 return parentesco;
+        }
+
+        public String getNombre() {
+                return nombre;
         }
 }

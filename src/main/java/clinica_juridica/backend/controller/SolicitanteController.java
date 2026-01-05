@@ -20,16 +20,22 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 public class SolicitanteController {
 
     private final SolicitanteService solicitanteService;
+    private final clinica_juridica.backend.service.CasoService casoService;
 
-    public SolicitanteController(SolicitanteService solicitanteService) {
+    public SolicitanteController(SolicitanteService solicitanteService,
+            clinica_juridica.backend.service.CasoService casoService) {
         this.solicitanteService = solicitanteService;
+        this.casoService = casoService;
     }
 
     @GetMapping
     @Operation(summary = "Obtener todos los solicitantes", description = "Devuelve una lista de todos los solicitantes registrados. Roles: COORDINADOR, PROFESOR, ESTUDIANTE.")
     @PreAuthorize("hasAnyRole('COORDINADOR', 'PROFESOR', 'ESTUDIANTE')")
-    public ResponseEntity<List<SolicitanteResponse>> getAll() {
-        return ResponseEntity.ok(solicitanteService.getAll());
+    public ResponseEntity<List<SolicitanteResponse>> getAll(
+            @RequestParam(required = false) Boolean activeCases,
+            @RequestParam(required = false, defaultValue = "TODOS") String role) {
+        boolean filterActive = Boolean.TRUE.equals(activeCases);
+        return ResponseEntity.ok(solicitanteService.getAll(filterActive, role));
     }
 
     @GetMapping("/{id}")
@@ -67,5 +73,21 @@ public class SolicitanteController {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok("Solicitante eliminado exitosamente");
+    }
+
+    @GetMapping("/{id}/casos-titular")
+    @Operation(summary = "Obtener casos como titular", description = "Devuelve los casos donde el solicitante es titular.")
+    @PreAuthorize("hasAnyRole('COORDINADOR', 'PROFESOR', 'ESTUDIANTE')")
+    public ResponseEntity<List<clinica_juridica.backend.dto.response.CasoSummaryResponse>> getCasosTitular(
+            @PathVariable String id) {
+        return ResponseEntity.ok(casoService.getCasosTitular(id));
+    }
+
+    @GetMapping("/{id}/casos-beneficiario")
+    @Operation(summary = "Obtener casos como beneficiario", description = "Devuelve los casos donde el solicitante es beneficiario.")
+    @PreAuthorize("hasAnyRole('COORDINADOR', 'PROFESOR', 'ESTUDIANTE')")
+    public ResponseEntity<List<clinica_juridica.backend.dto.response.CasoSummaryResponse>> getCasosBeneficiario(
+            @PathVariable String id) {
+        return ResponseEntity.ok(casoService.getCasosBeneficiario(id));
     }
 }

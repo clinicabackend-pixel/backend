@@ -1,75 +1,42 @@
 package clinica_juridica.backend.models;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
+import org.springframework.data.domain.Persistable;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 @Table("viviendas")
-public class Vivienda {
+public class Vivienda implements Persistable<String> {
     @Id
-    @Column("id_vivienda")
-    private String idVivienda;
+    @Column("cedula")
+    private String cedula;
 
-    @Column("tipo")
-    private String tipo;
-
-    @Column("cant_habitaciones")
+    @Column("cant_habit")
     private Integer cantHabitaciones;
 
     @Column("cant_banos")
     private Integer cantBanos;
 
-    @Column("material_paredes")
-    private String materialParedes;
-
-    @Column("aguas_negras")
-    private String aguasNegras;
-
-    @Column("servicio_agua")
-    private String servicioAgua;
-
-    @Column("material_techo")
-    private String materialTecho;
-
-    @Column("material_piso")
-    private String materialPiso;
-
-    @Column("servicio_aseo")
-    private String servicioAseo;
+    @Transient
+    private boolean isNew = false;
 
     public Vivienda() {
     }
 
-    public Vivienda(String idVivienda, String tipo, Integer cantHabitaciones,
-            Integer cantBanos, String materialParedes, String aguasNegras,
-            String servicioAgua, String materialTecho, String materialPiso,
-            String servicioAseo) {
-        this.idVivienda = idVivienda;
-        this.tipo = tipo;
+    public Vivienda(String cedula, Integer cantHabitaciones, Integer cantBanos) {
+        this.cedula = cedula;
         this.cantHabitaciones = cantHabitaciones;
         this.cantBanos = cantBanos;
-        this.materialParedes = materialParedes;
-        this.aguasNegras = aguasNegras;
-        this.servicioAgua = servicioAgua;
-        this.materialTecho = materialTecho;
-        this.materialPiso = materialPiso;
-        this.servicioAseo = servicioAseo;
+        this.isNew = true;
     }
 
-    public String getIdVivienda() {
-        return idVivienda;
+    public String getCedula() {
+        return cedula;
     }
 
-    public void setIdVivienda(String idVivienda) {
-        this.idVivienda = idVivienda;
-    }
-
-    public String getTipo() {
-        return tipo;
-    }
-
-    public void setTipo(String tipo) {
-        this.tipo = tipo;
+    public void setCedula(String cedula) {
+        this.cedula = cedula;
     }
 
     public Integer getCantHabitaciones() {
@@ -88,51 +55,23 @@ public class Vivienda {
         this.cantBanos = cantBanos;
     }
 
-    public String getMaterialParedes() {
-        return materialParedes;
+    public void setNew(boolean isNew) {
+        this.isNew = isNew;
     }
 
-    public void setMaterialParedes(String materialParedes) {
-        this.materialParedes = materialParedes;
+    @Override
+    public String getId() {
+        return cedula;
     }
 
-    public String getAguasNegras() {
-        return aguasNegras;
+    @Override
+    public boolean isNew() {
+        return isNew; // Simplification, logic handled in service usually
     }
 
-    public void setAguasNegras(String aguasNegras) {
-        this.aguasNegras = aguasNegras;
-    }
-
-    public String getServicioAgua() {
-        return servicioAgua;
-    }
-
-    public void setServicioAgua(String servicioAgua) {
-        this.servicioAgua = servicioAgua;
-    }
-
-    public String getMaterialTecho() {
-        return materialTecho;
-    }
-
-    public void setMaterialTecho(String materialTecho) {
-        this.materialTecho = materialTecho;
-    }
-
-    public String getMaterialPiso() {
-        return materialPiso;
-    }
-
-    public void setMaterialPiso(String materialPiso) {
-        this.materialPiso = materialPiso;
-    }
-
-    public String getServicioAseo() {
-        return servicioAseo;
-    }
-
-    public void setServicioAseo(String servicioAseo) {
-        this.servicioAseo = servicioAseo;
+    @Override
+    public String toString() {
+        return "Vivienda{cedula='" + cedula + "', cantHabitaciones=" + cantHabitaciones + ", cantBanos=" + cantBanos
+                + "}";
     }
 }

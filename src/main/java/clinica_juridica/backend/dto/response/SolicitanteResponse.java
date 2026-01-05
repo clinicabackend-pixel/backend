@@ -15,8 +15,11 @@ public record SolicitanteResponse(
         String telfCasa,
         String telfCelular,
         String email,
-        String estadoResidencia,
-        String municipioResidencia,
-        String parroquiaResidencia,
-        String tipoVivienda) {
+        Integer idEstadoCivil,
+        Integer idParroquia,
+        Integer idMunicipio,
+        Integer idEstado,
+        Integer idCondicion,
+        Integer idCondicionActividad,
+        Integer idNivel) {
 }

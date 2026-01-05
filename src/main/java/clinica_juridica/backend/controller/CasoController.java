@@ -159,6 +159,26 @@ public class CasoController {
         casoService.createPrueba(id, dto);
     }
 
+    @Operation(summary = "Agregar beneficiario", description = "Agrega un nuevo beneficiario a un caso existente.")
+    @ApiResponse(responseCode = "200", description = "Beneficiario agregado exitosamente")
+    @PostMapping("/{id}/beneficiarios")
+    public void addBeneficiario(
+            @Parameter(description = "ID del caso") @PathVariable String id,
+            @RequestBody BeneficiarioCreateRequest dto) {
+        casoService.addBeneficiario(id, dto);
+    }
+
+    @Operation(summary = "Actualizar beneficiario", description = "Actualiza la relación (tipo y parentesco) de un beneficiario en un caso.")
+    @ApiResponse(responseCode = "200", description = "Beneficiario actualizado exitosamente")
+    @PatchMapping("/{id}/beneficiarios/{cedula}")
+    public ResponseEntity<Void> updateBeneficiario(
+            @Parameter(description = "ID del caso") @PathVariable String id,
+            @Parameter(description = "Cédula del beneficiario") @PathVariable String cedula,
+            @RequestBody BeneficiarioUpdateRequest dto) {
+        casoService.updateBeneficiario(id, cedula, dto);
+        return ResponseEntity.ok().build();
+    }
+
     @Operation(summary = "Obtener acciones del caso", description = "Lista todas las acciones registradas para un caso.")
     @ApiResponse(responseCode = "200", description = "Lista de acciones recuperada exitosamente")
     @GetMapping("/{id}/acciones")

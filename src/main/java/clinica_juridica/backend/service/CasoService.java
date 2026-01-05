@@ -26,7 +26,9 @@ import clinica_juridica.backend.repository.CasoSupervisadoRepository;
 import clinica_juridica.backend.repository.AccionEjecutadaRepository;
 import clinica_juridica.backend.repository.EncuentroAtendidoRepository;
 import clinica_juridica.backend.dto.request.*;
+import clinica_juridica.backend.dto.request.BeneficiarioUpdateRequest;
 
+import clinica_juridica.backend.repository.SolicitanteRepository;
 import clinica_juridica.backend.repository.BeneficiariosCasosRepository;
 import clinica_juridica.backend.dto.response.BeneficiarioResponse;
 import clinica_juridica.backend.dto.request.AccionUpdateRequest;
@@ -54,6 +56,7 @@ public class CasoService {
         private final clinica_juridica.backend.repository.ProfesorRepository profesorRepository;
         private final clinica_juridica.backend.repository.TribunalRepository tribunalRepository;
         private final BeneficiariosCasosRepository beneficiariosCasosRepository;
+        private final SolicitanteRepository solicitanteRepository;
 
         public CasoService(CasoRepository casoRepository,
                         EstatusPorCasoRepository estatusPorCasoRepository,
@@ -68,7 +71,8 @@ public class CasoService {
                         clinica_juridica.backend.repository.EstudianteRepository estudianteRepository,
                         clinica_juridica.backend.repository.ProfesorRepository profesorRepository,
                         clinica_juridica.backend.repository.TribunalRepository tribunalRepository,
-                        BeneficiariosCasosRepository beneficiariosCasosRepository) {
+                        BeneficiariosCasosRepository beneficiariosCasosRepository,
+                        SolicitanteRepository solicitanteRepository) {
                 this.casoRepository = casoRepository;
                 this.estatusPorCasoRepository = estatusPorCasoRepository;
                 this.accionRepository = accionRepository;
@@ -83,6 +87,7 @@ public class CasoService {
                 this.profesorRepository = profesorRepository;
                 this.tribunalRepository = tribunalRepository;
                 this.beneficiariosCasosRepository = beneficiariosCasosRepository;
+                this.solicitanteRepository = solicitanteRepository;
         }
 
         public List<CasoSummaryResponse> getAllSummary() {
@@ -99,6 +104,14 @@ public class CasoService {
 
         public List<CasoSummaryResponse> getCasosSummaryByFilters(String estatus, String username, String termino) {
                 return casoRepository.findAllByFilters(estatus, username, termino);
+        }
+
+        public List<CasoSummaryResponse> getCasosTitular(String cedula) {
+                return casoRepository.findCasosBySolicitanteCedula(cedula);
+        }
+
+        public List<CasoSummaryResponse> getCasosBeneficiario(String cedula) {
+                return casoRepository.findCasosByBeneficiarioCedula(cedula);
         }
 
         // Deprecated methods removed or updated? Keeping internal use methods if
@@ -168,6 +181,23 @@ public class CasoService {
         }
 
         @Transactional
+        public void addBeneficiario(String numCaso, BeneficiarioCreateRequest ben) {
+                if (!casoRepository.existsById(numCaso)) {
+                        throw new RuntimeException("Caso no encontrado: " + numCaso);
+                }
+                // Validar si ya existe (opcional pero recomendado)
+                // Usamos saveManual que probablemente es un insert directo.
+                // Si la PK compuesta (cedula, numCaso) existe, dará error SQL, que es aceptable
+                // o podemos manejarlo.
+                // Por ahora insertamos directo.
+                beneficiariosCasosRepository.saveManual(
+                                ben.getCedula(),
+                                numCaso,
+                                ben.getTipoBeneficiario(),
+                                ben.getParentesco());
+        }
+
+        @Transactional
         public void update(String id, CasoUpdateRequest dto) {
                 if (!casoRepository.existsById(id)) {
                         throw new RuntimeException("Caso no encontrado: " + id);
@@ -175,6 +205,19 @@ public class CasoService {
                 casoRepository.updateManual(id, dto.getSintesis(),
                                 dto.getCodCasoTribunal(), dto.getFechaResCasoTri(), dto.getFechaCreaCasoTri(),
                                 dto.getIdTribunal(), dto.getComAmbLegal());
+        }
+
+        @Transactional
+        public void updateBeneficiario(String numCaso, String cedula, BeneficiarioUpdateRequest dto) {
+                if (!casoRepository.existsById(numCaso)) {
+                        throw new RuntimeException("Caso no encontrado: " + numCaso);
+                }
+                // Validar si es necesario que el beneficiario exista en el caso,
+                // pero el updateManual retorna 0 si no encuentra rows, así que es seguro.
+                // Opcional: Validar existencia en tabla intermedia para lanzar excepción si no
+                // existe.
+                beneficiariosCasosRepository.updateManual(cedula, numCaso, dto.getTipoBeneficiario(),
+                                dto.getParentesco());
         }
 
         public void delete(String id) {
@@ -462,11 +505,17 @@ public class CasoService {
 
         public List<BeneficiarioResponse> getBeneficiarios(String id) {
                 return beneficiariosCasosRepository.findAllByNumCaso(id).stream()
-                                .map(b -> new BeneficiarioResponse(
-                                                b.getCedula(),
-                                                b.getNumCaso(),
-                                                b.getTipoBeneficiario(),
-                                                b.getParentesco()))
+                                .map(b -> {
+                                        String nombre = solicitanteRepository.findById(b.getCedula())
+                                                        .map(s -> s.getNombre())
+                                                        .orElse("Desconocido");
+                                        return new BeneficiarioResponse(
+                                                        b.getCedula(),
+                                                        b.getNumCaso(),
+                                                        b.getTipoBeneficiario(),
+                                                        b.getParentesco(),
+                                                        nombre);
+                                })
                                 .toList();
         }
 

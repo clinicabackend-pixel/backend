@@ -24,4 +24,9 @@ public interface BeneficiariosCasosRepository extends CrudRepository<Beneficiari
     @Transactional
     @Query("DELETE FROM beneficiarios_casos WHERE num_caso = :numCaso")
     void deleteByNumCaso(String numCaso);
+
+    @Modifying
+    @Transactional
+    @Query("UPDATE beneficiarios_casos SET tipo_beneficiario = :tipoBeneficiario, parentesco = :parentesco WHERE cedula = :cedula AND num_caso = :numCaso")
+    void updateManual(String cedula, String numCaso, String tipoBeneficiario, String parentesco);
 }

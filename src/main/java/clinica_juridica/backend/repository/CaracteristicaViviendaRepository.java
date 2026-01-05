@@ -14,4 +14,11 @@ public interface CaracteristicaViviendaRepository extends CrudRepository<Caracte
     @NonNull
     @Query("SELECT * FROM caracteristicas_viviendas")
     List<CaracteristicaVivienda> findAll();
+
+    @Query("SELECT * FROM caracteristicas_viviendas WHERE cedula = :cedula")
+    List<CaracteristicaVivienda> findAllByCedula(@NonNull String cedula);
+
+    @org.springframework.data.jdbc.repository.query.Modifying
+    @Query("DELETE FROM caracteristicas_viviendas WHERE cedula = :cedula")
+    void deleteAllByCedula(@NonNull String cedula);
 }

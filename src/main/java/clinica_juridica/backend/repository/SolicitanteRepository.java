@@ -24,6 +24,27 @@ public interface SolicitanteRepository extends CrudRepository<Solicitante, Strin
     @Query("SELECT * FROM solicitantes WHERE cedula = :cedula")
     Optional<Solicitante> findById(@NonNull String cedula);
 
+    @Query("SELECT DISTINCT s.* FROM solicitantes s JOIN casos c ON s.cedula = c.cedula WHERE c.estatus = 'ABIERTO'")
+    List<Solicitante> findSolicitantesConCasosActivos();
+
+    @Query("SELECT DISTINCT s.* FROM solicitantes s JOIN casos c ON s.cedula = c.cedula")
+    List<Solicitante> findSolicitantesTitulares();
+
+    @Query("SELECT DISTINCT s.* FROM solicitantes s JOIN beneficiarios_casos bc ON s.cedula = bc.cedula")
+    List<Solicitante> findBeneficiarios();
+
+    @Query("SELECT DISTINCT s.* FROM solicitantes s JOIN beneficiarios_casos bc ON s.cedula = bc.cedula JOIN casos c ON bc.num_caso = c.num_caso WHERE c.estatus = 'ABIERTO'")
+    List<Solicitante> findBeneficiariosActivos();
+
+    @Query("""
+                SELECT DISTINCT s.* FROM solicitantes s
+                LEFT JOIN casos c ON s.cedula = c.cedula
+                LEFT JOIN beneficiarios_casos bc ON s.cedula = bc.cedula
+                LEFT JOIN casos cb ON bc.num_caso = cb.num_caso
+                WHERE c.estatus = 'ABIERTO' OR cb.estatus = 'ABIERTO'
+            """)
+    List<Solicitante> findParticipantesActivos();
+
     @Modifying
     @Query("""
                 INSERT INTO solicitantes (

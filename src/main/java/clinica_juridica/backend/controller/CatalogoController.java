@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import clinica_juridica.backend.dto.response.SemestreResponse;
 import java.util.List;
 import org.springframework.lang.NonNull;
 
@@ -221,7 +222,7 @@ public class CatalogoController {
 
     @Operation(summary = "Listar Semestres", description = "Retorna la lista de todos los semestres disponibles.")
     @GetMapping("/semestres")
-    public ResponseEntity<List<clinica_juridica.backend.dto.response.SemestreResponse>> getSemestres() {
+    public ResponseEntity<List<SemestreResponse>> getSemestres() {
         return ResponseEntity.ok(catalogoService.getSemestres());
     }
 }

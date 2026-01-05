@@ -36,6 +36,15 @@ public interface CasoRepository extends CrudRepository<Caso, String> {
                         "AND (:termino IS NULL OR c.termino = :termino)")
         List<CasoSummaryResponse> findAllByFilters(String estatus, String username, String termino);
 
+        @Query("SELECT DISTINCT c.num_caso, c.fecha_recepcion, c.sintesis, c.estatus, c.termino, c.cedula, s.nombre AS nombre_solicitante, c.com_amb_legal "
+                        + "FROM casos c " + "JOIN solicitantes s ON c.cedula = s.cedula " + "WHERE c.cedula = :cedula")
+        List<CasoSummaryResponse> findCasosBySolicitanteCedula(String cedula);
+
+        @Query("SELECT DISTINCT c.num_caso, c.fecha_recepcion, c.sintesis, c.estatus, c.termino, c.cedula, s.nombre AS nombre_solicitante, c.com_amb_legal "
+                        + "FROM casos c " + "JOIN solicitantes s ON c.cedula = s.cedula "
+                        + "JOIN beneficiarios_casos bc ON c.num_caso = bc.num_caso " + "WHERE bc.cedula = :cedula")
+        List<CasoSummaryResponse> findCasosByBeneficiarioCedula(String cedula);
+
         @Modifying
         @Query("UPDATE casos SET estatus = :estatus WHERE num_caso = :numCaso")
         void updateEstatus(String numCaso, String estatus);

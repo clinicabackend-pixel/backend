@@ -1,17 +1,14 @@
 package clinica_juridica.backend.service;
 
-import clinica_juridica.backend.models.Estado;
 import clinica_juridica.backend.models.Municipio;
 import clinica_juridica.backend.models.Parroquia;
 import clinica_juridica.backend.models.Solicitante;
-import clinica_juridica.backend.repository.EstadoRepository;
 import clinica_juridica.backend.repository.MunicipioRepository;
 import clinica_juridica.backend.repository.ParroquiaRepository;
 import clinica_juridica.backend.repository.SolicitanteRepository;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.Objects;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,28 +18,44 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 @Service
-
 public class SolicitanteService {
 
     private final SolicitanteRepository solicitanteRepository;
     private final ParroquiaRepository parroquiaRepository;
     private final MunicipioRepository municipioRepository;
-    private final EstadoRepository estadoRepository;
 
     public SolicitanteService(SolicitanteRepository solicitanteRepository,
             ParroquiaRepository parroquiaRepository,
-            MunicipioRepository municipioRepository,
-            EstadoRepository estadoRepository) {
+            MunicipioRepository municipioRepository) {
         this.solicitanteRepository = solicitanteRepository;
         this.parroquiaRepository = parroquiaRepository;
         this.municipioRepository = municipioRepository;
-        this.estadoRepository = estadoRepository;
+    }
+
+    public List<SolicitanteResponse> getAll(boolean activeCasesOnly, String role) {
+        Iterable<Solicitante> solicitantes;
+
+        if ("SOLICITANTE".equalsIgnoreCase(role)) {
+            solicitantes = activeCasesOnly
+                    ? solicitanteRepository.findSolicitantesConCasosActivos()
+                    : solicitanteRepository.findSolicitantesTitulares();
+        } else if ("BENEFICIARIO".equalsIgnoreCase(role)) {
+            solicitantes = activeCasesOnly
+                    ? solicitanteRepository.findBeneficiariosActivos()
+                    : solicitanteRepository.findBeneficiarios();
+        } else {
+            solicitantes = activeCasesOnly
+                    ? solicitanteRepository.findParticipantesActivos()
+                    : solicitanteRepository.findAll();
+        }
+
+        return StreamSupport.stream(solicitantes.spliterator(), false)
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
     }
 
     public List<SolicitanteResponse> getAll() {
-        return StreamSupport.stream(solicitanteRepository.findAll().spliterator(), false)
-                .map(this::mapToResponse)
-                .collect(Collectors.toList());
+        return getAll(false, "TODOS");
     }
 
     public Optional<SolicitanteResponse> getById(@NonNull String id) {
@@ -75,6 +88,7 @@ public class SolicitanteService {
         }
         Solicitante solicitante = mapToEntity(request);
         solicitante.setCedula(id);
+        solicitante.setIsNew(false);
         solicitanteRepository.save(solicitante);
         return true;
     }
@@ -93,33 +107,18 @@ public class SolicitanteService {
     }
 
     private SolicitanteResponse mapToResponse(Solicitante s) {
-        String nombreParroquia = "";
-        String nombreMunicipio = "";
-        String nombreEstado = "";
+        Integer idMuni = null;
+        Integer idEst = null;
 
-        if (s.getIdParroquia() != null) {
-            Optional<Parroquia> pOpt = parroquiaRepository
-                    .findById(Objects.requireNonNull(s.getIdParroquia()));
+        Integer idParroquia = s.getIdParroquia();
+        if (idParroquia != null) {
+            Optional<Parroquia> pOpt = parroquiaRepository.findById(idParroquia);
             if (pOpt.isPresent()) {
-                nombreParroquia = pOpt.get().getNombreParroquia();
-                Integer idMuni = pOpt.get().getIdMunicipio();
+                idMuni = pOpt.get().getIdMunicipio();
                 if (idMuni != null) {
                     Optional<Municipio> mOpt = municipioRepository.findById(idMuni);
                     if (mOpt.isPresent()) {
-                        nombreMunicipio = mOpt.get().getNombreMunicipio();
-                        Integer idEst = mOpt.get().getIdEstado();
-                        if (idEst != null) {
-                            estadoRepository.findById(idEst).ifPresent(estado -> {
-                                // Variable capture workaround if needed, but here simple assignment won't work
-                                // in lambda for local var.
-                                // So we restructure.
-                            });
-                            // Better structure without lambda for local var assignment
-                            Optional<Estado> eOpt = estadoRepository.findById(idEst);
-                            if (eOpt.isPresent()) {
-                                nombreEstado = eOpt.get().getNombreEstado();
-                            }
-                        }
+                        idEst = mOpt.get().getIdEstado();
                     }
                 }
             }
@@ -138,11 +137,13 @@ public class SolicitanteService {
                 s.getTelfCasa(),
                 s.getTelfCelular(),
                 s.getEmail(),
-                nombreEstado,
-                nombreMunicipio,
-                nombreParroquia,
-                "" // Placeholder
-        );
+                s.getIdEstadoCivil(),
+                s.getIdParroquia(),
+                idMuni,
+                idEst,
+                s.getIdCondicion(),
+                s.getIdCondicionActividad(),
+                s.getIdNivel());
     }
 
     private Solicitante mapToEntity(SolicitanteRequest r) {

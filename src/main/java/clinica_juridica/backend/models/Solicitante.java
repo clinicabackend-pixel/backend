@@ -179,6 +179,9 @@ public class Solicitante implements Persistable<String> {
         this.tiempoEstudio = tiempoEstudio;
     }
 
+    @org.springframework.data.annotation.Transient
+    private boolean isNew = true;
+
     @Override
     public String getId() {
         return cedula;
@@ -186,7 +189,11 @@ public class Solicitante implements Persistable<String> {
 
     @Override
     public boolean isNew() {
-        return true;
+        return isNew;
+    }
+
+    public void setIsNew(boolean isNew) {
+        this.isNew = isNew;
     }
 
     @Override

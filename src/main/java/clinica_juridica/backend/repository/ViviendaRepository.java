@@ -18,6 +18,6 @@ public interface ViviendaRepository extends CrudRepository<Vivienda, String> {
 
     @Override
     @NonNull
-    @Query("SELECT * FROM viviendas WHERE id_vivienda = :id")
+    @Query("SELECT * FROM viviendas WHERE cedula = :id")
     Optional<Vivienda> findById(@NonNull String id);
 }
