@@ -93,8 +93,14 @@ public class EncuestaService {
         // 1. Save Familia
         if (request.getFamilia() != null) {
             DatosEncuestaRequest.FamiliaDTO fDto = request.getFamilia();
-            Familia familia = familiaRepository.findById(cedula).orElse(new Familia());
-            familia.setCedula(cedula);
+            Familia familia = familiaRepository.findById(cedula).orElse(null);
+            if (familia == null) {
+                familia = new Familia();
+                familia.setCedula(cedula);
+                familia.setIsNew(true);
+            } else {
+                familia.setIsNew(false);
+            }
             familia.setCantPersonas(fDto.getCantPersonas());
             familia.setCantEstudiando(fDto.getCantEstudiando());
             familia.setIngresoMes(fDto.getIngresoMes());
@@ -110,8 +116,14 @@ public class EncuestaService {
         // 2. Save Vivienda
         if (request.getVivienda() != null) {
             DatosEncuestaRequest.ViviendaDTO vDto = request.getVivienda();
-            Vivienda vivienda = viviendaRepository.findById(cedula).orElse(new Vivienda());
-            vivienda.setCedula(cedula);
+            Vivienda vivienda = viviendaRepository.findById(cedula).orElse(null);
+            if (vivienda == null) {
+                vivienda = new Vivienda();
+                vivienda.setCedula(cedula);
+                vivienda.setIsNew(true);
+            } else {
+                vivienda.setIsNew(false);
+            }
             vivienda.setCantHabitaciones(vDto.getCantHabitaciones());
             vivienda.setCantBanos(vDto.getCantBanos());
             viviendaRepository.save(vivienda);
@@ -123,9 +135,8 @@ public class EncuestaService {
             caracteristicaViviendaRepository.deleteAllByCedula(cedula);
             for (CaracteristicaRequest cDto : request.getCaracteristicas()) {
                 if (cDto.getIdCatVivienda() != null && cDto.getIdTipoCat() != null) {
-                    CaracteristicaVivienda cv = new CaracteristicaVivienda(cedula, cDto.getIdTipoCat(),
-                            cDto.getIdCatVivienda());
-                    caracteristicaViviendaRepository.save(cv);
+                    caracteristicaViviendaRepository.saveManual(cedula, Objects.requireNonNull(cDto.getIdTipoCat()),
+                            Objects.requireNonNull(cDto.getIdCatVivienda()));
                 }
             }
         }

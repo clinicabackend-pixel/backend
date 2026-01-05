@@ -1,6 +1,8 @@
 package clinica_juridica.backend.exception;
 
 import clinica_juridica.backend.dto.response.ApiResponse;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -17,6 +19,19 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<ApiResponse<Void>> handleBadRequestException(BadRequestException ex) {
         return new ResponseEntity<>(ApiResponse.error(ex.getMessage(), null), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler({ DuplicateKeyException.class,
+            DataIntegrityViolationException.class })
+    public ResponseEntity<ApiResponse<Void>> handleDuplicateKeyException(Exception ex) {
+        return new ResponseEntity<>(
+                ApiResponse.error("Ya existe un registro con esa cédula o identificador único.", null),
+                HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(ResourceAlreadyExistsException.class)
+    public ResponseEntity<ApiResponse<Object>> handleResourceAlreadyExistsException(ResourceAlreadyExistsException ex) {
+        return new ResponseEntity<>(ApiResponse.error(ex.getMessage(), ex.getExistingResource()), HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(Exception.class)

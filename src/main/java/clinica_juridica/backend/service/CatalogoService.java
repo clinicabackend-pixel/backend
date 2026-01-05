@@ -39,6 +39,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.lang.NonNull;
 
+import clinica_juridica.backend.dto.response.EstadoCivilResponse;
+import clinica_juridica.backend.dto.response.SemestreResponse;
+import clinica_juridica.backend.repository.EstadoCivilRepository;
+import clinica_juridica.backend.repository.SemestreRepository;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -59,9 +64,9 @@ public class CatalogoService {
         private final EstadoRepository estadoRepository;
         private final MunicipioRepository municipioRepository;
         private final ParroquiaRepository parroquiaRepository;
-        private final clinica_juridica.backend.repository.EstadoCivilRepository estadoCivilRepository;
+        private final EstadoCivilRepository estadoCivilRepository;
         private final CentroRepository centroRepository;
-        private final clinica_juridica.backend.repository.SemestreRepository semestreRepository;
+        private final SemestreRepository semestreRepository;
 
         public CatalogoService(MateriaAmbitoLegalRepository materiaRepository,
                         CategoriaAmbitoLegalRepository categoriaRepository,
@@ -76,9 +81,9 @@ public class CatalogoService {
                         EstadoRepository estadoRepository,
                         MunicipioRepository municipioRepository,
                         ParroquiaRepository parroquiaRepository,
-                        clinica_juridica.backend.repository.EstadoCivilRepository estadoCivilRepository,
+                        EstadoCivilRepository estadoCivilRepository,
                         CentroRepository centroRepository,
-                        clinica_juridica.backend.repository.SemestreRepository semestreRepository) {
+                        SemestreRepository semestreRepository) {
                 this.materiaRepository = materiaRepository;
                 this.categoriaRepository = categoriaRepository;
                 this.subcategoriaRepository = subcategoriaRepository;
@@ -267,9 +272,9 @@ public class CatalogoService {
                                 .toList();
         }
 
-        public List<clinica_juridica.backend.dto.response.EstadoCivilResponse> getEstadosCiviles() {
+        public List<EstadoCivilResponse> getEstadosCiviles() {
                 return estadoCivilRepository.findAll().stream()
-                                .map(e -> new clinica_juridica.backend.dto.response.EstadoCivilResponse(
+                                .map(e -> new EstadoCivilResponse(
                                                 e.getIdEstadoCivil(),
                                                 e.getDescripcion()))
                                 .toList();
@@ -375,9 +380,9 @@ public class CatalogoService {
                 centroRepository.save(centro);
         }
 
-        public List<clinica_juridica.backend.dto.response.SemestreResponse> getSemestres() {
+        public List<SemestreResponse> getSemestres() {
                 return semestreRepository.findAll().stream()
-                                .map(s -> new clinica_juridica.backend.dto.response.SemestreResponse(
+                                .map(s -> new SemestreResponse(
                                                 s.getTermino(),
                                                 s.getNombre()))
                                 .toList();

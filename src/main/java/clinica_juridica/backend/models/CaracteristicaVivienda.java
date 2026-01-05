@@ -1,5 +1,6 @@
 package clinica_juridica.backend.models;
 
+import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 
 @Table("caracteristicas_viviendas")
@@ -7,6 +8,8 @@ public class CaracteristicaVivienda {
     // Composite PK: cedula, id_tipo_cat, id_cat_vivienda
     private String cedula;
     private Integer idTipoCat;
+
+    @Id
     private Integer idCatVivienda;
 
     public CaracteristicaVivienda() {

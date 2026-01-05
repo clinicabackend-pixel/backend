@@ -180,7 +180,7 @@ public class Solicitante implements Persistable<String> {
     }
 
     @org.springframework.data.annotation.Transient
-    private boolean isNew = true;
+    private boolean isNew = false;
 
     @Override
     public String getId() {

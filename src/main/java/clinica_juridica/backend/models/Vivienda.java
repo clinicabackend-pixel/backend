@@ -19,7 +19,7 @@ public class Vivienda implements Persistable<String> {
     private Integer cantBanos;
 
     @Transient
-    private boolean isNew = false;
+    private boolean isNew = true;
 
     public Vivienda() {
     }
@@ -55,7 +55,7 @@ public class Vivienda implements Persistable<String> {
         this.cantBanos = cantBanos;
     }
 
-    public void setNew(boolean isNew) {
+    public void setIsNew(boolean isNew) {
         this.isNew = isNew;
     }
 
