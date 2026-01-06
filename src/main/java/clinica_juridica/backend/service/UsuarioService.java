@@ -36,12 +36,11 @@ public class UsuarioService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public Iterable<Usuario> findAllUsuarios() {
+    public Iterable<Usuario> findAllUsuarios(String estatus) {
+        if (estatus != null && !estatus.isEmpty()) {
+            return usuarioRepository.findByStatus(estatus);
+        }
         return usuarioRepository.findAll();
-    }
-
-    public Iterable<Usuario> findAllActiveUsuarios() {
-        return usuarioRepository.findByStatus("ACTIVO");
     }
 
     public Usuario findUsuarioByUsername(String username) {

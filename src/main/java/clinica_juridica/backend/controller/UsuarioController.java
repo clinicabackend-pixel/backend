@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -32,20 +33,9 @@ public class UsuarioController {
 
     @GetMapping
     @PreAuthorize("hasRole('COORDINADOR') or hasRole('PROFESOR')")
-    @Operation(summary = "Obtener lista de usuarios", description = "Devuelve una lista de todos los usuarios. Requiere rol COORDINADOR o PROFESOR.")
-    public ResponseEntity<Iterable<UsuarioResponse>> getAllUsuarios() {
-        Iterable<Usuario> personal = usuarioService.findAllUsuarios();
-        Iterable<UsuarioResponse> response = StreamSupport.stream(personal.spliterator(), false)
-                .map(this::mapToResponse)
-                .toList();
-        return ResponseEntity.ok(response);
-    }
-
-    @GetMapping("/activos")
-    @PreAuthorize("isAuthenticated()")
-    @Operation(summary = "Obtener usuarios activos", description = "Devuelve una lista de todos los usuarios activos. Accesible para todos los roles authenticatedos.")
-    public ResponseEntity<Iterable<UsuarioResponse>> getActiveUsuarios() {
-        Iterable<Usuario> personal = usuarioService.findAllActiveUsuarios();
+    @Operation(summary = "Obtener lista de usuarios", description = "Devuelve una lista de usuarios, opcionalmente filtrada por estatus. Requiere rol COORDINADOR o PROFESOR.")
+    public ResponseEntity<Iterable<UsuarioResponse>> getAllUsuarios(@RequestParam(required = false) String estatus) {
+        Iterable<Usuario> personal = usuarioService.findAllUsuarios(estatus);
         Iterable<UsuarioResponse> response = StreamSupport.stream(personal.spliterator(), false)
                 .map(this::mapToResponse)
                 .toList();

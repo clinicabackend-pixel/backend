@@ -135,8 +135,9 @@ public class EncuestaService {
             caracteristicaViviendaRepository.deleteAllByCedula(cedula);
             for (CaracteristicaRequest cDto : request.getCaracteristicas()) {
                 if (cDto.getIdCatVivienda() != null && cDto.getIdTipoCat() != null) {
-                    caracteristicaViviendaRepository.saveManual(cedula, Objects.requireNonNull(cDto.getIdTipoCat()),
-                            Objects.requireNonNull(cDto.getIdCatVivienda()));
+                    int idTipoCat = cDto.getIdTipoCat();
+                    int idCatVivienda = cDto.getIdCatVivienda();
+                    caracteristicaViviendaRepository.saveManual(cedula, idTipoCat, idCatVivienda);
                 }
             }
         }
