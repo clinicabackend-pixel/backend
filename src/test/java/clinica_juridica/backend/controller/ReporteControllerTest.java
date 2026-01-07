@@ -50,17 +50,17 @@ public class ReporteControllerTest {
                 // Mock ReporteService behavior
                 try (Workbook workbook = new XSSFWorkbook()) {
                         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-                        workbook.createSheet("Reporte");
+                        workbook.createSheet("Reporte General");
                         workbook.write(outputStream);
-                        Mockito.when(reporteService.generarReporte()).thenReturn(outputStream.toByteArray());
+                        Mockito.when(reporteService.generarReporteGeneral()).thenReturn(outputStream.toByteArray());
                 }
 
-                MvcResult result = mockMvc.perform(get("/api/reportes"))
+                MvcResult result = mockMvc.perform(get("/api/reportes/general"))
                                 .andExpect(status().isOk())
                                 .andExpect(header().string("Content-Type",
                                                 "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
                                 .andExpect(header().string("Content-Disposition",
-                                                "form-data; name=\"attachment\"; filename=\"reporte.xlsx\""))
+                                                "form-data; name=\"attachment\"; filename=\"reporte_general.xlsx\""))
                                 .andReturn();
 
                 byte[] content = result.getResponse().getContentAsByteArray();
