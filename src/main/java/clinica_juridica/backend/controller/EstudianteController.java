@@ -29,6 +29,7 @@ public class EstudianteController {
     }
 
     @org.springframework.web.bind.annotation.PostMapping("/importar")
+    @org.springframework.security.access.prepost.PreAuthorize("hasRole('COORDINADOR')")
     public ResponseEntity<?> importarEstudiantes(
             @org.springframework.web.bind.annotation.RequestParam("file") org.springframework.web.multipart.MultipartFile file) {
         try {
