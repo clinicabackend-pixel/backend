@@ -9,6 +9,8 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import jakarta.annotation.PostConstruct;
+
 import java.util.List;
 
 @Service
@@ -21,6 +23,17 @@ public class EmailService {
 
     @Value("${spring.mail.username}")
     private String fromEmail;
+
+    @Value("${spring.mail.host}")
+    private String mailHost;
+
+    @Value("${spring.mail.port}")
+    private int mailPort;
+
+    @PostConstruct
+    public void logMailConfig() {
+        logger.info("EmailService initialized with: Host={}, Port={}, Username={}", mailHost, mailPort, fromEmail);
+    }
 
     /**
      * Sends a simple email to a list of recipients.
@@ -49,7 +62,7 @@ public class EmailService {
             emailSender.send(message);
             logger.info("Email sent successfully to: {}", to);
         } catch (Exception e) {
-            logger.error("Failed to send email to: {}", to, e);
+            logger.error("Failed to send email to: " + to, e);
         }
     }
 }

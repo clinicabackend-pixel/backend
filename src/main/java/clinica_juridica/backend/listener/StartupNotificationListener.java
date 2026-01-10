@@ -30,6 +30,7 @@ public class StartupNotificationListener {
 
     @EventListener(ApplicationReadyEvent.class)
     public void onApplicationEvent() {
+        logger.info("ApplicationReadyEvent received. Starting notification process...");
         logger.info("Application started. Sending notification email...");
 
         if (recipientsStr == null || recipientsStr.trim().isEmpty()) {
