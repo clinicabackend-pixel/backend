@@ -8,6 +8,8 @@ import clinica_juridica.backend.repository.UsuarioRepository;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -31,6 +33,81 @@ public class ImportService {
 
     @Transactional
     public Map<String, Object> importEstudiantes(MultipartFile file) throws IOException {
+        String filename = file.getOriginalFilename();
+        if (filename != null && (filename.endsWith(".xlsx") || filename.endsWith(".xls"))) {
+            return importEstudiantesExcel(file);
+        } else {
+            return importEstudiantesCSV(file);
+        }
+    }
+
+    private Map<String, Object> importEstudiantesExcel(MultipartFile file) throws IOException {
+        Map<String, Object> report = new HashMap<>();
+        int created = 0;
+        int updated = 0;
+        int failed = 0;
+        List<String> errors = new ArrayList<>();
+
+        try (Workbook workbook = new XSSFWorkbook(file.getInputStream())) {
+            Sheet sheet = workbook.getSheetAt(0);
+            DataFormatter dataFormatter = new DataFormatter();
+
+            // Assume header is at row 0
+            Row headerRow = sheet.getRow(0);
+            if (headerRow == null) {
+                throw new IOException("Excel file is empty or missing headers");
+            }
+
+            Map<String, Integer> headerMap = new HashMap<>();
+            for (Cell cell : headerRow) {
+                headerMap.put(dataFormatter.formatCellValue(cell).trim().toUpperCase(), cell.getColumnIndex());
+            }
+
+            for (int i = 1; i <= sheet.getLastRowNum(); i++) {
+                Row row = sheet.getRow(i);
+                if (row == null)
+                    continue;
+
+                try {
+                    String cedula = getCellValue(row, headerMap, "CEDULA", dataFormatter);
+                    String nombre = getCellValue(row, headerMap, "NOMBRE_ESTUDIANTE", dataFormatter);
+                    String email = getCellValue(row, headerMap, "ESTU_EMAIL_ADDRESS", dataFormatter);
+
+                    if (email == null || email.isBlank() || cedula == null || cedula.isBlank()) {
+                        failed++;
+                        errors.add("Row " + (i + 1) + ": Missing Email or Cedula");
+                        continue;
+                    }
+
+                    ProcessResult result = processUserAndStudent(cedula, nombre, email, row, headerMap, dataFormatter);
+                    if (result == ProcessResult.CREATED)
+                        created++;
+                    else if (result == ProcessResult.UPDATED)
+                        updated++;
+
+                } catch (Exception e) {
+                    failed++;
+                    errors.add("Row " + (i + 1) + ": " + e.getMessage());
+                }
+            }
+        }
+
+        report.put("created", created);
+        report.put("updated", updated);
+        report.put("failed", failed);
+        report.put("errors", errors);
+        return report;
+    }
+
+    private String getCellValue(Row row, Map<String, Integer> headerMap, String columnName, DataFormatter formatter) {
+        Integer index = headerMap.get(columnName);
+        if (index == null)
+            return null;
+        Cell cell = row.getCell(index);
+        return formatter.formatCellValue(cell);
+    }
+
+    private Map<String, Object> importEstudiantesCSV(MultipartFile file) throws IOException {
         Map<String, Object> report = new HashMap<>();
         int created = 0;
         int updated = 0;
@@ -48,8 +125,6 @@ public class ImportService {
                     String cedula = csvRecord.get("CEDULA");
                     String nombre = csvRecord.get("NOMBRE_ESTUDIANTE");
                     String email = csvRecord.get("ESTU_EMAIL_ADDRESS");
-                    // Assuming headers: CEDULA, NOMBRE_ESTUDIANTE, ESTU_EMAIL_ADDRESS, UCAB_USER,
-                    // YEAR_TERM, CRN, STATUS_DESC, MODALIDAD
 
                     if (email == null || email.isBlank() || cedula == null || cedula.isBlank()) {
                         failed++;
@@ -57,77 +132,22 @@ public class ImportService {
                         continue;
                     }
 
-                    // Check if usuario exists by Email or Cedula
-                    Optional<Usuario> existingUserByEmail = usuarioRepository.findByEmail(email);
-                    Optional<Usuario> existingUserByCedula = usuarioRepository.findByCedula(cedula);
+                    // Adapt CSVRecord to a common interface or just extract values here
+                    // Since logic is shared, it's better to duplicate small logic or adapter
+                    // pattern.
+                    // For simplicity in this edit, I'll extract vars.
 
-                    Usuario usuario;
-                    boolean isNewUser = false;
-
-                    if (existingUserByEmail.isPresent()) {
-                        usuario = existingUserByEmail.get();
-                        // Update basic info if needed? For now, we assume existing user is fine.
-                    } else if (existingUserByCedula.isPresent()) {
-                        usuario = existingUserByCedula.get();
-                        // Possible email update?
-                        usuario.setEmail(email);
-                    } else {
-                        // Create new user
-                        isNewUser = true;
-                        usuario = new Usuario();
-                        usuario.setUsername(email.split("@")[0]); // generate username from email
-                        // Check if username collision?
-                        if (usuarioRepository.existsById(Objects.requireNonNull(usuario.getUsername()))) {
-                            usuario.setUsername(usuario.getUsername() + "_" + new Random().nextInt(1000));
-                        }
-
-                        usuario.setCedula(cedula);
-                        usuario.setNombre(nombre);
-                        usuario.setEmail(email);
-                        usuario.setContrasena(null); // No password
-                        usuario.setStatus("ACTIVO"); // Default status
-                        usuario.setTipo(TipoUsuario.ESTUDIANTE.name());
-                    }
-
-                    usuarioRepository.save(Objects.requireNonNull(usuario));
-
-                    // Create/Update Estudiante
                     String termino = csvRecord.isMapped("YEAR_TERM") ? csvRecord.get("YEAR_TERM") : "UNKNOWN";
                     String nrcStr = csvRecord.isMapped("CRN") ? csvRecord.get("CRN") : "0";
-                    Integer nrc = 0;
-                    try {
-                        nrc = Integer.parseInt(nrcStr);
-                    } catch (NumberFormatException e) {
-                        // ignore
-                    }
-
                     String modalidad = csvRecord.isMapped("MODALIDAD") ? csvRecord.get("MODALIDAD") : "";
                     String courseStatus = csvRecord.isMapped("COURSE_STATUS_INSC") ? csvRecord.get("COURSE_STATUS_INSC")
                             : "";
-                    String tipoEstudiante = modalidad + " - " + courseStatus;
 
-                    // Check if Estudiante relation exists
-                    // Composite key logic might be needed if Estudiante uses composite key
-                    // (username + termino)
-                    // Based on Estudiante.java: @Id private String username; private String
-                    // termino;
-                    // But Repository is CrudRepository<Estudiante, String>, suggesting simple ID or
-                    // maybe Spring Data JDBC handling.
-                    // The Estudiante Entity has specific fields. Let's create a new object or
-                    // update.
-
-                    // Since specific lookup by composite key isn't standard in the simple repo
-                    // without custom query,
-                    // and existsByUsernameAndTermino was seen in EstudianteRepository.
-
-                    if (!estudianteRepository.existsByUsernameAndTermino(usuario.getUsername(), termino)) {
-                        Estudiante estudiante = new Estudiante(usuario.getUsername(), termino, tipoEstudiante, nrc);
-                        estudianteRepository.save(estudiante);
-                    }
-
-                    if (isNewUser)
+                    ProcessResult result = processCommon(cedula, nombre, email, termino, nrcStr, modalidad,
+                            courseStatus);
+                    if (result == ProcessResult.CREATED)
                         created++;
-                    else
+                    else if (result == ProcessResult.UPDATED)
                         updated++;
 
                 } catch (Exception e) {
@@ -143,5 +163,77 @@ public class ImportService {
         report.put("errors", errors);
 
         return report;
+    }
+
+    private enum ProcessResult {
+        CREATED, UPDATED
+    }
+
+    private ProcessResult processUserAndStudent(String cedula, String nombre, String email, Row row,
+            Map<String, Integer> headerMap, DataFormatter formatter) {
+        String termino = getCellValue(row, headerMap, "YEAR_TERM", formatter);
+        if (termino == null)
+            termino = "UNKNOWN";
+
+        String nrcStr = getCellValue(row, headerMap, "CRN", formatter);
+        if (nrcStr == null)
+            nrcStr = "0";
+
+        String modalidad = getCellValue(row, headerMap, "MODALIDAD", formatter);
+        if (modalidad == null)
+            modalidad = "";
+
+        String courseStatus = getCellValue(row, headerMap, "COURSE_STATUS_INSC", formatter);
+        if (courseStatus == null)
+            courseStatus = "";
+
+        return processCommon(cedula, nombre, email, termino, nrcStr, modalidad, courseStatus);
+    }
+
+    private ProcessResult processCommon(String cedula, String nombre, String email, String termino, String nrcStr,
+            String modalidad, String courseStatus) {
+        Optional<Usuario> existingUserByEmail = usuarioRepository.findByEmail(email);
+        Optional<Usuario> existingUserByCedula = usuarioRepository.findByCedula(cedula);
+
+        Usuario usuario;
+        boolean isNewUser = false;
+
+        if (existingUserByEmail.isPresent()) {
+            usuario = existingUserByEmail.get();
+        } else if (existingUserByCedula.isPresent()) {
+            usuario = existingUserByCedula.get();
+            usuario.setEmail(email);
+        } else {
+            isNewUser = true;
+            usuario = new Usuario();
+            usuario.setUsername(email.split("@")[0]);
+            if (usuarioRepository.existsById(Objects.requireNonNull(usuario.getUsername()))) {
+                usuario.setUsername(usuario.getUsername() + "_" + new Random().nextInt(1000));
+            }
+            usuario.setCedula(cedula);
+            usuario.setNombre(nombre);
+            usuario.setEmail(email);
+            usuario.setContrasena(null);
+            usuario.setStatus("ACTIVO");
+            usuario.setTipo(TipoUsuario.ESTUDIANTE.name());
+        }
+
+        usuarioRepository.save(Objects.requireNonNull(usuario));
+
+        Integer nrc = 0;
+        try {
+            nrc = Integer.parseInt(nrcStr);
+        } catch (NumberFormatException e) {
+            // ignore
+        }
+
+        String tipoEstudiante = modalidad + " - " + courseStatus;
+
+        if (!estudianteRepository.existsByUsernameAndTermino(usuario.getUsername(), termino)) {
+            Estudiante estudiante = new Estudiante(usuario.getUsername(), termino, tipoEstudiante, nrc);
+            estudianteRepository.save(estudiante);
+        }
+
+        return isNewUser ? ProcessResult.CREATED : ProcessResult.UPDATED;
     }
 }
