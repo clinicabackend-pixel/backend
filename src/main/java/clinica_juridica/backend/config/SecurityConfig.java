@@ -53,7 +53,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration
-                .setAllowedOrigins(Arrays.asList("http://localhost:5173", "https://proyecto-db-backend.onrender.com", "https://clinica-juridica-ucab.netlify.app"));
+                .setAllowedOrigins(Arrays.asList("http://localhost:5173","front-clinica.netlify.app"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setAllowCredentials(true);
