@@ -31,15 +31,30 @@ public class AuthController {
     private final CustomUserDetailsService userDetailsService;
     private final JwtUtil jwtUtil;
     private final UsuarioRepository usuarioRepository;
+    private final clinica_juridica.backend.service.UsuarioService usuarioService;
 
     public AuthController(AuthenticationManager authenticationManager,
             CustomUserDetailsService userDetailsService,
             JwtUtil jwtUtil,
-            UsuarioRepository usuarioRepository) {
+            UsuarioRepository usuarioRepository,
+            clinica_juridica.backend.service.UsuarioService usuarioService) {
         this.authenticationManager = authenticationManager;
         this.userDetailsService = userDetailsService;
         this.jwtUtil = jwtUtil;
         this.usuarioRepository = usuarioRepository;
+        this.usuarioService = usuarioService;
+    }
+
+    @PostMapping("/setup-password")
+    @Operation(summary = "Establecer contraseña", description = "Permite establecer la contraseña usando un token de invitación válido.")
+    public ResponseEntity<String> setupPassword(
+            @RequestBody clinica_juridica.backend.dto.request.SetupPasswordRequest request) {
+        try {
+            usuarioService.setupPassword(request.getToken(), request.getContrasena());
+            return ResponseEntity.ok("Contraseña establecida exitosamente. Ahora puedes iniciar sesión.");
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     @PostMapping("/login")

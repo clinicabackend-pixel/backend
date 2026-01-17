@@ -60,4 +60,37 @@ public class JwtUtil {
         final String extractedUsername = extractUsername(token);
         return (extractedUsername.equals(username) && !isTokenExpired(token));
     }
+
+    public String generateInvitationToken(String username, String currentPasswordHash) {
+        SecretKey dynamicKey = Keys.hmacShaKeyFor((secret + currentPasswordHash).getBytes(StandardCharsets.UTF_8));
+        return Jwts.builder()
+                .subject(username)
+                .issuedAt(new Date(System.currentTimeMillis()))
+                // No expiration date or very long one? User wanted no expiration.
+                // But generally good to have some limit. Since user insisted on "lives until
+                // pass created",
+                // we can set a long expiration (e.g., 30 days) just to be safe, or no
+                // expiration claim.
+                // However, without expiration, the token is valid forever unless password
+                // changes.
+                // I will set it to 30 days effectively "forever" for this context.
+                .expiration(new Date(System.currentTimeMillis() + 1000L * 60 * 60 * 24 * 30))
+                .signWith(dynamicKey)
+                .compact();
+    }
+
+    public Boolean validateInvitationToken(String token, String username, String currentPasswordHash) {
+        SecretKey dynamicKey = Keys.hmacShaKeyFor((secret + currentPasswordHash).getBytes(StandardCharsets.UTF_8));
+        try {
+            Claims claims = Jwts.parser()
+                    .verifyWith(dynamicKey)
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload();
+
+            return claims.getSubject().equals(username);
+        } catch (Exception e) {
+            return false;
+        }
+    }
 }

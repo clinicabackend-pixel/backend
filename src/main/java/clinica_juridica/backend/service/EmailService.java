@@ -42,6 +42,15 @@ public class EmailService {
             return;
         }
 
+        // --- TEMPORARY LOGGING FOR LOCAL DEVELOPMENT ---
+        logger.info("=================================================");
+        logger.info("EMAIL MOCKED DETECTED - SENDING TO LOGS");
+        logger.info("TO: {}", to);
+        logger.info("SUBJECT: {}", subject);
+        logger.info("MESSAGE:\n{}", text);
+        logger.info("=================================================");
+        // -----------------------------------------------
+
         Email from = new Email(fromEmail);
         Content content = new Content("text/plain", text);
         SendGrid sg = new SendGrid(sendGridApiKey);
@@ -87,5 +96,23 @@ public class EmailService {
         } catch (IOException e) {
             logger.error("Failed to make request to SendGrid", e);
         }
+    }
+
+    @Async
+    public void sendInvitationEmail(String to, String token) {
+        String setupUrl = "http://localhost:5173/setup-password?token=" + token; // Hardcoded origin for now
+        String subject = "Bienvenido a Clinica Juridica - Configura tu Contraseña";
+        String message = String.format("""
+                Hola!
+
+                Has sido registrado en el Sistema de Clinica Juridica.
+                Por favor, configura tu contraseña haciendo clic en el siguiente enlace:
+
+                %s
+
+                Si no puedes hacer clic, copia y pega el enlace en tu navegador.
+                """, setupUrl);
+
+        sendSimpleMessage(List.of(to), subject, message);
     }
 }

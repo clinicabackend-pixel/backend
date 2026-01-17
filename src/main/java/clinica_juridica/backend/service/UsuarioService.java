@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Objects;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @Service
 public class UsuarioService {
@@ -49,6 +50,12 @@ public class UsuarioService {
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
     }
 
+    @Autowired
+    private clinica_juridica.backend.security.JwtUtil jwtUtil;
+
+    @Autowired
+    private EmailService emailService;
+
     @Transactional
     public void createUsuario(UsuarioRequest request) {
         String username = Objects.requireNonNull(request.getUsername(), "Username cannot be null");
@@ -58,8 +65,6 @@ public class UsuarioService {
         if (request.getCedula() != null
                 && usuarioRepository.findAll().stream()
                         .anyMatch(u -> Objects.equals(request.getCedula(), u.getCedula()))) {
-            // Note: Ideally request.getCedula() check should be a DB query, but findAll
-            // stream is ok for now given repository limitations
             throw new RuntimeException("La cédula ya está registrada");
         }
 
@@ -68,12 +73,17 @@ public class UsuarioService {
         usuario.setCedula(request.getCedula());
         usuario.setNombre(request.getNombre());
         usuario.setEmail(request.getEmail());
-        usuario.setContrasena(passwordEncoder.encode(request.getContrasena()));
         usuario.setTipo(request.getTipoUsuario());
         usuario.setStatus("ACTIVO");
 
+        // Generate random internal password
+        String randomPassword = java.util.UUID.randomUUID().toString();
+        String hashedPassword = passwordEncoder.encode(randomPassword);
+        usuario.setContrasena(hashedPassword);
+
         usuarioRepository.save(usuario);
 
+        // Save role specific entities
         switch (request.getTipoUsuario()) {
             case "COORDINADOR":
                 Coordinador coordinador = new Coordinador(request.getUsername());
@@ -91,6 +101,25 @@ public class UsuarioService {
             default:
                 throw new RuntimeException("Tipo de usuario no válido");
         }
+
+        // Generate invitation token and send email
+        // Note: We use the HASHED password as part of the key.
+        String invitationToken = jwtUtil.generateInvitationToken(username, hashedPassword);
+        emailService.sendInvitationEmail(usuario.getEmail(), invitationToken);
+    }
+
+    public void setupPassword(String token, String nuevaContrasena) {
+        String username = jwtUtil.extractUsername(token);
+        Usuario usuario = findUsuarioByUsername(username);
+
+        // Validate token using current stored password hash
+        if (!jwtUtil.validateInvitationToken(token, username, usuario.getContrasena())) {
+            throw new RuntimeException("Token inválido o expirado. Es posible que ya hayas configurado tu contraseña.");
+        }
+
+        // Disable token reused by changing the password (which changes the hash)
+        usuario.setContrasena(passwordEncoder.encode(nuevaContrasena));
+        usuarioRepository.save(usuario);
     }
 
     @Transactional
@@ -109,11 +138,6 @@ public class UsuarioService {
         }
 
         usuarioRepository.save(usuario);
-
-        // Update specific roles fields if necessary (basic implementation updates
-        // common user fields)
-        // For full update of role specific fields (like NRC), specific logic would be
-        // needed here.
     }
 
     public void deleteUsuario(String username) {
