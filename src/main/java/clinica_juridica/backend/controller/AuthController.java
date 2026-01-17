@@ -89,4 +89,10 @@ public class AuthController {
                 usuario.getStatus(),
                 usuario.getTipo()));
     }
+
+    @GetMapping("/activo")
+    @Operation(summary = "Verificar estado del servicio", description = "Devuelve 'ACTIVO' si el servicio está funcionando.")
+    public ResponseEntity<String> getStatus() {
+        return ResponseEntity.ok("ACTIVO");
+    }
 }
