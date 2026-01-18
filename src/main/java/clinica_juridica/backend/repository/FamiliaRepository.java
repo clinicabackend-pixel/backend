@@ -20,4 +20,11 @@ public interface FamiliaRepository extends CrudRepository<Familia, String> {
     @NonNull
     @Query("SELECT * FROM familias WHERE cedula = :cedula")
     Optional<Familia> findById(@NonNull String cedula);
+
+    @Query("SELECT COUNT(*) FROM familias")
+    long countTotalFamilias();
+
+    // Vulnerabilidad: Ingreso < limite (ej. sueldo minimo referencial)
+    @Query("SELECT COUNT(*) FROM familias WHERE ingreso_mes < :limite")
+    long countFamiliasVulnerables(double limite);
 }

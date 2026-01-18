@@ -23,12 +23,15 @@ public class CasoSummaryResponse {
     private String nombreSolicitante;
     @Schema(description = "ID del ámbito legal")
     private Integer comAmbLegal;
+    @Schema(description = "Jerarquía legal completa")
+    private String legalHierarchy;
 
     public CasoSummaryResponse() {
     }
 
     public CasoSummaryResponse(String numCaso, LocalDate fechaRecepcion, String sintesis, String estatus,
-            String username, String termino, String cedula, String nombreSolicitante, Integer comAmbLegal) {
+            String username, String termino, String cedula, String nombreSolicitante, Integer comAmbLegal,
+            String legalHierarchy) {
         this.numCaso = numCaso;
         this.fechaRecepcion = fechaRecepcion;
         this.sintesis = sintesis;
@@ -38,6 +41,7 @@ public class CasoSummaryResponse {
         this.cedula = cedula;
         this.nombreSolicitante = nombreSolicitante;
         this.comAmbLegal = comAmbLegal;
+        this.legalHierarchy = legalHierarchy;
     }
 
     public String getNumCaso() {
@@ -110,5 +114,13 @@ public class CasoSummaryResponse {
 
     public void setComAmbLegal(Integer comAmbLegal) {
         this.comAmbLegal = comAmbLegal;
+    }
+
+    public String getLegalHierarchy() {
+        return legalHierarchy;
+    }
+
+    public void setLegalHierarchy(String legalHierarchy) {
+        this.legalHierarchy = legalHierarchy;
     }
 }

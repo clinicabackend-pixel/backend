@@ -1,12 +1,32 @@
 package clinica_juridica.backend.service;
 
+import clinica_juridica.backend.dto.response.*;
 import clinica_juridica.backend.dto.projection.CasoAsignadoProjection;
 import clinica_juridica.backend.dto.projection.CasoSupervisadoProjection;
-import clinica_juridica.backend.dto.response.*;
+import clinica_juridica.backend.repository.SolicitanteRepository;
 import clinica_juridica.backend.repository.CasoRepository;
+import clinica_juridica.backend.repository.FamiliaRepository;
+import clinica_juridica.backend.repository.VistaReporteViviendaRepository;
+import clinica_juridica.backend.repository.ParroquiaRepository;
+import clinica_juridica.backend.repository.MunicipioRepository;
+import clinica_juridica.backend.repository.EstadoRepository;
+import clinica_juridica.backend.models.Caso;
+import clinica_juridica.backend.models.Solicitante;
+import clinica_juridica.backend.models.Familia;
+import clinica_juridica.backend.models.VistaReporteVivienda;
+import clinica_juridica.backend.models.Parroquia;
+import clinica_juridica.backend.models.Municipio;
+import clinica_juridica.backend.models.Estado;
+import clinica_juridica.backend.models.AmbitoLegal;
+import clinica_juridica.backend.models.SubcategoriaAmbitoLegal;
+import clinica_juridica.backend.models.CategoriaAmbitoLegal;
+import clinica_juridica.backend.models.MateriaAmbitoLegal;
+import clinica_juridica.backend.repository.AmbitoLegalRepository;
+import clinica_juridica.backend.repository.SubcategoriaAmbitoLegalRepository;
+import clinica_juridica.backend.repository.CategoriaAmbitoLegalRepository;
+import clinica_juridica.backend.repository.MateriaAmbitoLegalRepository;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
@@ -15,13 +35,43 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Service
+@SuppressWarnings("null")
 public class ReporteService {
 
-    @Autowired
-    private CasoRepository casoRepository;
+    private final CasoRepository casoRepository;
+    private final CasoService casoService;
+    private final SolicitanteRepository solicitanteRepository;
+    private final FamiliaRepository familiaRepository;
+    private final VistaReporteViviendaRepository vistaReporteViviendaRepository;
+    private final ParroquiaRepository parroquiaRepository;
+    private final MunicipioRepository municipioRepository;
+    private final EstadoRepository estadoRepository;
+    private final AmbitoLegalRepository ambitoLegalRepository;
+    private final SubcategoriaAmbitoLegalRepository subcategoriaAmbitoLegalRepository;
+    private final CategoriaAmbitoLegalRepository categoriaAmbitoLegalRepository;
+    private final MateriaAmbitoLegalRepository materiaAmbitoLegalRepository;
 
-    @Autowired
-    private CasoService casoService;
+    public ReporteService(CasoRepository casoRepository, CasoService casoService,
+            SolicitanteRepository solicitanteRepository, FamiliaRepository familiaRepository,
+            VistaReporteViviendaRepository vistaReporteViviendaRepository, ParroquiaRepository parroquiaRepository,
+            MunicipioRepository municipioRepository, EstadoRepository estadoRepository,
+            AmbitoLegalRepository ambitoLegalRepository,
+            SubcategoriaAmbitoLegalRepository subcategoriaAmbitoLegalRepository,
+            CategoriaAmbitoLegalRepository categoriaAmbitoLegalRepository,
+            MateriaAmbitoLegalRepository materiaAmbitoLegalRepository) {
+        this.casoRepository = casoRepository;
+        this.casoService = casoService;
+        this.solicitanteRepository = solicitanteRepository;
+        this.familiaRepository = familiaRepository;
+        this.vistaReporteViviendaRepository = vistaReporteViviendaRepository;
+        this.parroquiaRepository = parroquiaRepository;
+        this.municipioRepository = municipioRepository;
+        this.estadoRepository = estadoRepository;
+        this.ambitoLegalRepository = ambitoLegalRepository;
+        this.subcategoriaAmbitoLegalRepository = subcategoriaAmbitoLegalRepository;
+        this.categoriaAmbitoLegalRepository = categoriaAmbitoLegalRepository;
+        this.materiaAmbitoLegalRepository = materiaAmbitoLegalRepository;
+    }
 
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
@@ -62,6 +112,313 @@ public class ReporteService {
             workbook.write(outputStream);
             return outputStream.toByteArray();
         }
+    }
+
+    public byte[] generarFichaSolicitante(String cedula) throws IOException {
+        Solicitante solicitante = solicitanteRepository.findById(cedula)
+                .orElseThrow(() -> new RuntimeException("Solicitante no encontrado"));
+
+        try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+            Sheet sheet = workbook.createSheet("Ficha Solicitante");
+            CellStyle headerStyle = createHeaderStyle(workbook);
+
+            int rowIdx = 0;
+            addRow(sheet, rowIdx++, "Cédula", solicitante.getCedula(), headerStyle);
+            addRow(sheet, rowIdx++, "Nombre", solicitante.getNombre(), headerStyle);
+            addRow(sheet, rowIdx++, "Nacionalidad", solicitante.getNacionalidad(), headerStyle);
+            addRow(sheet, rowIdx++, "Sexo", solicitante.getSexo(), headerStyle);
+            addRow(sheet, rowIdx++, "Email", solicitante.getEmail(), headerStyle);
+            addRow(sheet, rowIdx++, "Teléfono Celular", solicitante.getTelfCelular(), headerStyle);
+            addRow(sheet, rowIdx++, "Teléfono Casa", solicitante.getTelfCasa(), headerStyle);
+            addRow(sheet, rowIdx++, "Fecha Nacimiento",
+                    solicitante.getFNacimiento() != null ? solicitante.getFNacimiento().toString() : "N/A",
+                    headerStyle);
+            addRow(sheet, rowIdx++, "Edad", solicitante.getEdad() != null ? solicitante.getEdad().toString() : "N/A",
+                    headerStyle);
+
+            // Dirección
+            if (solicitante.getIdParroquia() != null) {
+                String direccion = "Desconocida";
+                Parroquia p = parroquiaRepository.findById(solicitante.getIdParroquia()).orElse(null);
+                if (p != null) {
+                    Municipio m = municipioRepository.findById(p.getIdMunicipio()).orElse(null);
+                    String estadoStr = "";
+                    if (m != null) {
+                        Estado e = estadoRepository.findById(m.getIdEstado()).orElse(null);
+                        if (e != null) {
+                            estadoStr = ", Edo. " + e.getNombreEstado();
+                        }
+                    }
+                    direccion = p.getNombreParroquia() + (m != null ? ", Mun. " + m.getNombreMunicipio() : "")
+                            + estadoStr;
+                }
+                addRow(sheet, rowIdx++, "Dirección", direccion, headerStyle);
+            }
+
+            // --- SECCIÓN: ENCUESTA SOCIOECONÓMICA ---
+            rowIdx++; // Spacer
+            Row titleRow = sheet.createRow(rowIdx++);
+            titleRow.createCell(0).setCellValue("ENCUESTA SOCIOECONÓMICA");
+            titleRow.getCell(0).setCellStyle(headerStyle);
+            sheet.addMergedRegion(new org.apache.poi.ss.util.CellRangeAddress(rowIdx - 1, rowIdx - 1, 0, 1));
+
+            // 1. Datos Familiares
+            Familia familia = familiaRepository.findById(cedula).orElse(null);
+            if (familia != null) {
+                rowIdx++;
+                Row famHeader = sheet.createRow(rowIdx++);
+                famHeader.createCell(0).setCellValue("Datos Familiares");
+                famHeader.getCell(0).setCellStyle(headerStyle);
+
+                addRow(sheet, rowIdx++, "Cant. Personas",
+                        familia.getCantPersonas() != null ? familia.getCantPersonas().toString() : "", null);
+                addRow(sheet, rowIdx++, "Ingreso Mensual",
+                        familia.getIngresoMes() != null ? familia.getIngresoMes().toString() : "", null);
+                addRow(sheet, rowIdx++, "Es Jefe de Familia",
+                        Boolean.TRUE.equals(familia.getJefeFamilia()) ? "Sí" : "No", null);
+                addRow(sheet, rowIdx++, "Cant. Niños",
+                        familia.getCantNinos() != null ? familia.getCantNinos().toString() : "", null);
+                addRow(sheet, rowIdx++, "Cant. Trabajan",
+                        familia.getCantTrabaja() != null ? familia.getCantTrabaja().toString() : "", null);
+            }
+
+            // 2. Vivienda
+            VistaReporteVivienda vivienda = vistaReporteViviendaRepository
+                    .findById(cedula).orElse(null);
+            if (vivienda != null) {
+                rowIdx++;
+                Row vivHeader = sheet.createRow(rowIdx++);
+                vivHeader.createCell(0).setCellValue("Vivienda");
+                vivHeader.getCell(0).setCellStyle(headerStyle);
+
+                addRow(sheet, rowIdx++, "Tipo Vivienda", vivienda.getTipoVivienda(), null);
+                addRow(sheet, rowIdx++, "Habitaciones",
+                        vivienda.getCantHabit() != null ? vivienda.getCantHabit().toString() : "", null);
+                addRow(sheet, rowIdx++, "Baños",
+                        vivienda.getCantBanos() != null ? vivienda.getCantBanos().toString() : "", null);
+                addRow(sheet, rowIdx++, "Piso", vivienda.getMaterialPiso(), null);
+                addRow(sheet, rowIdx++, "Paredes", vivienda.getMaterialParedes(), null);
+                addRow(sheet, rowIdx++, "Techo", vivienda.getMaterialTecho(), null);
+                addRow(sheet, rowIdx++, "Servicio Agua", vivienda.getServicioAgua(), null);
+            }
+
+            // --- SECCIÓN: CASOS COMO SOLICITANTE ---
+            rowIdx++;
+            Row solHeader = sheet.createRow(rowIdx++);
+            solHeader.createCell(0).setCellValue("Casos como Solicitante");
+            solHeader.getCell(0).setCellStyle(headerStyle);
+            sheet.addMergedRegion(new org.apache.poi.ss.util.CellRangeAddress(rowIdx - 1, rowIdx - 1, 0, 1));
+
+            List<CasoSummaryResponse> casosSolicitante = casoRepository.findCasosBySolicitanteCedula(cedula);
+            if (!casosSolicitante.isEmpty()) {
+                String[] caseHeaders = { "N° Caso", "Fecha", "Estatus", "Materia", "Síntesis" };
+                Row headerRow = sheet.createRow(rowIdx++);
+                for (int i = 0; i < caseHeaders.length; i++) {
+                    Cell cell = headerRow.createCell(i);
+                    cell.setCellValue(caseHeaders[i]);
+                    cell.setCellStyle(headerStyle); // Using same header style
+                }
+
+                for (CasoSummaryResponse c : casosSolicitante) {
+                    Row r = sheet.createRow(rowIdx++);
+                    r.createCell(0).setCellValue(c.getNumCaso());
+                    r.createCell(1).setCellValue(
+                            c.getFechaRecepcion() != null ? c.getFechaRecepcion().format(DATE_FORMATTER) : "");
+                    r.createCell(2).setCellValue(c.getEstatus());
+                    r.createCell(3).setCellValue(resolveLegalHierarchy(c.getComAmbLegal()));
+                    r.createCell(4).setCellValue(c.getSintesis());
+                }
+            } else {
+                sheet.createRow(rowIdx++).createCell(0).setCellValue("No registra casos como solicitante.");
+            }
+
+            // --- SECCIÓN: CASOS COMO BENEFICIARIO ---
+            rowIdx++;
+            Row benHeader = sheet.createRow(rowIdx++);
+            benHeader.createCell(0).setCellValue("Casos como Beneficiario");
+            benHeader.getCell(0).setCellStyle(headerStyle);
+            sheet.addMergedRegion(new org.apache.poi.ss.util.CellRangeAddress(rowIdx - 1, rowIdx - 1, 0, 1));
+
+            List<CasoSummaryResponse> casosBeneficiario = casoRepository.findCasosByBeneficiarioCedula(cedula);
+            if (!casosBeneficiario.isEmpty()) {
+                String[] caseHeaders = { "N° Caso", "Fecha", "Estatus", "Materia", "Síntesis" };
+                Row headerRow = sheet.createRow(rowIdx++);
+                for (int i = 0; i < caseHeaders.length; i++) {
+                    Cell cell = headerRow.createCell(i);
+                    cell.setCellValue(caseHeaders[i]);
+                    cell.setCellStyle(headerStyle);
+                }
+
+                for (CasoSummaryResponse c : casosBeneficiario) {
+                    Row r = sheet.createRow(rowIdx++);
+                    r.createCell(0).setCellValue(c.getNumCaso());
+                    r.createCell(1).setCellValue(
+                            c.getFechaRecepcion() != null ? c.getFechaRecepcion().format(DATE_FORMATTER) : "");
+                    r.createCell(2).setCellValue(c.getEstatus());
+                    r.createCell(3).setCellValue(resolveLegalHierarchy(c.getComAmbLegal()));
+                    r.createCell(4).setCellValue(c.getSintesis());
+                }
+            } else {
+                sheet.createRow(rowIdx++).createCell(0).setCellValue("No registra casos como beneficiario.");
+            }
+
+            // Adjust autosize for the first few columns
+            for (int i = 0; i < 5; i++) {
+                sheet.autoSizeColumn(i);
+            }
+
+            sheet.autoSizeColumn(0);
+            sheet.autoSizeColumn(1);
+
+            workbook.write(out);
+            return out.toByteArray();
+        }
+    }
+
+    public byte[] generarHistorialCasos(String cedula, java.time.LocalDate inicio, java.time.LocalDate fin)
+            throws IOException {
+        List<Caso> casos = casoRepository.findCasosBySolicitanteAndFechaRange(cedula,
+                inicio, fin);
+
+        try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+            Sheet sheet = workbook.createSheet("Historial de Casos");
+
+            String[] headers = { "Número de Caso", "Fecha Recepción", "Estatus", "Síntesis", "Trámite" };
+            createHeaderRow(sheet, headers, workbook);
+
+            int rowIdx = 1;
+            for (Caso caso : casos) {
+                Row row = sheet.createRow(rowIdx++);
+                row.createCell(0).setCellValue(caso.getNumCaso());
+                row.createCell(1)
+                        .setCellValue(caso.getFechaRecepcion() != null ? caso.getFechaRecepcion().toString() : "");
+                row.createCell(2).setCellValue(caso.getEstatus());
+                row.createCell(3).setCellValue(caso.getSintesis());
+                row.createCell(4).setCellValue(caso.getTramite());
+            }
+
+            for (int i = 0; i < headers.length; i++)
+                sheet.autoSizeColumn(i);
+
+            workbook.write(out);
+            return out.toByteArray();
+        }
+    }
+
+    public byte[] generarReporteHistorialGeneral(java.time.LocalDate inicio, java.time.LocalDate fin, String username)
+            throws IOException {
+        List<CasoSummaryResponse> casos = casoRepository.findCasosByDatesAndUsuario(inicio, fin, username);
+
+        try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+            Sheet sheet = workbook.createSheet("Historial General");
+
+            String[] headers = { "N° Caso", "Fecha Recepción", "Estatus", "Síntesis", "Materia", "Término",
+                    "Solicitante", "CI Solicitante" };
+            createHeaderRow(sheet, headers, workbook);
+
+            int rowIdx = 1;
+            for (CasoSummaryResponse caso : casos) {
+                Row row = sheet.createRow(rowIdx++);
+                row.createCell(0).setCellValue(caso.getNumCaso());
+                row.createCell(1).setCellValue(
+                        caso.getFechaRecepcion() != null ? caso.getFechaRecepcion().format(DATE_FORMATTER) : "");
+                row.createCell(2).setCellValue(caso.getEstatus());
+                row.createCell(3).setCellValue(caso.getSintesis());
+                row.createCell(4).setCellValue(resolveLegalHierarchy(caso.getComAmbLegal()));
+                row.createCell(5).setCellValue(caso.getTermino());
+                row.createCell(6).setCellValue(caso.getNombreSolicitante());
+                row.createCell(7).setCellValue(caso.getCedula());
+            }
+
+            autosizeColumns(sheet, headers.length);
+
+            workbook.write(out);
+            return out.toByteArray();
+        }
+    }
+
+    public byte[] generarReportePorEstatus(String estatus) throws IOException {
+        List<CasoSummaryResponse> casos = casoRepository.findAllByFilters(estatus, null, null);
+
+        try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+            Sheet sheet = workbook.createSheet("Casos " + estatus);
+
+            String[] headers = { "N° Caso", "Fecha Recepción", "Síntesis", "Estatus", "Asignado a", "Término",
+                    "Solicitante" };
+            createHeaderRow(sheet, headers, workbook);
+
+            int rowIdx = 1;
+            for (CasoSummaryResponse caso : casos) {
+                Row row = sheet.createRow(rowIdx++);
+                row.createCell(0).setCellValue(caso.getNumCaso());
+                row.createCell(1).setCellValue(
+                        caso.getFechaRecepcion() != null ? caso.getFechaRecepcion().format(DATE_FORMATTER) : "");
+                row.createCell(2).setCellValue(caso.getSintesis());
+                row.createCell(3).setCellValue(caso.getEstatus());
+                row.createCell(4).setCellValue(caso.getUsername());
+                row.createCell(5).setCellValue(caso.getTermino());
+                row.createCell(6).setCellValue(caso.getNombreSolicitante());
+            }
+            for (int i = 0; i < headers.length; i++)
+                sheet.autoSizeColumn(i);
+
+            workbook.write(out);
+            return out.toByteArray();
+        }
+    }
+
+    public byte[] generarInformeResumen(String semestre, Integer tipoCaso) throws IOException {
+        List<ReporteResumenDto> resumen = casoRepository.getResumenSemestreTipo(semestre, tipoCaso);
+
+        try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+            Sheet sheet = workbook.createSheet("Resumen Semestral");
+
+            String[] headers = { "Semestre", "Tipo Caso (ID)", "Estatus", "Total Casos" };
+            createHeaderRow(sheet, headers, workbook);
+
+            int rowIdx = 1;
+            long totalGeneral = 0;
+
+            for (ReporteResumenDto item : resumen) {
+                Row row = sheet.createRow(rowIdx++);
+                row.createCell(0).setCellValue(semestre);
+                row.createCell(1).setCellValue(tipoCaso);
+                row.createCell(2).setCellValue(item.getEstatus());
+                row.createCell(3).setCellValue(item.getCantidad());
+                totalGeneral += item.getCantidad();
+            }
+
+            Row totalRow = sheet.createRow(rowIdx + 1);
+            totalRow.createCell(2).setCellValue("TOTAL GENERAL");
+            totalRow.createCell(3).setCellValue(totalGeneral);
+
+            for (int i = 0; i < 4; i++)
+                sheet.autoSizeColumn(i);
+
+            workbook.write(out);
+            return out.toByteArray();
+        }
+    }
+
+    public DashboardStatsDto getDashboardStats() {
+        long totalCasos = casoRepository.countTotalCasos();
+        long casosActivos = casoRepository.countByEstatus("ABIERTO"); // Or list specific active statuses
+        long casosCerrados = casoRepository.countByEstatus("CERRADO");
+        long totalSolicitantes = solicitanteRepository.count();
+
+        List<clinica_juridica.backend.dto.projection.MateriaCountProjection> materiaCounts = casoRepository
+                .countDistribucionMateria();
+        java.util.Map<String, Long> distribucionMateria = new java.util.HashMap<>();
+        for (clinica_juridica.backend.dto.projection.MateriaCountProjection p : materiaCounts) {
+            distribucionMateria.put(p.getMateria(), p.getCantidad());
+        }
+
+        long totalFamilias = familiaRepository.countTotalFamilias();
+        long vulnerables = familiaRepository.countFamiliasVulnerables(5000.0); // Threshold example
+        double porcentajeVulnerabilidad = totalFamilias > 0 ? (double) vulnerables / totalFamilias * 100 : 0;
+
+        return new DashboardStatsDto(totalCasos, casosActivos, casosCerrados, totalSolicitantes, distribucionMateria,
+                porcentajeVulnerabilidad);
     }
 
     public byte[] generarReporteCaso(String id) throws IOException {
@@ -294,5 +651,39 @@ public class ReporteService {
         for (int i = 0; i < count; i++) {
             sheet.autoSizeColumn(i);
         }
+    }
+
+    private String resolveLegalHierarchy(Integer comAmbLegal) {
+        if (comAmbLegal == null)
+            return "N/A";
+
+        AmbitoLegal ambito = ambitoLegalRepository.findById(comAmbLegal).orElse(null);
+        if (ambito == null)
+            return "ID: " + comAmbLegal;
+
+        String hierarchy = ambito.getAmbLegal();
+
+        if (ambito.getCodSubAmbLegal() != null) {
+            SubcategoriaAmbitoLegal sub = subcategoriaAmbitoLegalRepository
+                    .findById(ambito.getCodSubAmbLegal()).orElse(null);
+            if (sub != null) {
+                hierarchy = sub.getNombreSubcategoria() + " > " + hierarchy;
+                if (sub.getCodCatAmbLegal() != null) {
+                    CategoriaAmbitoLegal cat = categoriaAmbitoLegalRepository
+                            .findById(sub.getCodCatAmbLegal()).orElse(null);
+                    if (cat != null) {
+                        hierarchy = cat.getCatAmbLegal() + " > " + hierarchy;
+                        if (cat.getCodMatAmbLegal() != null) {
+                            MateriaAmbitoLegal mat = materiaAmbitoLegalRepository
+                                    .findById(cat.getCodMatAmbLegal()).orElse(null);
+                            if (mat != null) {
+                                hierarchy = mat.getMatAmbLegal() + " > " + hierarchy;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return hierarchy;
     }
 }

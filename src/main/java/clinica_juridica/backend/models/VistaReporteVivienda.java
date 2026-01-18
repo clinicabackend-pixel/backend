@@ -1,21 +1,43 @@
 package clinica_juridica.backend.models;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 @Table("vista_reporte_vivienda")
 public class VistaReporteVivienda {
     @Id
+    @Column("cedula")
     private String cedula;
+
+    @Column("nombre")
     private String nombre;
+
+    @Column("tipo_vivienda")
     private String tipoVivienda;
+
+    @Column("material_piso")
     private String materialPiso;
+
+    @Column("material_paredes")
     private String materialParedes;
+
+    @Column("material_techo")
     private String materialTecho;
+
+    @Column("servicio_agua")
     private String servicioAgua;
+
+    @Column("eliminacion_excretas")
     private String eliminacionExcretas;
+
+    @Column("aseo_urbano")
     private String aseoUrbano;
+
+    @Column("cant_habit")
     private Integer cantHabit;
+
+    @Column("cant_banos")
     private Integer cantBanos;
 
     public VistaReporteVivienda() {

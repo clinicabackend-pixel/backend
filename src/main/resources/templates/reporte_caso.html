@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Detalle del Caso</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 2cm;
+
+            @bottom-right {
+                content: "Página " counter(page) " de " counter(pages);
+                font-family: sans-serif;
+                font-size: 10pt;
+            }
+
+            @bottom-left {
+                content: "Sistema Clínica Jurídica - Reporte Detallado";
+                font-family: sans-serif;
+                font-size: 8pt;
+                color: #666;
+            }
+        }
+
+        body {
+            font-family: "Helvetica", sans-serif;
+            font-size: 11pt;
+            line-height: 1.4;
+            color: #333;
+        }
+
+        h1,
+        h2,
+        h3 {
+            font-family: "Times New Roman", serif;
+            color: #450a0a;
+            margin-bottom: 10px;
+        }
+
+        h1 {
+            font-size: 20pt;
+            text-align: center;
+            border-bottom: 2px solid #450a0a;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            font-size: 14pt;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 5px;
+            margin-top: 25px;
+            background-color: #fcfcfc;
+            padding: 5px;
+        }
+
+        .header-info {
+            text-align: right;
+            font-size: 10pt;
+            margin-bottom: 20px;
+        }
+
+        .section-table {
+            width: 100%;
+            margin-bottom: 15px;
+            border-collapse: collapse;
+        }
+
+        .section-table td {
+            vertical-align: top;
+            padding: 5px;
+        }
+
+        .label {
+            font-weight: bold;
+            color: #450a0a;
+            width: 160px;
+            font-family: "Times New Roman", serif;
+        }
+
+        .value {
+            border-bottom: 1px dotted #999;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            font-size: 10pt;
+        }
+
+        .data-table th {
+            background-color: #450a0a;
+            color: white;
+            padding: 6px;
+            text-align: left;
+            font-family: "Times New Roman", serif;
+            font-size: 9pt;
+        }
+
+        .data-table td {
+            border: 1px solid #ddd;
+            padding: 5px;
+            vertical-align: top;
+        }
+
+        .data-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .no-data {
+            font-style: italic;
+            color: #777;
+            padding: 10px;
+            font-size: 10pt;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="header-info">
+        Fecha de Emisión: <span th:text="${fechaEmision}">2026-01-18</span>
+    </div>
+
+    <h1>EXPEDIENTE DE CASO</h1>
+
+    <!-- Resumen del Caso -->
+    <!-- Resumen del Caso -->
+    <h2>DATOS DEL CASO</h2>
+    <table class="section-table">
+        <tr>
+            <td class="label">Número de Caso:</td>
+            <td class="value" th:text="${datos.caso.numCaso}" style="font-weight: bold; font-size: 12pt;">C-2023-001
+            </td>
+            <td class="label">Estatus:</td>
+            <td class="value" th:text="${datos.caso.estatus}">ABIERTO</td>
+        </tr>
+        <tr>
+            <td class="label">Fecha Recepción:</td>
+            <td class="value" th:text="${datos.caso.fechaRecepcion}">2023-01-01</td>
+            <td class="label">Centro:</td>
+            <td class="value" th:text="${datos.caso.idCentro}">1</td>
+        </tr>
+        <tr>
+            <td class="label">Materia:</td>
+            <td class="value" colspan="3" th:text="${materiaCompleta}">Civil > Familia > Divorcio</td>
+        </tr>
+        <tr>
+            <td class="label">Trámite:</td>
+            <td class="value" colspan="3" th:text="${datos.caso.tramite}">Divorcio Contencioso</td>
+        </tr>
+        <tr>
+            <td class="label">Síntesis:</td>
+            <td class="value" colspan="3" th:text="${datos.caso.sintesis}">Descripción breve...</td>
+        </tr>
+    </table>
+
+    <!-- Datos del Solicitante -->
+    <h2>DATOS DEL SOLICITANTE</h2>
+    <table class="section-table" th:if="${solicitante != null}">
+        <tr>
+            <td class="label">Nombre Completo:</td>
+            <td class="value" colspan="3" th:text="${solicitante.nombre}">Juan Pérez</td>
+        </tr>
+        <tr>
+            <td class="label">Cédula:</td>
+            <td class="value" th:text="${solicitante.cedula}">V-12345678</td>
+            <td class="label">Nacionalidad:</td>
+            <td class="value" th:text="${solicitante.nacionalidad}">V</td>
+        </tr>
+        <tr>
+            <td class="label">Teléfonos:</td>
+            <td class="value" colspan="3">
+                <span th:text="${solicitante.telfCelular}">0414-1234567</span>
+                <span th:if="${solicitante.telfCasa != null}"> / </span>
+                <span th:text="${solicitante.telfCasa}">0212-1234567</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="label">Email:</td>
+            <td class="value" colspan="3" th:text="${solicitante.email}">juan@example.com</td>
+        </tr>
+    </table>
+    <div th:if="${solicitante == null}" class="no-data">
+        <p>No se encontraron datos detallados del solicitante.</p>
+    </div>
+
+    <!-- Equipo Asignado -->
+    <h2>EQUIPO ASIGNADO</h2>
+
+    <h3 style="font-size: 11pt; border-bottom: none; margin-top: 10px; color: #666;">Estudiantes / Abogados</h3>
+    <table class="data-table" th:if="${not #lists.isEmpty(datos.asignados)}">
+        <thead>
+            <tr>
+                <th>Semestre</th>
+                <th>Usuario</th>
+                <th>Nombre</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="usuario : ${datos.asignados}">
+                <td th:text="${usuario.termino}" style="width: 20%;">2024-1</td>
+                <td th:text="${usuario.username}" style="width: 30%;">jperez</td>
+                <td th:text="${usuario.nombre}">Juan Pérez</td>
+            </tr>
+        </tbody>
+    </table>
+    <div th:if="${#lists.isEmpty(datos.asignados)}" class="no-data">
+        <p>No hay estudiantes asignados.</p>
+    </div>
+
+    <h3 style="font-size: 11pt; border-bottom: none; margin-top: 15px; color: #666;">Supervisores</h3>
+    <table class="data-table" th:if="${not #lists.isEmpty(datos.supervisores)}">
+        <thead>
+            <tr>
+                <th>Semestre</th>
+                <th>Usuario</th>
+                <th>Nombre</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="sup : ${datos.supervisores}">
+                <td th:text="${sup.termino}" style="width: 20%;">2024-1</td>
+                <td th:text="${sup.username}" style="width: 30%;">supervisor1</td>
+                <td th:text="${sup.nombre}">Supervisor Principal</td>
+            </tr>
+        </tbody>
+    </table>
+    <div th:if="${#lists.isEmpty(datos.supervisores)}" class="no-data">
+        <p>No hay supervisores asignados.</p>
+    </div>
+
+
+    <!-- Acciones -->
+    <h2>REGISTRO DE ACCIONES</h2>
+    <table class="data-table" th:if="${not #lists.isEmpty(datos.acciones)}">
+        <thead>
+            <tr>
+                <th style="width: 15%;">Fecha</th>
+                <th style="width: 25%;">Título</th>
+                <th>Descripción</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="accion : ${datos.acciones}">
+                <td th:text="${accion.fechaEjecucion}">2023-02-01</td>
+                <td th:text="${accion.titulo}" style="font-weight: bold;">Reunión inicial</td>
+                <td th:text="${accion.descripcion}">Se acordó...</td>
+            </tr>
+        </tbody>
+    </table>
+    <div th:if="${#lists.isEmpty(datos.acciones)}" class="no-data">
+        <p>No hay acciones registradas.</p>
+    </div>
+
+    <!-- Encuentros -->
+    <h2>ENCUENTROS</h2>
+    <table class="data-table" th:if="${not #lists.isEmpty(datos.encuentros)}">
+        <thead>
+            <tr>
+                <th style="width: 15%;">Fecha</th>
+                <th>Observación</th>
+                <th style="width: 30%;">Orientación</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="enc : ${datos.encuentros}">
+                <td th:text="${enc.fechaAtencion}">2023-02-05</td>
+                <td th:text="${enc.observacion}">El cliente asistió...</td>
+                <td th:text="${enc.orientacion}">Se le indicó...</td>
+            </tr>
+        </tbody>
+    </table>
+    <div th:if="${#lists.isEmpty(datos.encuentros)}" class="no-data">
+        <p>No hay encuentros registrados.</p>
+    </div>
+
+    <!-- Documentos -->
+    <h2>DOCUMENTOS</h2>
+    <table class="data-table" th:if="${not #lists.isEmpty(datos.documentos)}">
+        <thead>
+            <tr>
+                <th style="width: 30%;">Título</th>
+                <th style="width: 15%;">Folios</th>
+                <th>Observación</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="doc : ${datos.documentos}">
+                <td th:text="${doc.titulo}">Cédula</td>
+                <td><span th:text="${doc.folioIni}">1</span> - <span th:text="${doc.folioFin}">2</span></td>
+                <td th:text="${doc.observacion}">Copia legible</td>
+            </tr>
+        </tbody>
+    </table>
+    <div th:if="${#lists.isEmpty(datos.documentos)}" class="no-data">
+        <p>No hay documentos registrados.</p>
+    </div>
+
+    <!-- Pruebas -->
+    <h2>PRUEBAS</h2>
+    <table class="data-table" th:if="${not #lists.isEmpty(datos.pruebas)}">
+        <thead>
+            <tr>
+                <th style="width: 15%;">Fecha</th>
+                <th style="width: 30%;">Título</th>
+                <th>Documento / Observación</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="prueba : ${datos.pruebas}">
+                <td th:text="${prueba.fecha}">2023-03-01</td>
+                <td th:text="${prueba.titulo}">Informe Médico</td>
+                <td>
+                    <div th:text="${prueba.documento}" style="font-weight: bold; margin-bottom: 2px;">Doc.ref</div>
+                    <div th:text="${prueba.observacion}" style="font-size: 9pt; color: #555;">Obs...</div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <div th:if="${#lists.isEmpty(datos.pruebas)}" class="no-data">
+        <p>No hay pruebas registradas.</p>
+    </div>
+
+</body>
+
+</html>

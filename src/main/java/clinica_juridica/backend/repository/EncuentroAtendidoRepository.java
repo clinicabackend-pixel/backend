@@ -19,4 +19,7 @@ public interface EncuentroAtendidoRepository extends CrudRepository<EncuentroAte
     @Modifying
     @Query("INSERT INTO encuentros_atendidos (id_encuentro, num_caso, username) VALUES (:idEncuentro, :numCaso, :username)")
     void saveManual(Integer idEncuentro, String numCaso, String username);
+
+    @Query("SELECT * FROM encuentros_atendidos WHERE num_caso = :numCaso")
+    List<EncuentroAtendido> findByNumCaso(String numCaso);
 }

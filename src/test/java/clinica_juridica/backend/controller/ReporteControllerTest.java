@@ -33,6 +33,9 @@ public class ReporteControllerTest {
         private ReporteService reporteService;
 
         @MockitoBean
+        private clinica_juridica.backend.service.PdfService pdfService;
+
+        @MockitoBean
         private UsuarioService usuarioService;
 
         @MockitoBean

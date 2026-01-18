@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Ficha del Solicitante</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 2cm;
+
+            @bottom-right {
+                content: "Página " counter(page) " de " counter(pages);
+                font-family: sans-serif;
+                font-size: 10pt;
+            }
+
+            @bottom-left {
+                content: "Documento confidencial generado por Sistema Clínica Jurídica";
+                font-family: sans-serif;
+                font-size: 8pt;
+                color: #666;
+            }
+        }
+
+        body {
+            font-family: "Helvetica", sans-serif;
+            font-size: 11pt;
+            line-height: 1.4;
+            color: #333;
+        }
+
+        h1,
+        h2,
+        h3 {
+            font-family: "Times New Roman", serif;
+            color: #450a0a;
+            margin-bottom: 10px;
+        }
+
+        h1 {
+            font-size: 24pt;
+            text-align: center;
+            border-bottom: 2px solid #450a0a;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            font-size: 14pt;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 5px;
+            margin-top: 20px;
+        }
+
+        .header-info {
+            text-align: right;
+            font-size: 10pt;
+            margin-bottom: 20px;
+        }
+
+        .section-table {
+            width: 100%;
+            margin-bottom: 15px;
+            border-collapse: collapse;
+        }
+
+        .section-table td {
+            vertical-align: top;
+            padding: 5px;
+        }
+
+        .label {
+            font-weight: bold;
+            color: #450a0a;
+            width: 150px;
+            font-family: "Times New Roman", serif;
+        }
+
+        .value {
+            border-bottom: 1px dotted #999;
+        }
+
+        .casos-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        .casos-table th {
+            background-color: #450a0a;
+            color: white;
+            padding: 8px;
+            text-align: left;
+            font-family: "Times New Roman", serif;
+            font-size: 10pt;
+        }
+
+        .casos-table td {
+            border: 1px solid #ddd;
+            padding: 6px;
+            font-size: 10pt;
+        }
+
+        .casos-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .no-data {
+            font-style: italic;
+            color: #777;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="header-info">
+        Fecha de Emisión: <span th:text="${fechaEmision}">2026-01-18</span>
+    </div>
+
+    <h1>FICHA DE SOLICITANTE</h1>
+
+    <!-- Datos Personales -->
+    <h2>DATOS PERSONALES</h2>
+    <table class="section-table">
+        <tr>
+            <td class="label">Nombres y Apellidos:</td>
+            <td class="value" th:text="${datos.datosPersonales.nombre}">Juan Pérez</td>
+            <td class="label">Cédula:</td>
+            <td class="value" th:text="${datos.datosPersonales.cedula}">V-12345678</td>
+        </tr>
+        <tr>
+            <td class="label">Fecha Nacimiento:</td>
+            <td class="value" th:text="${datos.datosPersonales.fechaNacimiento}">1980-01-01</td>
+            <td class="label">Edad:</td>
+            <!-- Calculate age if DOB exists -->
+            <td class="value"
+                th:text="${datos.datosPersonales.fechaNacimiento != null ? T(java.time.Period).between(datos.datosPersonales.fechaNacimiento, T(java.time.LocalDate).now()).getYears() + ' años' : '--'}">
+                44 años</td>
+        </tr>
+        <tr>
+            <td class="label">Nacionalidad:</td>
+            <td class="value" th:text="${datos.datosPersonales.nacionalidad}">VENEZOLANA</td>
+            <td class="label">Estado Civil:</td>
+            <td class="value" th:text="${datos.datosPersonales.estadoCivil}">SOLTERO</td>
+        </tr>
+        <tr>
+            <td class="label">Teléfono Celular:</td>
+            <td class="value" th:text="${datos.datosPersonales.telfCelular}">0414-1234567</td>
+            <td class="label">Teléfono Casa:</td>
+            <td class="value" th:text="${datos.datosPersonales.telfCasa}">0212-1234567</td>
+        </tr>
+        <tr>
+            <td class="label">Correo Electrónico:</td>
+            <td class="value" colspan="3" th:text="${datos.datosPersonales.email}">juan@example.com</td>
+        </tr>
+        <tr>
+            <td class="label">Dirección:</td>
+            <td class="value" colspan="3">
+                <span th:text="${datos.datosPersonales.nombreParroquia}">Parroquia</span>,
+                <span th:text="${datos.datosPersonales.nombreMunicipio}">Municipio</span>,
+                <span th:text="${datos.datosPersonales.nombreEstado}">Estado</span>
+            </td>
+        </tr>
+    </table>
+
+    <!-- Datos Socioeconómicos -->
+    <h2>DATOS SOCIOECONÓMICOS</h2>
+    <div th:if="${datos.datosSocioeconomicos != null}">
+        <table class="section-table">
+            <!-- Datos Familiares -->
+            <tr>
+                <td colspan="4"
+                    style="border-bottom: 1px solid #eee; font-weight: bold; color: #444; padding-bottom: 5px; margin-bottom: 5px;">
+                    Detalles Familiares</td>
+            </tr>
+            <tr>
+                <td class="label">Carga Familiar:</td>
+                <td class="value"
+                    th:text="${datos.datosSocioeconomicos.familia != null ? datos.datosSocioeconomicos.familia.cantPersonas : 'N/A'}">
+                    4</td>
+                <td class="label">Cant. Niños:</td>
+                <td class="value"
+                    th:text="${datos.datosSocioeconomicos.familia != null ? datos.datosSocioeconomicos.familia.cantNinos : 'N/A'}">
+                    2</td>
+            </tr>
+            <tr>
+                <td class="label">Cant. Trabaja:</td>
+                <td class="value"
+                    th:text="${datos.datosSocioeconomicos.familia != null ? datos.datosSocioeconomicos.familia.cantTrabaja : 'N/A'}">
+                    1</td>
+                <td class="label">Ingreso Mensual:</td>
+                <td class="value"
+                    th:text="${datos.datosSocioeconomicos.familia != null ? datos.datosSocioeconomicos.familia.ingresoMes : 'N/A'}">
+                    100.00</td>
+            </tr>
+            <tr>
+                <td class="label">Jefe de Familia:</td>
+                <td class="value"
+                    th:text="${datos.datosSocioeconomicos.familia != null ? (datos.datosSocioeconomicos.familia.jefeFamilia ? 'SI' : 'NO') : 'N/A'}">
+                    SI</td>
+                <td class="label"></td>
+                <td class="value"></td>
+            </tr>
+
+            <!-- Datos Vivienda -->
+            <tr>
+                <td colspan="4"
+                    style="padding-top: 15px; border-bottom: 1px solid #eee; font-weight: bold; color: #444; padding-bottom: 5px; margin-bottom: 5px;">
+                    Detalles de Vivienda</td>
+            </tr>
+            <tr>
+                <td class="label">Tipo de Vivienda:</td>
+                <td class="value"
+                    th:text="${datos.datosSocioeconomicos.vivienda != null ? datos.datosSocioeconomicos.vivienda.tipoVivienda : 'N/A'}">
+                    CASA</td>
+                <td class="label">Habitaciones:</td>
+                <td class="value"
+                    th:text="${datos.datosSocioeconomicos.vivienda != null ? datos.datosSocioeconomicos.vivienda.cantHabitaciones : 'N/A'}">
+                    3</td>
+            </tr>
+            <tr>
+                <td class="label">Baños:</td>
+                <td class="value"
+                    th:text="${datos.datosSocioeconomicos.vivienda != null ? datos.datosSocioeconomicos.vivienda.cantBanos : 'N/A'}">
+                    2</td>
+                <td class="label">Material Piso:</td>
+                <td class="value"
+                    th:text="${datos.datosSocioeconomicos.vivienda != null ? datos.datosSocioeconomicos.vivienda.materialPiso : 'N/A'}">
+                    CERAMICA</td>
+            </tr>
+            <tr>
+                <td class="label">Material Paredes:</td>
+                <td class="value"
+                    th:text="${datos.datosSocioeconomicos.vivienda != null ? datos.datosSocioeconomicos.vivienda.materialParedes : 'N/A'}">
+                    BLOQUE</td>
+                <td class="label">Material Techo:</td>
+                <td class="value"
+                    th:text="${datos.datosSocioeconomicos.vivienda != null ? datos.datosSocioeconomicos.vivienda.materialTecho : 'N/A'}">
+                    TEJA</td>
+            </tr>
+            <tr>
+                <td class="label">Servicio Agua:</td>
+                <td class="value"
+                    th:text="${datos.datosSocioeconomicos.vivienda != null ? datos.datosSocioeconomicos.vivienda.servicioAgua : 'N/A'}">
+                    ACUEDUCTO</td>
+                <td class="label">Aseo Urbano:</td>
+                <td class="value"
+                    th:text="${datos.datosSocioeconomicos.vivienda != null ? datos.datosSocioeconomicos.vivienda.aseoUrbano : 'N/A'}">
+                    DOMICILIARIO</td>
+            </tr>
+            <tr>
+                <td class="label">Elim. Excretas:</td>
+                <td class="value"
+                    th:text="${datos.datosSocioeconomicos.vivienda != null ? datos.datosSocioeconomicos.vivienda.eliminacionExcretas : 'N/A'}">
+                    CLOACAS</td>
+                <td class="label"></td>
+                <td class="value"></td>
+            </tr>
+        </table>
+    </div>
+    <div th:unless="${datos.datosSocioeconomicos != null}" class="no-data">
+        <p>No hay datos socioeconómicos registrados.</p>
+    </div>
+
+    <!-- Historial de Casos -->
+    <h2>HISTORIAL DE CASOS</h2>
+    <table class="casos-table" th:if="${not #lists.isEmpty(datos.historialCasos)}">
+        <thead>
+            <tr>
+                <th>N° Caso</th>
+                <th>Fecha Recepción</th>
+                <th>Síntesis / Materia</th>
+                <th>Estatus</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="caso : ${datos.historialCasos}">
+                <td th:text="${caso.numCaso}">C-2023-001</td>
+                <td th:text="${caso.fechaRecepcion}">2023-01-01</td>
+                <td th:text="${caso.sintesis}">Desalojo...</td>
+                <td th:text="${caso.estatus}">ABIERTO</td>
+            </tr>
+        </tbody>
+    </table>
+    <div th:if="${#lists.isEmpty(datos.historialCasos)}" class="no-data">
+        <p>Este solicitante no tiene casos registrados.</p>
+    </div>
+
+</body>
+
+</html>

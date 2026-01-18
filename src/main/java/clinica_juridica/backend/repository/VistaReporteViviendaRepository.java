@@ -18,6 +18,8 @@ public interface VistaReporteViviendaRepository extends CrudRepository<VistaRepo
     @Query("SELECT * FROM vista_reporte_vivienda")
     List<VistaReporteVivienda> findAll();
 
+    @Override
+    @NonNull
     @Query("SELECT * FROM vista_reporte_vivienda WHERE cedula = :cedula")
-    Optional<VistaReporteVivienda> findByCedula(String cedula);
+    Optional<VistaReporteVivienda> findById(@NonNull String cedula);
 }

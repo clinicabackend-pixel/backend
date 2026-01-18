@@ -56,7 +56,6 @@ public class CasoService {
         private final AccionEjecutadaRepository accionEjecutadaRepository;
         private final EncuentroAtendidoRepository encuentroAtendidoRepository;
         private final EstudianteRepository estudianteRepository;
-
         private final ProfesorRepository profesorRepository;
         private final TribunalRepository tribunalRepository;
         private final BeneficiariosCasosRepository beneficiariosCasosRepository;

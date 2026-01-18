@@ -2,23 +2,26 @@ package clinica_juridica.backend.controller;
 
 import clinica_juridica.backend.dto.response.EstudianteResponse;
 import clinica_juridica.backend.service.EstudianteService;
+import clinica_juridica.backend.service.ImportService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/estudiantes")
 public class EstudianteController {
 
     private final EstudianteService estudianteService;
-    private final clinica_juridica.backend.service.ImportService importService;
+    private final ImportService importService;
 
     public EstudianteController(EstudianteService estudianteService,
-            clinica_juridica.backend.service.ImportService importService) {
+            ImportService importService) {
         this.estudianteService = estudianteService;
         this.importService = importService;
     }
@@ -28,15 +31,14 @@ public class EstudianteController {
         return ResponseEntity.ok(estudianteService.getEstudiantes(activo));
     }
 
-    @org.springframework.web.bind.annotation.PostMapping("/importar")
-    @org.springframework.security.access.prepost.PreAuthorize("hasRole('COORDINADOR')")
-    public ResponseEntity<?> importarEstudiantes(
-            @org.springframework.web.bind.annotation.RequestParam("file") org.springframework.web.multipart.MultipartFile file) {
+    @PostMapping("/importar")
+    @PreAuthorize("hasRole('COORDINADOR')")
+    public ResponseEntity<?> importarEstudiantes(@RequestParam("file") MultipartFile file) {
         try {
-            java.util.Map<String, Object> report = importService.importEstudiantes(file);
+            Map<String, Object> report = importService.importEstudiantes(file);
             return ResponseEntity.ok(report);
-        } catch (java.io.IOException e) {
-            return ResponseEntity.status(org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR)
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Error processing file: " + e.getMessage());
         }
     }

@@ -18,8 +18,8 @@ import clinica_juridica.backend.dto.response.SolicitanteResponse;
 import clinica_juridica.backend.dto.response.CasoSummaryResponse;
 import clinica_juridica.backend.service.CasoService;
 
+import clinica_juridica.backend.dto.response.EncuestaResponse;
 import java.util.List;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
@@ -99,5 +99,15 @@ public class SolicitanteController {
     public ResponseEntity<List<CasoSummaryResponse>> getCasosBeneficiario(
             @PathVariable String id) {
         return ResponseEntity.ok(casoService.getCasosBeneficiario(id));
+    }
+
+    @GetMapping("/{id}/encuesta-resumen")
+    @Operation(summary = "Obtener encuesta socioeconómica", description = "Devuelve los datos de familia y vivienda del solicitante.")
+    @PreAuthorize("hasAnyRole('COORDINADOR', 'PROFESOR', 'ESTUDIANTE')")
+    public ResponseEntity<EncuestaResponse> getEncuesta(
+            @PathVariable String id) {
+        return solicitanteService.getEncuesta(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 }

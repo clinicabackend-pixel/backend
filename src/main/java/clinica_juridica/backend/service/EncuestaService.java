@@ -108,7 +108,11 @@ public class EncuestaService {
             familia.setCantSinTrabajo(fDto.getCantSinTrabajo());
             familia.setCantNinos(fDto.getCantNinos());
             familia.setCantTrabaja(fDto.getCantTrabaja());
-            familia.setIdNivelEduJefe(fDto.getIdNivelEduJefe());
+            Integer idNivel = fDto.getIdNivelEduJefe();
+            if (idNivel != null && idNivel == 0) {
+                idNivel = null;
+            }
+            familia.setIdNivelEduJefe(idNivel);
             familia.setTiempoEstudio(fDto.getTiempoEstudio());
             familiaRepository.save(familia);
         }
@@ -147,11 +151,17 @@ public class EncuestaService {
         if (s != null) {
             boolean updated = false;
             if (request.getIdCondicion() != null) {
-                s.setIdCondicion(request.getIdCondicion());
+                Integer idCond = request.getIdCondicion();
+                if (idCond == 0)
+                    idCond = null;
+                s.setIdCondicion(idCond);
                 updated = true;
             }
             if (request.getIdCondicionActividad() != null) {
-                s.setIdCondicionActividad(request.getIdCondicionActividad());
+                Integer idAct = request.getIdCondicionActividad();
+                if (idAct == 0)
+                    idAct = null;
+                s.setIdCondicionActividad(idAct);
                 updated = true;
             }
             if (updated) {

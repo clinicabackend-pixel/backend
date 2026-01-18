@@ -13,7 +13,16 @@ import clinica_juridica.backend.exception.ResourceAlreadyExistsException;
 import java.util.Objects;
 import java.util.List;
 import java.util.Optional;
+import clinica_juridica.backend.models.Familia;
+import clinica_juridica.backend.models.VistaReporteVivienda;
+import clinica_juridica.backend.repository.FamiliaRepository;
+import clinica_juridica.backend.repository.VistaReporteViviendaRepository;
+import clinica_juridica.backend.dto.response.EncuestaResponse;
+import clinica_juridica.backend.dto.response.FamiliaDto;
+import clinica_juridica.backend.dto.response.ViviendaDto;
 
+import clinica_juridica.backend.models.Estado;
+import clinica_juridica.backend.repository.EstadoRepository;
 import clinica_juridica.backend.dto.request.SolicitanteRequest;
 import clinica_juridica.backend.dto.response.SolicitanteResponse;
 import java.util.stream.Collectors;
@@ -25,13 +34,22 @@ public class SolicitanteService {
     private final SolicitanteRepository solicitanteRepository;
     private final ParroquiaRepository parroquiaRepository;
     private final MunicipioRepository municipioRepository;
+    private final FamiliaRepository familiaRepository;
+    private final VistaReporteViviendaRepository vistaReporteViviendaRepository;
+    private final EstadoRepository estadoRepository;
 
     public SolicitanteService(SolicitanteRepository solicitanteRepository,
             ParroquiaRepository parroquiaRepository,
-            MunicipioRepository municipioRepository) {
+            MunicipioRepository municipioRepository,
+            FamiliaRepository familiaRepository,
+            VistaReporteViviendaRepository vistaReporteViviendaRepository,
+            EstadoRepository estadoRepository) {
         this.solicitanteRepository = solicitanteRepository;
         this.parroquiaRepository = parroquiaRepository;
         this.municipioRepository = municipioRepository;
+        this.familiaRepository = familiaRepository;
+        this.vistaReporteViviendaRepository = vistaReporteViviendaRepository;
+        this.estadoRepository = estadoRepository;
     }
 
     public List<SolicitanteResponse> getAll(boolean activeCasesOnly, String role) {
@@ -59,6 +77,56 @@ public class SolicitanteService {
 
     public List<SolicitanteResponse> getAll() {
         return getAll(false, "TODOS");
+    }
+
+    private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(SolicitanteService.class);
+
+    public Optional<EncuestaResponse> getEncuesta(@NonNull String cedula) {
+        Familia familia = null;
+        try {
+            familia = familiaRepository.findById(cedula).orElse(null);
+        } catch (Exception e) {
+            logger.error("Error fetching Familia for cedula: " + cedula, e);
+        }
+
+        VistaReporteVivienda vivienda = null;
+        try {
+            vivienda = vistaReporteViviendaRepository.findById(cedula).orElse(null);
+        } catch (Exception e) {
+            logger.error("Error fetching VistaReporteVivienda for cedula: " + cedula, e);
+        }
+
+        if (familia == null && vivienda == null) {
+            return Optional.empty();
+        }
+
+        FamiliaDto familiaDto = null;
+        if (familia != null) {
+            familiaDto = new FamiliaDto(
+                    familia.getCedula(),
+                    familia.getCantPersonas(),
+                    familia.getIngresoMes(),
+                    familia.getJefeFamilia(),
+                    familia.getCantNinos(),
+                    familia.getCantTrabaja());
+        }
+
+        ViviendaDto viviendaDto = null;
+        if (vivienda != null) {
+            viviendaDto = new ViviendaDto(
+                    vivienda.getCedula(),
+                    vivienda.getTipoVivienda(),
+                    vivienda.getCantHabit(),
+                    vivienda.getCantBanos(),
+                    vivienda.getMaterialPiso(),
+                    vivienda.getMaterialParedes(),
+                    vivienda.getMaterialTecho(),
+                    vivienda.getServicioAgua(),
+                    vivienda.getEliminacionExcretas(),
+                    vivienda.getAseoUrbano());
+        }
+
+        return Optional.of(new EncuestaResponse(familiaDto, viviendaDto));
     }
 
     public Optional<SolicitanteResponse> getById(@NonNull String id) {
@@ -143,24 +211,47 @@ public class SolicitanteService {
                 .collect(Collectors.toList());
 
         // 4. Fetch Municipios in batch
+        // 4. Fetch Municipios in batch
         java.util.Map<Integer, Municipio> municipioMap = StreamSupport
                 .stream(municipioRepository.findAllById(municipioIds).spliterator(), false)
                 .collect(Collectors.toMap(Municipio::getIdMunicipio, java.util.function.Function.identity()));
 
         // 5. Map to response using in-memory maps
+        List<Integer> estadoIds = municipioMap.values().stream()
+                .map(Municipio::getIdEstado)
+                .filter(Objects::nonNull)
+                .distinct()
+                .collect(Collectors.toList());
+
+        java.util.Map<Integer, Estado> estadoMap = StreamSupport
+                .stream(estadoRepository.findAllById(estadoIds).spliterator(), false)
+                .collect(Collectors.toMap(Estado::getIdEstado,
+                        java.util.function.Function.identity()));
+
         return solicitantes.stream().map(s -> {
             Integer idMuni = null;
             Integer idEst = null;
+            String nombreParroquia = null;
+            String nombreMunicipio = null;
+            String nombreEstado = null;
 
             Integer idParroquia = s.getIdParroquia();
             if (idParroquia != null) {
                 Parroquia p = parroquiaMap.get(idParroquia);
                 if (p != null) {
+                    nombreParroquia = p.getNombreParroquia();
                     idMuni = p.getIdMunicipio();
                     if (idMuni != null) {
                         Municipio m = municipioMap.get(idMuni);
                         if (m != null) {
+                            nombreMunicipio = m.getNombreMunicipio();
                             idEst = m.getIdEstado();
+                            if (idEst != null) {
+                                Estado e = estadoMap.get(idEst);
+                                if (e != null) {
+                                    nombreEstado = e.getNombreEstado();
+                                }
+                            }
                         }
                     }
                 }
@@ -185,7 +276,10 @@ public class SolicitanteService {
                     idEst,
                     s.getIdCondicion(),
                     s.getIdCondicionActividad(),
-                    s.getIdNivel());
+                    s.getIdNivel(),
+                    nombreParroquia,
+                    nombreMunicipio,
+                    nombreEstado);
         }).collect(Collectors.toList());
     }
 
