@@ -80,6 +80,7 @@ public class UsuarioService {
         String randomPassword = java.util.UUID.randomUUID().toString();
         String hashedPassword = passwordEncoder.encode(randomPassword);
         usuario.setContrasena(hashedPassword);
+        usuario.setNew(true);
 
         usuarioRepository.save(usuario);
 

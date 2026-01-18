@@ -44,6 +44,7 @@ public class DataSeeder {
                 admin.setContrasena(passwordEncoder.encode("123456"));
                 admin.setTipo(TipoUsuario.COORDINADOR.name());
                 admin.setStatus("ACTIVO");
+                admin.setNew(true);
 
                 usuarioRepository.save(admin);
 
@@ -63,6 +64,7 @@ public class DataSeeder {
                 prof.setContrasena(passwordEncoder.encode("123456"));
                 prof.setTipo(TipoUsuario.PROFESOR.name());
                 prof.setStatus("ACTIVO");
+                prof.setNew(true);
 
                 usuarioRepository.save(prof);
 
@@ -82,6 +84,7 @@ public class DataSeeder {
                 est.setContrasena(passwordEncoder.encode("123456"));
                 est.setTipo(TipoUsuario.ESTUDIANTE.name());
                 est.setStatus("ACTIVO");
+                est.setNew(true);
 
                 usuarioRepository.save(est);
 

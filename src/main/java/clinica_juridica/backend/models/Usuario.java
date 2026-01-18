@@ -88,6 +88,9 @@ public class Usuario implements Persistable<String> {
         this.tipo = tipo;
     }
 
+    @org.springframework.data.annotation.Transient
+    private boolean isNew = false;
+
     @Override
     public String getId() {
         return username;
@@ -95,7 +98,11 @@ public class Usuario implements Persistable<String> {
 
     @Override
     public boolean isNew() {
-        return true; // Simplified for now
+        return isNew;
+    }
+
+    public void setNew(boolean isNew) {
+        this.isNew = isNew;
     }
 
     @Override
