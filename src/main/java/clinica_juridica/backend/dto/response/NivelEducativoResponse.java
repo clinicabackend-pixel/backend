@@ -7,11 +7,14 @@ public class NivelEducativoResponse {
     @Schema(description = "ID del nivel educativo")
     private Integer id;
     @Schema(description = "Nombre del nivel")
-    private String nivel;
+    private String nombre;
+    @Schema(description = "Estatus del nivel")
+    private String estatus;
 
-    public NivelEducativoResponse(Integer id, String nivel) {
+    public NivelEducativoResponse(Integer id, String nombre, String estatus) {
         this.id = id;
-        this.nivel = nivel;
+        this.nombre = nombre;
+        this.estatus = estatus;
     }
 
     public Integer getId() {
@@ -22,11 +25,19 @@ public class NivelEducativoResponse {
         this.id = id;
     }
 
-    public String getNivel() {
-        return nivel;
+    public String getNombre() {
+        return nombre;
     }
 
-    public void setNivel(String nivel) {
-        this.nivel = nivel;
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+
+    public String getEstatus() {
+        return estatus;
+    }
+
+    public void setEstatus(String estatus) {
+        this.estatus = estatus;
     }
 }

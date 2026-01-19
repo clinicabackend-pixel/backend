@@ -21,10 +21,10 @@ public interface NivelEducativoRepository extends CrudRepository<NivelEducativo,
 
     @Override
     @NonNull
-    @Query("SELECT * FROM niveles_educativos WHERE id_nivel_edu = :id")
+    @Query("SELECT * FROM niveles_educativos WHERE id_nivel = :id")
     Optional<NivelEducativo> findById(@NonNull Integer id);
 
     @org.springframework.data.jdbc.repository.query.Modifying
-    @Query("UPDATE niveles_educativos SET estatus = :estatus WHERE id_nivel_edu = :id")
+    @Query("UPDATE niveles_educativos SET estatus = :estatus WHERE id_nivel = :id")
     void updateStatus(Integer id, String estatus);
 }

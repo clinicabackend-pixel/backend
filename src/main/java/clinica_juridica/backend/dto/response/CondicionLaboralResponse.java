@@ -7,11 +7,14 @@ public class CondicionLaboralResponse {
     @Schema(description = "ID de la condición laboral")
     private Integer id;
     @Schema(description = "Descripción de la condición")
-    private String condicion;
+    private String nombre;
+    @Schema(description = "Estatus de la condición")
+    private String estatus;
 
-    public CondicionLaboralResponse(Integer id, String condicion) {
+    public CondicionLaboralResponse(Integer id, String nombre, String estatus) {
         this.id = id;
-        this.condicion = condicion;
+        this.nombre = nombre;
+        this.estatus = estatus;
     }
 
     public Integer getId() {
@@ -22,11 +25,19 @@ public class CondicionLaboralResponse {
         this.id = id;
     }
 
-    public String getCondicion() {
-        return condicion;
+    public String getNombre() {
+        return nombre;
     }
 
-    public void setCondicion(String condicion) {
-        this.condicion = condicion;
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+
+    public String getEstatus() {
+        return estatus;
+    }
+
+    public void setEstatus(String estatus) {
+        this.estatus = estatus;
     }
 }

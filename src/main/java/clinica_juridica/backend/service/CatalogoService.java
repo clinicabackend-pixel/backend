@@ -206,7 +206,8 @@ public class CatalogoService {
                 return list.stream()
                                 .map(n -> new NivelEducativoResponse(
                                                 n.getIdNivelEdu(),
-                                                n.getNivel()))
+                                                n.getNivel(),
+                                                n.getEstatus()))
                                 .toList();
         }
 
@@ -220,7 +221,8 @@ public class CatalogoService {
                 return list.stream()
                                 .map(c -> new CondicionLaboralResponse(
                                                 c.getIdCondicion(),
-                                                c.getCondicion()))
+                                                c.getCondicion(),
+                                                c.getEstatus()))
                                 .toList();
         }
 
@@ -234,7 +236,8 @@ public class CatalogoService {
                 return list.stream()
                                 .map(c -> new CondicionActividadResponse(
                                                 c.getIdCondicionActividad(),
-                                                c.getNombreActividad()))
+                                                c.getNombreActividad(),
+                                                c.getEstatus()))
                                 .toList();
         }
 

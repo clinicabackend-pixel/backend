@@ -1,13 +1,17 @@
 package clinica_juridica.backend.models;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 @Table("condicion_actividad")
 public class CondicionActividad {
     @Id
+    @Column("id_condicion_actividad")
     private Integer idCondicionActividad;
+    @Column("nombre_actividad")
     private String nombreActividad;
+    @Column("estatus")
     private String estatus;
 
     public CondicionActividad() {

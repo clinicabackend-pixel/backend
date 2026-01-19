@@ -145,6 +145,10 @@
             <td class="value" th:text="${datos.datosPersonales.estadoCivil}">SOLTERO</td>
         </tr>
         <tr>
+            <td class="label">Nivel Educativo:</td>
+            <td class="value" colspan="3" th:text="${datos.datosPersonales.nombreNivel != null ? datos.datosPersonales.nombreNivel : 'N/A'}">BACHILLER</td>
+        </tr>
+        <tr>
             <td class="label">Teléfono Celular:</td>
             <td class="value" th:text="${datos.datosPersonales.telfCelular}">0414-1234567</td>
             <td class="label">Teléfono Casa:</td>

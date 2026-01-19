@@ -21,6 +21,9 @@ import clinica_juridica.backend.dto.response.EncuestaResponse;
 import clinica_juridica.backend.dto.response.FamiliaDto;
 import clinica_juridica.backend.dto.response.ViviendaDto;
 
+import clinica_juridica.backend.models.NivelEducativo;
+import clinica_juridica.backend.repository.NivelEducativoRepository;
+
 import clinica_juridica.backend.models.Estado;
 import clinica_juridica.backend.repository.EstadoRepository;
 import clinica_juridica.backend.dto.request.SolicitanteRequest;
@@ -37,19 +40,22 @@ public class SolicitanteService {
     private final FamiliaRepository familiaRepository;
     private final VistaReporteViviendaRepository vistaReporteViviendaRepository;
     private final EstadoRepository estadoRepository;
+    private final NivelEducativoRepository nivelEducativoRepository;
 
     public SolicitanteService(SolicitanteRepository solicitanteRepository,
             ParroquiaRepository parroquiaRepository,
             MunicipioRepository municipioRepository,
             FamiliaRepository familiaRepository,
             VistaReporteViviendaRepository vistaReporteViviendaRepository,
-            EstadoRepository estadoRepository) {
+            EstadoRepository estadoRepository,
+            NivelEducativoRepository nivelEducativoRepository) {
         this.solicitanteRepository = solicitanteRepository;
         this.parroquiaRepository = parroquiaRepository;
         this.municipioRepository = municipioRepository;
         this.familiaRepository = familiaRepository;
         this.vistaReporteViviendaRepository = vistaReporteViviendaRepository;
         this.estadoRepository = estadoRepository;
+        this.nivelEducativoRepository = nivelEducativoRepository;
     }
 
     public List<SolicitanteResponse> getAll(boolean activeCasesOnly, String role) {
@@ -157,7 +163,8 @@ public class SolicitanteService {
                 s.getIdEstadoCivil(),
                 s.getIdParroquia(),
                 s.getIdCondicion(),
-                s.getIdCondicionActividad());
+                s.getIdCondicionActividad(),
+                s.getIdNivel());
     }
 
     @Transactional
@@ -228,6 +235,17 @@ public class SolicitanteService {
                 .collect(Collectors.toMap(Estado::getIdEstado,
                         java.util.function.Function.identity()));
 
+        // 6. Map Nivel Educativo
+        List<Integer> nivelIds = solicitantes.stream()
+                .map(Solicitante::getIdNivel)
+                .filter(Objects::nonNull)
+                .distinct()
+                .collect(Collectors.toList());
+
+        java.util.Map<Integer, NivelEducativo> nivelMap = StreamSupport
+                .stream(nivelEducativoRepository.findAllById(nivelIds).spliterator(), false)
+                .collect(Collectors.toMap(NivelEducativo::getIdNivelEdu, java.util.function.Function.identity()));
+
         return solicitantes.stream().map(s -> {
             Integer idMuni = null;
             Integer idEst = null;
@@ -279,7 +297,10 @@ public class SolicitanteService {
                     s.getIdNivel(),
                     nombreParroquia,
                     nombreMunicipio,
-                    nombreEstado);
+                    nombreEstado,
+                    s.getIdNivel() != null && nivelMap.containsKey(s.getIdNivel())
+                            ? nivelMap.get(s.getIdNivel()).getNivel()
+                            : null);
         }).collect(Collectors.toList());
     }
 
@@ -298,6 +319,7 @@ public class SolicitanteService {
         s.setIdParroquia(r.idParroquia());
         s.setIdCondicion(r.idCondicion());
         s.setIdCondicionActividad(r.idCondicionActividad());
+        s.setIdNivel(r.idNivel());
         return s;
     }
 }

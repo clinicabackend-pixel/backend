@@ -50,11 +50,11 @@ public interface SolicitanteRepository extends CrudRepository<Solicitante, Strin
                 INSERT INTO solicitantes (
                     cedula, nombre, sexo, nacionalidad, email, concubinato,
                     telf_casa, telf_celular, f_nacimiento, id_estado_civil, id_parroquia,
-                    id_condicion, id_condicion_actividad
+                    id_condicion, id_condicion_actividad, id_nivel
                 ) VALUES (
                     :cedula, :nombre, :sexo, :nacionalidad, :email, :concubinato,
                     :telfCasa, :telfCelular, :fNacimiento, :idEstadoCivil, :idParroquia,
-                    :idCondicion, :idCondicionActividad
+                    :idCondicion, :idCondicionActividad, :idNivel
                 )
             """)
     void insertSolicitante(
@@ -70,5 +70,6 @@ public interface SolicitanteRepository extends CrudRepository<Solicitante, Strin
             @Param("idEstadoCivil") Integer idEstadoCivil,
             @Param("idParroquia") Integer idParroquia,
             @Param("idCondicion") Integer idCondicion,
-            @Param("idCondicionActividad") Integer idCondicionActividad);
+            @Param("idCondicionActividad") Integer idCondicionActividad,
+            @Param("idNivel") Integer idNivel);
 }

@@ -102,7 +102,7 @@ public class SolicitanteController {
     }
 
     @GetMapping("/{id}/encuesta-resumen")
-    @Operation(summary = "Obtener encuesta socioeconómica", description = "Devuelve los datos de familia y vivienda del solicitante.")
+    @Operation(summary = "Obtener encuesta socioeconómica (Resumen)", description = "Devuelve los datos de familia y vivienda del solicitante.")
     @PreAuthorize("hasAnyRole('COORDINADOR', 'PROFESOR', 'ESTUDIANTE')")
     public ResponseEntity<EncuestaResponse> getEncuesta(
             @PathVariable String id) {

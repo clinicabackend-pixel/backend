@@ -7,12 +7,11 @@ import org.springframework.data.relational.core.mapping.Table;
 @Table("niveles_educativos")
 public class NivelEducativo {
     @Id
-    @Column("id_nivel_edu")
+    @Column("id_nivel")
     private Integer idNivelEdu;
 
     @Column("nivel")
     private String nivel;
-
 
     @Column("estatus")
     private String estatus;
@@ -41,7 +40,6 @@ public class NivelEducativo {
     public void setNivel(String nivel) {
         this.nivel = nivel;
     }
-
 
     public String getEstatus() {
         return estatus;

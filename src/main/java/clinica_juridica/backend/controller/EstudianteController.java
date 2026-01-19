@@ -13,8 +13,14 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+
 @RestController
 @RequestMapping("/api/estudiantes")
+@Tag(name = "Estudiantes", description = "Gestión de estudiantes y carga masiva")
 public class EstudianteController {
 
     private final EstudianteService estudianteService;
@@ -26,14 +32,18 @@ public class EstudianteController {
         this.importService = importService;
     }
 
+    @Operation(summary = "Obtener lista de estudiantes", description = "Devuelve una lista de estudiantes, opcionalmente filtrada por estado activo.")
     @GetMapping
-    public ResponseEntity<List<EstudianteResponse>> getEstudiantes(@RequestParam(required = false) Boolean activo) {
+    public ResponseEntity<List<EstudianteResponse>> getEstudiantes(
+            @RequestParam(required = false) @Parameter(description = "Filtrar por estudiantes activos (true/false)") Boolean activo) {
         return ResponseEntity.ok(estudianteService.getEstudiantes(activo));
     }
 
+    @Operation(summary = "Importar estudiantes masivamente", description = "Carga estudiantes desde un archivo Excel. Requiere rol de COORDINADOR.")
     @PostMapping("/importar")
     @PreAuthorize("hasRole('COORDINADOR')")
-    public ResponseEntity<?> importarEstudiantes(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<?> importarEstudiantes(
+            @RequestParam("file") @Parameter(description = "Archivo Excel (.xlsx) con los datos de los estudiantes", content = @Content(mediaType = "multipart/form-data")) MultipartFile file) {
         try {
             Map<String, Object> report = importService.importEstudiantes(file);
             return ResponseEntity.ok(report);

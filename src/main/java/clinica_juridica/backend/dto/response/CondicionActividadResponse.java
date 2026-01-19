@@ -8,10 +8,13 @@ public class CondicionActividadResponse {
     private Integer id;
     @Schema(description = "Nombre de la actividad")
     private String nombre;
+    @Schema(description = "Estatus de la actividad")
+    private String estatus;
 
-    public CondicionActividadResponse(Integer id, String nombre) {
+    public CondicionActividadResponse(Integer id, String nombre, String estatus) {
         this.id = id;
         this.nombre = nombre;
+        this.estatus = estatus;
     }
 
     public Integer getId() {
@@ -28,5 +31,13 @@ public class CondicionActividadResponse {
 
     public void setNombre(String nombre) {
         this.nombre = nombre;
+    }
+
+    public String getEstatus() {
+        return estatus;
+    }
+
+    public void setEstatus(String estatus) {
+        this.estatus = estatus;
     }
 }
