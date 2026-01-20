@@ -110,7 +110,10 @@ public class UsuarioService {
     }
 
     public void setupPassword(String token, String nuevaContrasena) {
-        String username = jwtUtil.extractUsername(token);
+        String username = jwtUtil.extractUsernameFromInvitation(token);
+        if (username == null) {
+            throw new RuntimeException("Token inválido (imposible leer usuario)");
+        }
         Usuario usuario = findUsuarioByUsername(username);
 
         // Validate token using current stored password hash

@@ -14,7 +14,16 @@ import java.util.function.Function;
 @Component
 public class JwtUtil {
 
-    private String secret = "clave_super_secreta_para_clinica_juridica_backend_123456"; // Debe ser larga y segura
+    private String secret = "clave_super_secreta_para_clinica_juridica_backend_123456_7890_seguridad_extra_para_hs512"; // Debe
+                                                                                                                        // ser
+                                                                                                                        // larga
+                                                                                                                        // y
+                                                                                                                        // segura
+                                                                                                                        // (min
+                                                                                                                        // 64
+                                                                                                                        // chars
+                                                                                                                        // para
+                                                                                                                        // HS512)
     private SecretKey key;
 
     @PostConstruct
@@ -91,6 +100,30 @@ public class JwtUtil {
             return claims.getSubject().equals(username);
         } catch (Exception e) {
             return false;
+        }
+    }
+
+    public String extractUsernameFromInvitation(String token) {
+        try {
+            String[] parts = token.split("\\.");
+            if (parts.length < 2)
+                return null;
+            String payload = new String(java.util.Base64.getUrlDecoder().decode(parts[1]), StandardCharsets.UTF_8);
+
+            // Simple string extraction to avoid Jackson dependency issues since we just
+            // need "sub"
+            int subIndex = payload.indexOf("\"sub\":\"");
+            if (subIndex == -1)
+                return null;
+
+            int startIndex = subIndex + 7;
+            int endIndex = payload.indexOf("\"", startIndex);
+            if (endIndex == -1)
+                return null;
+
+            return payload.substring(startIndex, endIndex);
+        } catch (Exception e) {
+            return null;
         }
     }
 }
