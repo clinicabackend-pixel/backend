@@ -137,6 +137,25 @@ public class CatalogoController {
             @PathVariable Integer id,
             @RequestParam String estatus) {
         catalogoService.updateCondicionLaboralStatus(id, estatus);
+        catalogoService.updateCondicionLaboralStatus(id, estatus);
+        return ResponseEntity.ok("Estatus actualizado correctamente");
+    }
+
+    @Operation(summary = "Actualizar Estatus de Estado Civil", description = "Actualiza el estatus (ACTIVO/INACTIVO) de un estado civil.")
+    @PatchMapping("/estados-civiles/{id}/estatus")
+    public ResponseEntity<String> updateEstadoCivilStatus(
+            @PathVariable Integer id,
+            @RequestParam String estatus) {
+        catalogoService.updateEstadoCivilStatus(id, estatus);
+        return ResponseEntity.ok("Estatus actualizado correctamente");
+    }
+
+    @Operation(summary = "Actualizar Estatus de Tribunal", description = "Actualiza el estatus (ACTIVO/INACTIVO) de un tribunal.")
+    @PatchMapping("/tribunales/{id}/estatus")
+    public ResponseEntity<String> updateTribunalStatus(
+            @PathVariable Integer id,
+            @RequestParam String estatus) {
+        catalogoService.updateTribunalStatus(id, estatus);
         return ResponseEntity.ok("Estatus actualizado correctamente");
     }
 
@@ -225,5 +244,61 @@ public class CatalogoController {
     @GetMapping("/semestres")
     public ResponseEntity<List<SemestreResponse>> getSemestres() {
         return ResponseEntity.ok(catalogoService.getSemestres());
+    }
+
+    @Operation(summary = "Crear Estado Civil", description = "Crea un nuevo estado civil.")
+    @PostMapping("/estados-civiles")
+    public ResponseEntity<String> createEstadoCivil(
+            @RequestBody CreateCatalogoRequest request) {
+        catalogoService.createEstadoCivil(request.getNombre());
+        return ResponseEntity.ok("Estado Civil creado correctamente");
+    }
+
+    @Operation(summary = "Crear Semestre", description = "Crea un nuevo semestre.")
+    @PostMapping("/semestres")
+    public ResponseEntity<String> createSemestre(
+            @RequestBody clinica_juridica.backend.models.Semestre semestre) {
+        catalogoService.createSemestre(semestre);
+        return ResponseEntity.ok("Semestre creado correctamente");
+    }
+
+    @Operation(summary = "Crear Tribunal", description = "Crea un nuevo tribunal.")
+    @PostMapping("/tribunales")
+    public ResponseEntity<String> createTribunal(
+            @RequestBody clinica_juridica.backend.models.Tribunal tribunal) {
+        catalogoService.createTribunal(tribunal);
+        return ResponseEntity.ok("Tribunal creado correctamente");
+    }
+
+    @Operation(summary = "Crear Materia", description = "Crea una nueva materia (Raíz Ámbito).")
+    @PostMapping("/materias")
+    public ResponseEntity<String> createMateria(
+            @RequestBody CreateCatalogoRequest request) {
+        catalogoService.createMateria(request.getNombre());
+        return ResponseEntity.ok("Materia creada correctamente");
+    }
+
+    @Operation(summary = "Crear Categoría", description = "Crea una nueva categoría legal.")
+    @PostMapping("/categorias")
+    public ResponseEntity<String> createCategoria(
+            @RequestBody clinica_juridica.backend.dto.request.CreateHierarchyRequest request) {
+        catalogoService.createCategoria(request.nombre(), request.idMateria());
+        return ResponseEntity.ok("Categoría creada correctamente");
+    }
+
+    @Operation(summary = "Crear Subcategoría", description = "Crea una nueva subcategoría legal.")
+    @PostMapping("/subcategorias")
+    public ResponseEntity<String> createSubcategoria(
+            @RequestBody clinica_juridica.backend.dto.request.CreateHierarchyRequest request) {
+        catalogoService.createSubcategoria(request.nombre(), request.idCategoria());
+        return ResponseEntity.ok("Subcategoría creada correctamente");
+    }
+
+    @Operation(summary = "Crear Ámbito", description = "Crea un nuevo ámbito legal (hoja).")
+    @PostMapping("/ambitos")
+    public ResponseEntity<String> createAmbito(
+            @RequestBody clinica_juridica.backend.dto.request.CreateHierarchyRequest request) {
+        catalogoService.createAmbito(request.nombre(), request.idSubcategoria());
+        return ResponseEntity.ok("Ámbito creado correctamente");
     }
 }

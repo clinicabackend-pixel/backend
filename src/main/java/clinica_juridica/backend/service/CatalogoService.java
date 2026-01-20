@@ -163,8 +163,12 @@ public class CatalogoService {
                 return tribunalRepository.findAll().stream()
                                 .map(t -> new TribunalResponse(
                                                 t.getIdTribunal(),
-                                                t.getMateria(), // Map 'materia' to 'tipoTribunal'
-                                                t.getNombreTribunal()))
+                                                null, // tipoTribunal (not present in entity)
+                                                t.getNombreTribunal(),
+                                                t.getMateria(),
+                                                t.getInstancia(),
+                                                t.getUbicacion(),
+                                                t.getEstatus()))
                                 .toList();
         }
 
@@ -279,7 +283,8 @@ public class CatalogoService {
                 return estadoCivilRepository.findAll().stream()
                                 .map(e -> new EstadoCivilResponse(
                                                 e.getIdEstadoCivil(),
-                                                e.getDescripcion()))
+                                                e.getDescripcion(),
+                                                e.getEstatus()))
                                 .toList();
         }
 
@@ -389,5 +394,63 @@ public class CatalogoService {
                                                 s.getTermino(),
                                                 s.getNombre()))
                                 .toList();
+        }
+
+        @Transactional
+        public void updateEstadoCivilStatus(Integer id, String estatus) {
+                estadoCivilRepository.updateStatus(id, estatus);
+        }
+
+        @Transactional
+        public void createEstadoCivil(String nombre) {
+                clinica_juridica.backend.models.EstadoCivil nuevo = new clinica_juridica.backend.models.EstadoCivil(
+                                null, nombre, "ACTIVO");
+                estadoCivilRepository.save(nuevo);
+        }
+
+        @Transactional
+        public void updateTribunalStatus(Integer id, String estatus) {
+                tribunalRepository.updateStatus(id, estatus);
+        }
+
+        @Transactional
+        public void createTribunal(clinica_juridica.backend.models.Tribunal tribunal) {
+                tribunal.setEstatus("ACTIVO");
+                tribunalRepository.save(tribunal);
+        }
+
+        @Transactional
+        public void createSemestre(clinica_juridica.backend.models.Semestre semestre) {
+                semestreRepository.save(semestre);
+        }
+
+        // --- LEGA SCOPE HIERARCHY ---
+
+        @Transactional
+        public void createMateria(String nombre) {
+                clinica_juridica.backend.models.MateriaAmbitoLegal m = new clinica_juridica.backend.models.MateriaAmbitoLegal(
+                                null, nombre);
+                materiaRepository.save(m);
+        }
+
+        @Transactional
+        public void createCategoria(String nombre, Integer idMateria) {
+                clinica_juridica.backend.models.CategoriaAmbitoLegal c = new clinica_juridica.backend.models.CategoriaAmbitoLegal(
+                                null, idMateria, nombre);
+                categoriaRepository.save(c);
+        }
+
+        @Transactional
+        public void createSubcategoria(String nombre, Integer idCategoria) {
+                clinica_juridica.backend.models.SubcategoriaAmbitoLegal s = new clinica_juridica.backend.models.SubcategoriaAmbitoLegal(
+                                null, idCategoria, nombre);
+                subcategoriaRepository.save(s);
+        }
+
+        @Transactional
+        public void createAmbito(String nombre, Integer idSubcategoria) {
+                clinica_juridica.backend.models.AmbitoLegal a = new clinica_juridica.backend.models.AmbitoLegal(null,
+                                idSubcategoria, nombre);
+                ambitoRepository.save(a);
         }
 }
