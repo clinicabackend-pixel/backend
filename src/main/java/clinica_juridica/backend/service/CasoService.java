@@ -380,7 +380,18 @@ public class CasoService {
                 }
                 Integer maxId = pruebaRepository.findMaxIdByNumCaso(numCaso);
                 Integer nextId = (maxId == null) ? 1 : maxId + 1;
-                pruebaRepository.saveManual(nextId, numCaso, dto.getFecha(), dto.getDocumento(), dto.getObservacion(),
+
+                String observacionFinal = dto.getObservacion();
+                if (dto.getUsername() != null && !dto.getUsername().isEmpty()) {
+                        String userNote = " (Subido por: " + dto.getUsername() + ")";
+                        if (observacionFinal == null) {
+                                observacionFinal = userNote;
+                        } else {
+                                observacionFinal += userNote;
+                        }
+                }
+
+                pruebaRepository.saveManual(nextId, numCaso, dto.getFecha(), dto.getDocumento(), observacionFinal,
                                 dto.getTitulo());
         }
 

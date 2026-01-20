@@ -45,4 +45,15 @@ public class PruebaCreateRequest {
     public void setTitulo(String titulo) {
         this.titulo = titulo;
     }
+
+    @Schema(description = "Nombre de usuario que sube la prueba")
+    private String username;
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
 }
