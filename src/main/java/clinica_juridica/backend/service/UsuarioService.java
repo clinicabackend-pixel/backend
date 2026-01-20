@@ -1,5 +1,8 @@
 package clinica_juridica.backend.service;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import clinica_juridica.backend.dto.request.UsuarioRequest;
 import clinica_juridica.backend.models.Coordinador;
 import clinica_juridica.backend.models.Estudiante;
@@ -9,6 +12,7 @@ import clinica_juridica.backend.repository.CoordinadorRepository;
 import clinica_juridica.backend.repository.EstudianteRepository;
 import clinica_juridica.backend.repository.ProfesorRepository;
 import clinica_juridica.backend.repository.UsuarioRepository;
+import clinica_juridica.backend.repository.SemestreRepository; // Added import
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,17 +27,20 @@ public class UsuarioService {
     private final CoordinadorRepository coordinadorRepository;
     private final ProfesorRepository profesorRepository;
     private final EstudianteRepository estudianteRepository;
+    private final SemestreRepository semestreRepository; // Added field
     private final PasswordEncoder passwordEncoder;
 
     public UsuarioService(UsuarioRepository usuarioRepository,
             CoordinadorRepository coordinadorRepository,
             ProfesorRepository profesorRepository,
             EstudianteRepository estudianteRepository,
+            SemestreRepository semestreRepository, // Added param
             PasswordEncoder passwordEncoder) {
         this.usuarioRepository = usuarioRepository;
         this.coordinadorRepository = coordinadorRepository;
         this.profesorRepository = profesorRepository;
         this.estudianteRepository = estudianteRepository;
+        this.semestreRepository = semestreRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -42,6 +49,13 @@ public class UsuarioService {
             return usuarioRepository.findByStatus(estatus);
         }
         return usuarioRepository.findAll();
+    }
+
+    public Page<Usuario> findAllUsuarios(String estatus, Pageable pageable) {
+        if (estatus != null && !estatus.isEmpty()) {
+            return usuarioRepository.findByStatus(estatus, pageable);
+        }
+        return usuarioRepository.findAll(pageable);
     }
 
     public Usuario findUsuarioByUsername(String username) {
@@ -91,11 +105,21 @@ public class UsuarioService {
                 coordinadorRepository.save(coordinador);
                 break;
             case "PROFESOR":
-                Profesor profesor = new Profesor(request.getUsername(), request.getTermino());
+                String terminoProf = request.getTermino();
+                if (terminoProf == null || terminoProf.isEmpty()) {
+                    var active = semestreRepository.findActiveSemester();
+                    terminoProf = (active != null) ? active.getTermino() : null;
+                }
+                Profesor profesor = new Profesor(request.getUsername(), terminoProf);
                 profesorRepository.save(profesor);
                 break;
             case "ESTUDIANTE":
-                Estudiante estudiante = new Estudiante(request.getUsername(), request.getTermino(),
+                String terminoEst = request.getTermino();
+                if (terminoEst == null || terminoEst.isEmpty()) {
+                    var active = semestreRepository.findActiveSemester();
+                    terminoEst = (active != null) ? active.getTermino() : null;
+                }
+                Estudiante estudiante = new Estudiante(request.getUsername(), terminoEst,
                         request.getTipoDeEstudiante(), request.getNrc());
                 estudianteRepository.save(estudiante);
                 break;
@@ -148,6 +172,15 @@ public class UsuarioService {
         Usuario usuario = findUsuarioByUsername(username);
         usuario.setStatus("INACTIVO");
         usuarioRepository.save(usuario);
+    }
+
+    public String getTerminoByUsername(String username, String tipo) {
+        if ("ESTUDIANTE".equals(tipo)) {
+            return estudianteRepository.findByUsername(username).map(Estudiante::getTermino).orElse(null);
+        } else if ("PROFESOR".equals(tipo)) {
+            return profesorRepository.findByUsername(username).map(Profesor::getTermino).orElse(null);
+        }
+        return null;
     }
 
 }

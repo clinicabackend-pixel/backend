@@ -80,6 +80,8 @@ public class AuthController {
         Usuario usuario = usuarioRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
+        String termino = usuarioService.getTerminoByUsername(usuario.getUsername(), usuario.getTipo());
+
         return ResponseEntity.ok(new UsuarioResponse(
                 usuario.getCedula(),
                 usuario.getNombre(),
@@ -87,7 +89,8 @@ public class AuthController {
                 usuario.getEmail(),
                 usuario.getUsername(),
                 usuario.getStatus(),
-                usuario.getTipo()));
+                usuario.getTipo(),
+                termino));
     }
 
     @GetMapping("/activo")

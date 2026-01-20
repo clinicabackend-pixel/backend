@@ -26,6 +26,8 @@ public interface EstudianteRepository extends CrudRepository<Estudiante, String>
     @Query("SELECT COUNT(*) > 0 FROM estudiantes WHERE username = :username AND termino = :termino")
     boolean existsByUsernameAndTermino(@Param("username") String username, @Param("termino") String termino);
 
+    Optional<Estudiante> findByUsername(String username);
+
     @Query("SELECT e.username, u.nombre, u.cedula, e.termino, e.tipo_de_estudiante AS tipoDeEstudiante, e.nrc FROM estudiantes e JOIN usuarios u ON e.username = u.username WHERE e.termino = :termino")
     List<EstudianteResponse> findByTermino(@Param("termino") String termino);
 

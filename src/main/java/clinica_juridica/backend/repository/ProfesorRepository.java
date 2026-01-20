@@ -24,4 +24,6 @@ public interface ProfesorRepository extends CrudRepository<Profesor, String> {
 
     @Query("SELECT COUNT(*) > 0 FROM profesores WHERE username = :username AND termino = :termino")
     boolean existsByUsernameAndTermino(@Param("username") String username, @Param("termino") String termino);
+
+    Optional<Profesor> findByUsername(String username);
 }

@@ -4,7 +4,9 @@ import clinica_juridica.backend.dto.request.UsuarioRequest;
 import clinica_juridica.backend.dto.response.UsuarioResponse;
 import clinica_juridica.backend.models.Usuario;
 import clinica_juridica.backend.service.UsuarioService;
+
 import java.util.stream.StreamSupport;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -75,7 +77,8 @@ public class UsuarioController {
     }
 
     private UsuarioResponse mapToResponse(Usuario p) {
+        String termino = usuarioService.getTerminoByUsername(p.getUsername(), p.getTipo());
         return new UsuarioResponse(p.getCedula(), p.getNombre(), "N/A", p.getEmail(),
-                p.getUsername(), p.getStatus(), p.getTipo());
+                p.getUsername(), p.getStatus(), p.getTipo(), termino);
     }
 }
