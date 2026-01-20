@@ -14,4 +14,8 @@ public interface EstadoCivilRepository extends CrudRepository<EstadoCivil, Integ
     @NonNull
     @Query("SELECT * FROM estado_civil")
     List<EstadoCivil> findAll();
+
+    @org.springframework.data.jdbc.repository.query.Modifying
+    @Query("UPDATE estado_civil SET estatus = :status WHERE id_estado_civil = :id")
+    void updateStatus(Integer id, String status);
 }

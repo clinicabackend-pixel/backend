@@ -20,4 +20,8 @@ public interface TribunalRepository extends CrudRepository<Tribunal, Integer> {
     @NonNull
     @Query("SELECT * FROM tribunal WHERE id_tribunal = :id")
     Optional<Tribunal> findById(@NonNull Integer id);
+
+    @org.springframework.data.jdbc.repository.query.Modifying
+    @Query("UPDATE tribunal SET estatus = :status WHERE id_tribunal = :id")
+    void updateStatus(Integer id, String status);
 }

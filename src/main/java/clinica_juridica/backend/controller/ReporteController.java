@@ -59,6 +59,25 @@ public class ReporteController {
                                 .body(content);
         }
 
+        @Operation(summary = "Descargar Reporte Socioeconómico Unificado (Excel)", description = "Genera y descarga un reporte consolidado con datos socioeconómicos de todos los solicitantes.")
+        @GetMapping("/socioeconomico")
+        public ResponseEntity<byte[]> descargarReporteSocioeconomico()
+                        throws IOException {
+                byte[] content = reporteService.generarReporteSocioeconomico();
+
+                String filename = "reporte_socioeconomico.xlsx";
+
+                HttpHeaders headers = new HttpHeaders();
+                headers.add(HttpHeaders.CONTENT_TYPE,
+                                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+                headers.add(HttpHeaders.CONTENT_DISPOSITION,
+                                "form-data; name=\"attachment\"; filename=\"" + filename + "\"");
+
+                return ResponseEntity.ok()
+                                .headers(headers)
+                                .body(content);
+        }
+
         @Operation(summary = "Obtener Datos para Gráficos Estadísticos", description = "Devuelve los datos (labels y valores) para un tipo de reporte específico.")
         @GetMapping("/chart-data")
         public ResponseEntity<clinica_juridica.backend.dto.stats.ReporteDataDto> getChartData(

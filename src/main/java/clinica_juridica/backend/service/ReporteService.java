@@ -50,6 +50,10 @@ public class ReporteService {
     private final SubcategoriaAmbitoLegalRepository subcategoriaAmbitoLegalRepository;
     private final CategoriaAmbitoLegalRepository categoriaAmbitoLegalRepository;
     private final MateriaAmbitoLegalRepository materiaAmbitoLegalRepository;
+    private final clinica_juridica.backend.repository.CondicionLaboralRepository condicionLaboralRepository;
+    private final clinica_juridica.backend.repository.CondicionActividadRepository condicionActividadRepository;
+    private final clinica_juridica.backend.repository.NivelEducativoRepository nivelEducativoRepository;
+    private final clinica_juridica.backend.repository.EstadoCivilRepository estadoCivilRepository;
 
     public ReporteService(CasoRepository casoRepository, CasoService casoService,
             SolicitanteRepository solicitanteRepository, FamiliaRepository familiaRepository,
@@ -58,7 +62,11 @@ public class ReporteService {
             AmbitoLegalRepository ambitoLegalRepository,
             SubcategoriaAmbitoLegalRepository subcategoriaAmbitoLegalRepository,
             CategoriaAmbitoLegalRepository categoriaAmbitoLegalRepository,
-            MateriaAmbitoLegalRepository materiaAmbitoLegalRepository) {
+            MateriaAmbitoLegalRepository materiaAmbitoLegalRepository,
+            clinica_juridica.backend.repository.CondicionLaboralRepository condicionLaboralRepository,
+            clinica_juridica.backend.repository.CondicionActividadRepository condicionActividadRepository,
+            clinica_juridica.backend.repository.NivelEducativoRepository nivelEducativoRepository,
+            clinica_juridica.backend.repository.EstadoCivilRepository estadoCivilRepository) {
         this.casoRepository = casoRepository;
         this.casoService = casoService;
         this.solicitanteRepository = solicitanteRepository;
@@ -71,6 +79,10 @@ public class ReporteService {
         this.subcategoriaAmbitoLegalRepository = subcategoriaAmbitoLegalRepository;
         this.categoriaAmbitoLegalRepository = categoriaAmbitoLegalRepository;
         this.materiaAmbitoLegalRepository = materiaAmbitoLegalRepository;
+        this.condicionLaboralRepository = condicionLaboralRepository;
+        this.condicionActividadRepository = condicionActividadRepository;
+        this.nivelEducativoRepository = nivelEducativoRepository;
+        this.estadoCivilRepository = estadoCivilRepository;
     }
 
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
@@ -111,6 +123,101 @@ public class ReporteService {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             workbook.write(outputStream);
             return outputStream.toByteArray();
+        }
+    }
+
+    public byte[] generarReporteSocioeconomico() throws IOException {
+        List<Solicitante> solicitantes = solicitanteRepository.findAll();
+
+        // Cache catalogs to avoid N+1 queries
+        // Using simple maps for ID -> Description resolution
+        java.util.Map<Integer, String> estadoCivilMap = new java.util.HashMap<>();
+        estadoCivilRepository.findAll().forEach(e -> estadoCivilMap.put(e.getIdEstadoCivil(), e.getDescripcion()));
+
+        java.util.Map<Integer, String> condicionLaboralMap = new java.util.HashMap<>();
+        condicionLaboralRepository.findAll()
+                .forEach(c -> condicionLaboralMap.put(c.getIdCondicion(), c.getCondicion()));
+
+        java.util.Map<Integer, String> condicionActividadMap = new java.util.HashMap<>();
+        condicionActividadRepository.findAll()
+                .forEach(c -> condicionActividadMap.put(c.getIdCondicionActividad(), c.getNombreActividad()));
+
+        java.util.Map<Integer, String> nivelEducativoMap = new java.util.HashMap<>();
+        nivelEducativoRepository.findAll().forEach(n -> nivelEducativoMap.put(n.getIdNivelEdu(), n.getNivel()));
+
+        try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+            Sheet sheet = workbook.createSheet("Reporte Socioeconómico");
+            createHeaderStyle(workbook); // Ensure style is created
+
+            // Header
+            String[] headers = {
+                    // PERSONAL
+                    "N°", "Nacionalidad", "Sexo", "Edad", "Estado Civil",
+                    // LABORAL / ACADEMICO
+                    "Condición Laboral", "Actividad", "Nivel Educativo", "Tiempo Estudio",
+                    // FAMILIAR
+                    "Cant. Personas", "Ingreso Mensual", "Jefe Familia", "Cant. Niños", "Cant. Trabajan",
+                    // VIVIENDA
+                    "Tipo Vivienda", "Habitaciones", "Baños", "Piso", "Paredes", "Techo", "Agua", "Excretas", "Aseo"
+            };
+            createHeaderRow(sheet, headers, workbook);
+
+            int rowIdx = 1;
+            int counter = 1;
+            for (Solicitante sol : solicitantes) {
+                Row row = sheet.createRow(rowIdx++);
+                int col = 0;
+
+                // PERSONAL
+                row.createCell(col++).setCellValue(counter++);
+                // Removed Name and Cedula
+                row.createCell(col++).setCellValue(sol.getNacionalidad());
+                row.createCell(col++).setCellValue(sol.getSexo());
+                row.createCell(col++).setCellValue(sol.getEdad() != null ? sol.getEdad().toString() : "");
+                row.createCell(col++).setCellValue(estadoCivilMap.getOrDefault(sol.getIdEstadoCivil(), ""));
+                // Removed Email and Phones
+
+                // LABORAL / ACADEMICO
+                row.createCell(col++).setCellValue(condicionLaboralMap.getOrDefault(sol.getIdCondicion(), ""));
+                row.createCell(col++)
+                        .setCellValue(condicionActividadMap.getOrDefault(sol.getIdCondicionActividad(), ""));
+                row.createCell(col++).setCellValue(nivelEducativoMap.getOrDefault(sol.getIdNivel(), ""));
+                row.createCell(col++).setCellValue(sol.getTiempoEstudio());
+
+                // FAMILIAR
+                Familia fam = familiaRepository.findById(sol.getCedula()).orElse(null);
+                if (fam != null) {
+                    row.createCell(col++)
+                            .setCellValue(fam.getCantPersonas() != null ? fam.getCantPersonas().toString() : "");
+                    row.createCell(col++)
+                            .setCellValue(fam.getIngresoMes() != null ? fam.getIngresoMes().toString() : "");
+                    row.createCell(col++).setCellValue(Boolean.TRUE.equals(fam.getJefeFamilia()) ? "Sí" : "No");
+                    row.createCell(col++).setCellValue(fam.getCantNinos() != null ? fam.getCantNinos().toString() : "");
+                    row.createCell(col++)
+                            .setCellValue(fam.getCantTrabaja() != null ? fam.getCantTrabaja().toString() : "");
+                } else {
+                    col += 5; // Skip columns
+                }
+
+                // VIVIENDA
+                VistaReporteVivienda viv = vistaReporteViviendaRepository.findById(sol.getCedula()).orElse(null);
+                if (viv != null) {
+                    row.createCell(col++).setCellValue(viv.getTipoVivienda());
+                    row.createCell(col++).setCellValue(viv.getCantHabit() != null ? viv.getCantHabit().toString() : "");
+                    row.createCell(col++).setCellValue(viv.getCantBanos() != null ? viv.getCantBanos().toString() : "");
+                    row.createCell(col++).setCellValue(viv.getMaterialPiso());
+                    row.createCell(col++).setCellValue(viv.getMaterialParedes());
+                    row.createCell(col++).setCellValue(viv.getMaterialTecho());
+                    row.createCell(col++).setCellValue(viv.getServicioAgua());
+                    row.createCell(col++).setCellValue(viv.getEliminacionExcretas());
+                    row.createCell(col++).setCellValue(viv.getAseoUrbano());
+                }
+            }
+
+            autosizeColumns(sheet, headers.length);
+
+            workbook.write(out);
+            return out.toByteArray();
         }
     }
 
