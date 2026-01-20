@@ -433,6 +433,14 @@ public class CasoService {
         }
 
         @Transactional
+        public void unassignStudent(String numCaso, String username, String termino) {
+                if (!casoRepository.existsById(numCaso)) {
+                        throw new RuntimeException("Caso no encontrado: " + numCaso);
+                }
+                casoAsignadoRepository.deleteManual(numCaso, username, termino);
+        }
+
+        @Transactional
         public void updateAccion(String numCaso, Integer idAccion, AccionUpdateRequest dto) {
                 if (!casoRepository.existsById(numCaso)) {
                         throw new RuntimeException("Caso no encontrado: " + numCaso);

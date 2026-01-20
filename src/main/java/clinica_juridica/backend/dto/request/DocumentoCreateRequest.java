@@ -5,18 +5,34 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "Solicitud para registrar un nuevo documento")
 public class DocumentoCreateRequest {
+    @Schema(description = "Número del caso asociado", requiredMode = Schema.RequiredMode.REQUIRED)
+    private String numCaso;
+
     @Schema(description = "Fecha de registro")
     private LocalDate fechaRegistro;
+
     @Schema(description = "Folio inicial")
     private Integer folioIni;
+
     @Schema(description = "Folio final")
     private Integer folioFin;
+
     @Schema(description = "Título del documento", requiredMode = Schema.RequiredMode.REQUIRED)
     private String titulo;
+
     @Schema(description = "Observaciones adicionales")
     private String observacion;
+
     @Schema(description = "Usuario que registra")
     private String username;
+
+    public String getNumCaso() {
+        return numCaso;
+    }
+
+    public void setNumCaso(String numCaso) {
+        this.numCaso = numCaso;
+    }
 
     public LocalDate getFechaRegistro() {
         return fechaRegistro;

@@ -29,6 +29,9 @@ public interface EstudianteRepository extends CrudRepository<Estudiante, String>
     @Query("SELECT e.username, u.nombre, u.cedula, e.termino, e.tipo_de_estudiante AS tipoDeEstudiante, e.nrc FROM estudiantes e JOIN usuarios u ON e.username = u.username WHERE e.termino = :termino")
     List<EstudianteResponse> findByTermino(@Param("termino") String termino);
 
-    @Query("SELECT e.username, u.nombre, u.cedula, e.termino, e.tipo_de_estudiante AS tipoDeEstudiante, e.nrc FROM estudiantes e JOIN usuarios u ON e.username = u.username")
+    @Query("SELECT DISTINCT e.username, u.nombre, u.cedula, e.termino, e.tipo_de_estudiante, e.nrc FROM estudiantes e JOIN usuarios u ON e.username = u.username JOIN casos_asignados ca ON e.username = ca.username WHERE e.termino = :termino AND ca.termino = :termino")
+    List<EstudianteResponse> findWithActiveCases(@Param("termino") String termino);
+
+    @Query("SELECT e.username, u.nombre, u.cedula, e.termino, e.tipo_de_estudiante as tipoDeEstudiante, e.nrc FROM estudiantes e JOIN usuarios u ON e.username = u.username")
     List<EstudianteResponse> findAllProjected();
 }

@@ -267,13 +267,32 @@ public class CasoController {
             @ApiResponse(responseCode = "404", description = "Caso no encontrado")
     })
     @PostMapping("/{id}/asignacion")
-    @PreAuthorize("hasAnyRole('COORDINADOR', 'PROFESOR')")
+    @PreAuthorize("hasAnyRole('COORDINADOR', 'PROFESOR', 'ADMIN')")
     public ResponseEntity<String> assignStudent(
             @Parameter(description = "ID del caso") @PathVariable String id,
             @RequestBody CasoAsignacionRequest request) {
         try {
             casoService.assignStudent(id, request);
             return ResponseEntity.ok("Estudiante asignado exitosamente");
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @Operation(summary = "Desasignar estudiante de caso", description = "Elimina la asignación de un estudiante de un caso específico. Roles requeridos: COORDINADOR, PROFESOR, ADMIN.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Desasignación exitosa"),
+            @ApiResponse(responseCode = "404", description = "Caso o asignación no encontrada")
+    })
+    @DeleteMapping("/{id}/asignacion/estudiante/{username}/termino/{termino}")
+    @PreAuthorize("hasAnyRole('COORDINADOR', 'PROFESOR', 'ADMIN')")
+    public ResponseEntity<String> unassignStudent(
+            @Parameter(description = "ID del caso") @PathVariable String id,
+            @Parameter(description = "Username del estudiante") @PathVariable String username,
+            @Parameter(description = "Término de la asignación") @PathVariable String termino) {
+        try {
+            casoService.unassignStudent(id, username, termino);
+            return ResponseEntity.ok("Estudiante desasignado exitosamente");
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

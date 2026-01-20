@@ -32,11 +32,12 @@ public class EstudianteController {
         this.importService = importService;
     }
 
-    @Operation(summary = "Obtener lista de estudiantes", description = "Devuelve una lista de estudiantes, opcionalmente filtrada por estado activo.")
+    @Operation(summary = "Obtener lista de estudiantes", description = "Devuelve una lista de estudiantes, opcionalmente filtrada por estado activo o si tienen casos asignados.")
     @GetMapping
     public ResponseEntity<List<EstudianteResponse>> getEstudiantes(
-            @RequestParam(required = false) @Parameter(description = "Filtrar por estudiantes activos (true/false)") Boolean activo) {
-        return ResponseEntity.ok(estudianteService.getEstudiantes(activo));
+            @RequestParam(required = false) @Parameter(description = "Filtrar por estudiantes activos (true/false)") Boolean activo,
+            @RequestParam(required = false) @Parameter(description = "Filtrar por estudiantes con casos asignados (true/false)") Boolean conCasos) {
+        return ResponseEntity.ok(estudianteService.getEstudiantes(activo, conCasos));
     }
 
     @Operation(summary = "Importar estudiantes masivamente", description = "Carga estudiantes desde un archivo Excel. Requiere rol de COORDINADOR.")

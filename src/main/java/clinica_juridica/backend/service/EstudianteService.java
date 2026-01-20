@@ -19,12 +19,16 @@ public class EstudianteService {
         this.semestreRepository = semestreRepository;
     }
 
-    public List<EstudianteResponse> getEstudiantes(Boolean activo) {
-        if (Boolean.TRUE.equals(activo)) {
+    public List<EstudianteResponse> getEstudiantes(Boolean activo, Boolean conCasos) {
+        if (Boolean.TRUE.equals(activo) || Boolean.TRUE.equals(conCasos)) {
             Semestre activeSemester = semestreRepository.findActiveSemester();
 
             if (activeSemester == null) {
                 return List.of();
+            }
+
+            if (Boolean.TRUE.equals(conCasos)) {
+                return estudianteRepository.findWithActiveCases(activeSemester.getTermino());
             }
 
             return estudianteRepository.findByTermino(activeSemester.getTermino());
