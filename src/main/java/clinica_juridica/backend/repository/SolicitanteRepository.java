@@ -83,4 +83,16 @@ public interface SolicitanteRepository extends CrudRepository<Solicitante, Strin
 
     @Query("SELECT s.sexo AS label, COUNT(s.cedula) AS value FROM solicitantes s GROUP BY s.sexo")
     List<clinica_juridica.backend.dto.stats.StatsItem> countSolicitantesPorSexo();
+
+    // Stats for "Total Beneficiarios" (Direct vs Indirect)
+    // Direct: Number of Solicitantes + Number of people registered in
+    // beneficiarios_casos
+    @Query("SELECT (SELECT COUNT(*) FROM solicitantes) + (SELECT COUNT(*) FROM beneficiarios_casos)")
+    Long countTotalDirectBeneficiaries();
+
+    // Indirect: Usually estimated. For now we will return 0 or do a simple
+    // multiplier logic in service.
+    // Or we can count distinct families? Let's just create a query that helps.
+    // Actually, "Indirectos" is often estimated. We can just keep it 0 or mock in
+    // service, but let's expose explicit count.
 }

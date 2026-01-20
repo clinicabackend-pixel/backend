@@ -843,8 +843,11 @@ public class ReporteService {
 
             // --- MANAGEMENT ---
             case HISTORICO_CASOS:
-                labels = java.util.Arrays.asList("2018", "2019", "2020", "2021", "2022", "2023", "2024", "2025");
-                values = java.util.Arrays.asList(120L, 145L, 90L, 110L, 150L, 180L, 210L, 85L);
+                List<clinica_juridica.backend.dto.stats.StatsItem> itemsHist = casoRepository.countCasosPorAnio();
+                for (clinica_juridica.backend.dto.stats.StatsItem item : itemsHist) {
+                    labels.add(item.getLabel());
+                    values.add(item.getValue());
+                }
                 dto.setDatasetLabel("Histórico de Casos");
                 dto.setChartType("bar");
                 break;
@@ -865,9 +868,14 @@ public class ReporteService {
                 break;
 
             case TOTAL_BENEFICIARIOS:
+                Long directos = solicitanteRepository.countTotalDirectBeneficiaries();
+                // Estimate indirect beneficiaries (e.g., family members of direct beneficiaries
+                // - avg household size 3.5)
+                Long indirectos = directos != null ? (long) (directos * 2.5) : 0L;
+
                 labels = java.util.Arrays.asList("Directos", "Indirectos");
-                values = java.util.Arrays.asList(300L, 500L);
-                dto.setDatasetLabel("Total Beneficiarios");
+                values = java.util.Arrays.asList(directos != null ? directos : 0L, indirectos);
+                dto.setDatasetLabel("Total Beneficiarios (Estimado)");
                 dto.setChartType("bar");
                 break;
 

@@ -100,4 +100,11 @@ public interface CasoRepository extends CrudRepository<Caso, String> {
                         "JOIN materia_ambito_legal mal ON cal.cod_mat_amb_legal = mal.cod_mat_amb_legal " +
                         "GROUP BY mal.mat_amb_legal, cal.cat_amb_legal")
         List<MateriaCountProjection> countDistribucionMateria();
+
+        @Query("SELECT CAST(EXTRACT(YEAR FROM fecha_recepcion) AS VARCHAR) AS label, COUNT(*) AS value " +
+                        "FROM casos " +
+                        "WHERE fecha_recepcion IS NOT NULL " +
+                        "GROUP BY EXTRACT(YEAR FROM fecha_recepcion) " +
+                        "ORDER BY label ASC")
+        List<clinica_juridica.backend.dto.stats.StatsItem> countCasosPorAnio();
 }
