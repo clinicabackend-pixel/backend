@@ -2,7 +2,7 @@ package clinica_juridica.backend.service;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -14,11 +14,11 @@ public class FileUploadService {
 
     private final Cloudinary cloudinary;
 
-    @Autowired
     public FileUploadService(Cloudinary cloudinary) {
         this.cloudinary = cloudinary;
     }
 
+    @SuppressWarnings("unchecked")
     public Map<String, Object> uploadUniversalFile(MultipartFile file) throws IOException {
         if (file.isEmpty()) {
             throw new IllegalArgumentException("El archivo está vacío.");

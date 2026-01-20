@@ -59,6 +59,13 @@ public class ReporteController {
                                 .body(content);
         }
 
+        @Operation(summary = "Obtener Datos para Gráficos Estadísticos", description = "Devuelve los datos (labels y valores) para un tipo de reporte específico.")
+        @GetMapping("/chart-data")
+        public ResponseEntity<clinica_juridica.backend.dto.stats.ReporteDataDto> getChartData(
+                        @RequestParam clinica_juridica.backend.dto.stats.TipoReporte tipo) {
+                return ResponseEntity.ok(reporteService.getReporteData(tipo));
+        }
+
         @Operation(summary = "Descargar Ficha de Solicitante (Excel)", description = "Genera y descarga la ficha del solicitante en formato Excel.")
         @GetMapping("/solicitante/{cedula}")
         public ResponseEntity<byte[]> descargarFichaSolicitante(

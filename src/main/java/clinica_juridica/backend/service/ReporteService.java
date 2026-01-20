@@ -686,4 +686,197 @@ public class ReporteService {
         }
         return hierarchy;
     }
+
+    // --- STATISTICAL CHARTS DATA ---
+
+    public clinica_juridica.backend.dto.stats.ReporteDataDto getReporteData(
+            clinica_juridica.backend.dto.stats.TipoReporte tipo) {
+        clinica_juridica.backend.dto.stats.ReporteDataDto dto = new clinica_juridica.backend.dto.stats.ReporteDataDto();
+        java.util.List<String> labels = new java.util.ArrayList<>();
+        java.util.List<Long> values = new java.util.ArrayList<>();
+        dto.setChartType("bar"); // Default
+
+        switch (tipo) {
+            case USUARIOS_POR_PARROQUIA:
+                List<clinica_juridica.backend.dto.stats.StatsItem> itemsP = solicitanteRepository
+                        .countSolicitantesPorParroquia();
+                for (clinica_juridica.backend.dto.stats.StatsItem item : itemsP) {
+                    labels.add(item.getLabel());
+                    values.add(item.getValue());
+                }
+                dto.setDatasetLabel("Usuarios por Parroquia");
+                dto.setChartType("horizontalBar");
+                break;
+
+            case USUARIOS_POR_ESTADO:
+                List<clinica_juridica.backend.dto.stats.StatsItem> itemsE = solicitanteRepository
+                        .countSolicitantesPorEstado();
+                for (clinica_juridica.backend.dto.stats.StatsItem item : itemsE) {
+                    labels.add(item.getLabel());
+                    values.add(item.getValue());
+                }
+                dto.setDatasetLabel("Usuarios por Estado");
+                dto.setChartType("bar");
+                break;
+
+            case CLASIFICACION_POR_GENERO:
+                List<clinica_juridica.backend.dto.stats.StatsItem> itemsG = solicitanteRepository
+                        .countSolicitantesPorSexo();
+                for (clinica_juridica.backend.dto.stats.StatsItem item : itemsG) {
+                    labels.add(item.getLabel());
+                    values.add(item.getValue());
+                }
+                dto.setDatasetLabel("Clasificación por Género");
+                dto.setChartType("pie");
+                break;
+
+            case RESUMEN_CASOS_POR_MATERIA:
+                // Map from MateriaCountProjection to generic Lists
+                List<clinica_juridica.backend.dto.projection.MateriaCountProjection> matCounts = casoRepository
+                        .countDistribucionMateria();
+                for (clinica_juridica.backend.dto.projection.MateriaCountProjection p : matCounts) {
+                    labels.add(p.getMateria());
+                    values.add(p.getCantidad());
+                }
+                dto.setDatasetLabel("Casos por Materia");
+                dto.setChartType("pie");
+                break;
+
+            // --- MOCK DATA FOR SPECIFIC SUB-CATEGORIES ---
+            case MATERIA_CIVIL_SUCESIONES:
+                labels = java.util.Arrays.asList("Declaración Sucesoral", "Testamentos", "Únicos Herederos",
+                        "Partición Amistosa");
+                values = java.util.Arrays.asList(15L, 5L, 12L, 8L);
+                dto.setDatasetLabel("Civil - Sucesiones");
+                dto.setChartType("pie");
+                break;
+            case MATERIA_CIVIL_FAMILIA_ORDINARIOS:
+                labels = java.util.Arrays.asList("Divorcio (185-A)", "Separación de Cuerpos",
+                        "Partición Comunidad Conyugal", "Rectificación Partidas");
+                values = java.util.Arrays.asList(45L, 12L, 8L, 20L);
+                dto.setDatasetLabel("Civil - Familia (Ordinarios)");
+                dto.setChartType("pie");
+                break;
+            case MATERIA_CIVIL_FAMILIA_PROTECCION:
+                labels = java.util.Arrays.asList("Manutención", "Régimen de Convivencia", "Autorización de Viaje",
+                        "Curatela", "Privación Patria Potestad");
+                values = java.util.Arrays.asList(60L, 35L, 15L, 5L, 2L);
+                dto.setDatasetLabel("Civil - Familia (LOPNNA)");
+                dto.setChartType("pie");
+                break;
+            case MATERIA_CIVIL_PERSONAS:
+                labels = java.util.Arrays.asList("Rectificación de Actas", "Justificativos de Soltería",
+                        "Unión Estable de Hecho", "Declaración de Ausencia");
+                values = java.util.Arrays.asList(18L, 25L, 14L, 1L);
+                dto.setDatasetLabel("Civil - Personas");
+                dto.setChartType("bar");
+                break;
+            case MATERIA_CIVIL_BIENES:
+                labels = java.util.Arrays.asList("Títulos Supletorios", "Compra-Venta Bienhechuría", "Desalojo",
+                        "Interdictos");
+                values = java.util.Arrays.asList(22L, 10L, 14L, 3L);
+                dto.setDatasetLabel("Civil - Bienes");
+                dto.setChartType("pie");
+                break;
+            case MATERIA_CIVIL_CONTRATOS:
+                labels = java.util.Arrays.asList("Arrendamiento", "Comodato", "Opción Compra-Venta", "Préstamo");
+                values = java.util.Arrays.asList(30L, 12L, 8L, 5L);
+                dto.setDatasetLabel("Civil - Contratos");
+                dto.setChartType("bar");
+                break;
+            case MATERIA_PENAL:
+                labels = java.util.Arrays.asList("Contra la Propiedad", "Contra las Personas", "Violencia Doméstica",
+                        "Actos Lascivos");
+                values = java.util.Arrays.asList(10L, 15L, 40L, 5L);
+                dto.setDatasetLabel("Materia Penal");
+                dto.setChartType("pie");
+                break;
+            case MATERIA_LABORAL:
+                labels = java.util.Arrays.asList("Despidos Injustificados", "Prestaciones Sociales",
+                        "Accidentes Laborales", "Consejería Laboral");
+                values = java.util.Arrays.asList(25L, 30L, 5L, 15L);
+                dto.setDatasetLabel("Materia Laboral");
+                dto.setChartType("bar");
+                break;
+            case MATERIA_MERCANTIL:
+                labels = java.util.Arrays.asList("Constitución Compañía", "Actas de Asamblea", "Firma Personal",
+                        "Registro de Marcas");
+                values = java.util.Arrays.asList(8L, 12L, 20L, 3L);
+                dto.setDatasetLabel("Materia Mercantil");
+                dto.setChartType("bar");
+                break;
+            case MATERIA_OTROS:
+                labels = java.util.Arrays.asList("Convivencia Ciudadana", "Tránsito", "DDHH", "Asesoría General");
+                values = java.util.Arrays.asList(40L, 10L, 15L, 50L);
+                dto.setDatasetLabel("Otros Casos");
+                dto.setChartType("bar");
+                break;
+
+            // --- UNITS ---
+            case CONCILIACION_RESUMEN:
+                labels = java.util.Arrays.asList("Total Atendidos", "Acuerdos Logrados", "Sin Acuerdo", "Remitidos");
+                values = java.util.Arrays.asList(100L, 60L, 20L, 20L);
+                dto.setDatasetLabel("Unidad de Conciliación");
+                dto.setChartType("bar");
+                break;
+            case DEFENSORIA_NNA_BENEFICIARIOS:
+                labels = java.util.Arrays.asList("Niñas", "Niños", "Adolescentes (F)", "Adolescentes (M)", "Madres",
+                        "Padres");
+                values = java.util.Arrays.asList(40L, 35L, 25L, 20L, 60L, 20L);
+                dto.setDatasetLabel("Beneficiarios NNA");
+                dto.setChartType("bar");
+                break;
+            case DEFENSORIA_NNA_TIPOS_CASOS:
+                labels = java.util.Arrays.asList("Custodia", "Manutención", "Régimen de Convivencia",
+                        "Permisos de Viaje");
+                values = java.util.Arrays.asList(30L, 55L, 40L, 15L);
+                dto.setDatasetLabel("Tipos de Casos NNA");
+                dto.setChartType("bar");
+                break;
+            case DEFENSORIA_NNA_UBICACION:
+                labels = java.util.Arrays.asList("Municipio Libertador", "Municipio Sucre", "Municipio Chacao",
+                        "Vargas");
+                values = java.util.Arrays.asList(150L, 80L, 20L, 10L);
+                dto.setDatasetLabel("Ubicación Beneficiarios NNA");
+                dto.setChartType("bar");
+                break;
+
+            // --- MANAGEMENT ---
+            case HISTORICO_CASOS:
+                labels = java.util.Arrays.asList("2018", "2019", "2020", "2021", "2022", "2023", "2024", "2025");
+                values = java.util.Arrays.asList(120L, 145L, 90L, 110L, 150L, 180L, 210L, 85L);
+                dto.setDatasetLabel("Histórico de Casos");
+                dto.setChartType("bar");
+                break;
+
+            case FORMACION_ACADEMICA:
+                labels = java.util.Arrays.asList("Estudiantes Clínica I", "Estudiantes Clínica II", "Voluntarios",
+                        "Profesores");
+                values = java.util.Arrays.asList(45L, 40L, 15L, 8L);
+                dto.setDatasetLabel("Personal Académico");
+                dto.setChartType("bar");
+                break;
+
+            case VOLUNTARIADO_BENEFICIARIOS:
+                labels = java.util.Arrays.asList("Niños Atendidos", "Charlas Comunitarias", "Personas Capacitadas");
+                values = java.util.Arrays.asList(120L, 15L, 300L);
+                dto.setDatasetLabel("Impacto Social");
+                dto.setChartType("bar");
+                break;
+
+            case TOTAL_BENEFICIARIOS:
+                labels = java.util.Arrays.asList("Directos", "Indirectos");
+                values = java.util.Arrays.asList(300L, 500L);
+                dto.setDatasetLabel("Total Beneficiarios");
+                dto.setChartType("bar");
+                break;
+
+            default:
+                break;
+        }
+
+        dto.setLabels(labels);
+        dto.setValues(values);
+        return dto;
+    }
 }

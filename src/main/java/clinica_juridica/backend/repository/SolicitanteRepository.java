@@ -72,4 +72,15 @@ public interface SolicitanteRepository extends CrudRepository<Solicitante, Strin
             @Param("idCondicion") Integer idCondicion,
             @Param("idCondicionActividad") Integer idCondicionActividad,
             @Param("idNivel") Integer idNivel);
+
+    // --- REPORT Stats Generic Queries ---
+
+    @Query("SELECT p.nombre_parroquia AS label, COUNT(s.cedula) AS value FROM solicitantes s JOIN parroquias p ON s.id_parroquia = p.id_parroquia GROUP BY p.nombre_parroquia ORDER BY COUNT(s.cedula) DESC")
+    List<clinica_juridica.backend.dto.stats.StatsItem> countSolicitantesPorParroquia();
+
+    @Query("SELECT e.nombre_estado AS label, COUNT(s.cedula) AS value FROM solicitantes s JOIN parroquias p ON s.id_parroquia = p.id_parroquia JOIN municipios m ON p.id_municipio = m.id_municipio JOIN estados e ON m.id_estado = e.id_estado GROUP BY e.nombre_estado ORDER BY COUNT(s.cedula) DESC")
+    List<clinica_juridica.backend.dto.stats.StatsItem> countSolicitantesPorEstado();
+
+    @Query("SELECT s.sexo AS label, COUNT(s.cedula) AS value FROM solicitantes s GROUP BY s.sexo")
+    List<clinica_juridica.backend.dto.stats.StatsItem> countSolicitantesPorSexo();
 }

@@ -1,7 +1,7 @@
 package clinica_juridica.backend.controller;
 
 import clinica_juridica.backend.service.FileUploadService;
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,7 +15,6 @@ public class AssetController {
 
     private final FileUploadService fileUploadService;
 
-    @Autowired
     public AssetController(FileUploadService fileUploadService) {
         this.fileUploadService = fileUploadService;
     }

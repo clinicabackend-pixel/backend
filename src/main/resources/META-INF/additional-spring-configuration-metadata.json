@@ -1,14 +1,39 @@
 {
   "properties": [
     {
+      "name": "app.sendgrid.key",
+      "type": "java.lang.String",
+      "description": "SendGrid API Key for email service."
+    },
+    {
+      "name": "app.mail.from",
+      "type": "java.lang.String",
+      "description": "Default sender email address."
+    },
+    {
+      "name": "CLOUDINARY_CLOUD_NAME",
+      "type": "java.lang.String",
+      "description": "Cloudinary Cloud Name."
+    },
+    {
+      "name": "CLOUDINARY_API_KEY",
+      "type": "java.lang.String",
+      "description": "Cloudinary API Key."
+    },
+    {
+      "name": "CLOUDINARY_API_SECRET",
+      "type": "java.lang.String",
+      "description": "Cloudinary API Secret."
+    },
+    {
       "name": "app.notification.recipients",
       "type": "java.lang.String",
-      "description": "Comma-separated list of email recipients for application notifications."
+      "description": "Comma-separated list of email recipients for notifications."
     },
     {
       "name": "app.notification.subject",
       "type": "java.lang.String",
-      "description": "Subject line for application startup notifications."
+      "description": "Subject line for notification emails."
     }
   ]
 }
