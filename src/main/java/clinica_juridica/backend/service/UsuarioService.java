@@ -94,10 +94,13 @@ public class UsuarioService {
         usuario.setSexo(request.getSexo());
         usuario.setStatus("ACTIVO");
 
-        // Generate random internal password
-        String randomPassword = java.util.UUID.randomUUID().toString();
-        String hashedPassword = passwordEncoder.encode(randomPassword);
-        usuario.setContrasena(hashedPassword);
+        // Password handling
+        if (request.getContrasena() != null && !request.getContrasena().isBlank()) {
+            usuario.setContrasena(passwordEncoder.encode(request.getContrasena()));
+        } else {
+            String randomPassword = java.util.UUID.randomUUID().toString();
+            usuario.setContrasena(passwordEncoder.encode(randomPassword));
+        }
         usuario.setNew(true);
 
         usuarioRepository.save(usuario);
@@ -136,7 +139,7 @@ public class UsuarioService {
 
         // Generate invitation token and send email
         // Note: We use the HASHED password as part of the key.
-        String invitationToken = jwtUtil.generateInvitationToken(username, hashedPassword);
+        String invitationToken = jwtUtil.generateInvitationToken(username, usuario.getContrasena());
         emailService.sendInvitationEmail(usuario.getEmail(), invitationToken);
     }
 
