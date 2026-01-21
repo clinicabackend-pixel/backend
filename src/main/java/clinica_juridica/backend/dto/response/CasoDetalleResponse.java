@@ -64,6 +64,7 @@ public class CasoDetalleResponse {
         this.documentos = documentos;
         this.pruebas = pruebas;
         this.asignados = asignados;
+        this.supervisores = supervisores;
         this.beneficiarios = beneficiarios;
     }
 

@@ -308,10 +308,63 @@ public class CasoController {
     @PreAuthorize("hasAnyRole('COORDINADOR', 'PROFESOR')")
     public ResponseEntity<String> assignSupervisor(
             @Parameter(description = "ID del caso") @PathVariable String id,
-            @RequestBody CasoSupervisionRequest request) {
+            @RequestBody CasoSupervisionRequest request,
+            org.springframework.security.core.Authentication authentication) {
+
+        // Validar permisos específicos de Profesor
+        boolean isCoordinador = authentication.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_COORDINADOR"));
+        boolean isProfesor = authentication.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_PROFESOR"));
+
+        if (isProfesor && !isCoordinador) {
+            String currentUsername = authentication.getName();
+            if (!request.getUsername().equals(currentUsername)) {
+                return ResponseEntity.status(org.springframework.http.HttpStatus.FORBIDDEN)
+                        .body("Los profesores solo pueden auto-asignarse como supervisores.");
+            }
+        }
+
         try {
             casoService.assignSupervisor(id, request);
             return ResponseEntity.ok("Supervisor asignado exitosamente");
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @Operation(summary = "Desasignar supervisor de caso", description = "Elimina la asignación de un supervisor de un caso.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Supervisor desasignado exitosamente"),
+            @ApiResponse(responseCode = "400", description = "Error de validación"),
+            @ApiResponse(responseCode = "404", description = "Caso no encontrado"),
+            @ApiResponse(responseCode = "403", description = "No tiene permisos para desasignar a este supervisor")
+    })
+    @DeleteMapping("/{id}/supervision/profesor/{username}/termino/{termino}")
+    @PreAuthorize("hasAnyRole('COORDINADOR', 'PROFESOR')")
+    public ResponseEntity<String> unassignSupervisor(
+            @Parameter(description = "ID del caso") @PathVariable String id,
+            @Parameter(description = "Username del supervisor") @PathVariable String username,
+            @Parameter(description = "Término de la asignación") @PathVariable String termino,
+            org.springframework.security.core.Authentication authentication) {
+
+        // Validar permisos específicos de Profesor
+        boolean isCoordinador = authentication.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_COORDINADOR"));
+        boolean isProfesor = authentication.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_PROFESOR"));
+
+        if (isProfesor && !isCoordinador) {
+            String currentUsername = authentication.getName();
+            if (!username.equals(currentUsername)) {
+                return ResponseEntity.status(org.springframework.http.HttpStatus.FORBIDDEN)
+                        .body("Los profesores solo pueden desasignarse a sí mismos.");
+            }
+        }
+
+        try {
+            casoService.unassignSupervisor(id, username, termino);
+            return ResponseEntity.ok("Supervisor desasignado exitosamente");
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

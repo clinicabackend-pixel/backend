@@ -79,8 +79,8 @@ public class EncuestaService {
         // 4. Fetch Solicitante fields (Condicion Laboral/Actividad)
         clinica_juridica.backend.models.Solicitante s = solicitanteRepository.findById(cedula).orElse(null);
         if (s != null) {
-            response.setIdCondicion(s.getIdCondicion());
-            response.setIdCondicionActividad(s.getIdCondicionActividad());
+            response.setCondicionLaboral(s.getCondicionLaboral());
+            response.setCondicionActividad(s.getCondicionActividad());
         }
 
         return response;
@@ -150,18 +150,12 @@ public class EncuestaService {
         clinica_juridica.backend.models.Solicitante s = solicitanteRepository.findById(cedula).orElse(null);
         if (s != null) {
             boolean updated = false;
-            if (request.getIdCondicion() != null) {
-                Integer idCond = request.getIdCondicion();
-                if (idCond == 0)
-                    idCond = null;
-                s.setIdCondicion(idCond);
+            if (request.getCondicionLaboral() != null) {
+                s.setCondicionLaboral(request.getCondicionLaboral());
                 updated = true;
             }
-            if (request.getIdCondicionActividad() != null) {
-                Integer idAct = request.getIdCondicionActividad();
-                if (idAct == 0)
-                    idAct = null;
-                s.setIdCondicionActividad(idAct);
+            if (request.getCondicionActividad() != null) {
+                s.setCondicionActividad(request.getCondicionActividad());
                 updated = true;
             }
             if (updated) {

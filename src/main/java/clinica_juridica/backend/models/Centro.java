@@ -13,15 +13,19 @@ public class Centro {
     @Column("nombre")
     private String nombre;
 
+    @Column("abreviatura")
+    private String abreviatura;
+
     @Column("id_parroquia")
     private Integer idParroquia;
 
     public Centro() {
     }
 
-    public Centro(Integer idCentro, String nombre, Integer idParroquia) {
+    public Centro(Integer idCentro, String nombre, String abreviatura, Integer idParroquia) {
         this.idCentro = idCentro;
         this.nombre = nombre;
+        this.abreviatura = abreviatura;
         this.idParroquia = idParroquia;
     }
 
@@ -39,6 +43,14 @@ public class Centro {
 
     public void setNombre(String nombre) {
         this.nombre = nombre;
+    }
+
+    public String getAbreviatura() {
+        return abreviatura;
+    }
+
+    public void setAbreviatura(String abreviatura) {
+        this.abreviatura = abreviatura;
     }
 
     public Integer getIdParroquia() {

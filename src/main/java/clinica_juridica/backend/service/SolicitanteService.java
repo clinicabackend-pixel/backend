@@ -21,9 +21,6 @@ import clinica_juridica.backend.dto.response.EncuestaResponse;
 import clinica_juridica.backend.dto.response.FamiliaDto;
 import clinica_juridica.backend.dto.response.ViviendaDto;
 
-import clinica_juridica.backend.models.NivelEducativo;
-import clinica_juridica.backend.repository.NivelEducativoRepository;
-
 import clinica_juridica.backend.models.Estado;
 import clinica_juridica.backend.repository.EstadoRepository;
 import clinica_juridica.backend.dto.request.SolicitanteRequest;
@@ -40,22 +37,19 @@ public class SolicitanteService {
     private final FamiliaRepository familiaRepository;
     private final VistaReporteViviendaRepository vistaReporteViviendaRepository;
     private final EstadoRepository estadoRepository;
-    private final NivelEducativoRepository nivelEducativoRepository;
 
     public SolicitanteService(SolicitanteRepository solicitanteRepository,
             ParroquiaRepository parroquiaRepository,
             MunicipioRepository municipioRepository,
             FamiliaRepository familiaRepository,
             VistaReporteViviendaRepository vistaReporteViviendaRepository,
-            EstadoRepository estadoRepository,
-            NivelEducativoRepository nivelEducativoRepository) {
+            EstadoRepository estadoRepository) {
         this.solicitanteRepository = solicitanteRepository;
         this.parroquiaRepository = parroquiaRepository;
         this.municipioRepository = municipioRepository;
         this.familiaRepository = familiaRepository;
         this.vistaReporteViviendaRepository = vistaReporteViviendaRepository;
         this.estadoRepository = estadoRepository;
-        this.nivelEducativoRepository = nivelEducativoRepository;
     }
 
     public List<SolicitanteResponse> getAll(boolean activeCasesOnly, String role) {
@@ -160,11 +154,11 @@ public class SolicitanteService {
                 s.getTelfCasa(),
                 s.getTelfCelular(),
                 s.getFNacimiento(),
-                s.getIdEstadoCivil(),
+                s.getEstadoCivil(),
                 s.getIdParroquia(),
-                s.getIdCondicion(),
-                s.getIdCondicionActividad(),
-                s.getIdNivel());
+                s.getCondicionLaboral(),
+                s.getCondicionActividad(),
+                s.getNivelEducativo());
     }
 
     @Transactional
@@ -218,7 +212,6 @@ public class SolicitanteService {
                 .collect(Collectors.toList());
 
         // 4. Fetch Municipios in batch
-        // 4. Fetch Municipios in batch
         java.util.Map<Integer, Municipio> municipioMap = StreamSupport
                 .stream(municipioRepository.findAllById(municipioIds).spliterator(), false)
                 .collect(Collectors.toMap(Municipio::getIdMunicipio, java.util.function.Function.identity()));
@@ -234,17 +227,6 @@ public class SolicitanteService {
                 .stream(estadoRepository.findAllById(estadoIds).spliterator(), false)
                 .collect(Collectors.toMap(Estado::getIdEstado,
                         java.util.function.Function.identity()));
-
-        // 6. Map Nivel Educativo
-        List<Integer> nivelIds = solicitantes.stream()
-                .map(Solicitante::getIdNivel)
-                .filter(Objects::nonNull)
-                .distinct()
-                .collect(Collectors.toList());
-
-        java.util.Map<Integer, NivelEducativo> nivelMap = StreamSupport
-                .stream(nivelEducativoRepository.findAllById(nivelIds).spliterator(), false)
-                .collect(Collectors.toMap(NivelEducativo::getIdNivelEdu, java.util.function.Function.identity()));
 
         return solicitantes.stream().map(s -> {
             Integer idMuni = null;
@@ -279,28 +261,24 @@ public class SolicitanteService {
                     s.getCedula(),
                     s.getNombre(),
                     s.getSexo(),
-                    "SOLTERO", // Placeholder: Need lookup for idEstadoCivil
+                    s.getEstadoCivil(), // Passing string directly
                     s.getFNacimiento(),
                     "SI".equals(s.getConcubinato()),
                     s.getNacionalidad(),
-                    false, // Placeholder: need logic from idCondicionActividad
-                    "FORMAL", // Placeholder
+                    s.getCondicionLaboral(), // String
+                    s.getCondicionActividad(), // String
                     s.getTelfCasa(),
                     s.getTelfCelular(),
                     s.getEmail(),
-                    s.getIdEstadoCivil(),
                     s.getIdParroquia(),
                     idMuni,
                     idEst,
-                    s.getIdCondicion(),
-                    s.getIdCondicionActividad(),
-                    s.getIdNivel(),
+                    s.getNivelEducativo(), // String
+                    s.getNombre(), // Just use nombre as apellido fallback if needed, or remove param if we update
+                                   // dto
                     nombreParroquia,
                     nombreMunicipio,
-                    nombreEstado,
-                    s.getIdNivel() != null && nivelMap.containsKey(s.getIdNivel())
-                            ? nivelMap.get(s.getIdNivel()).getNivel()
-                            : null);
+                    nombreEstado);
         }).collect(Collectors.toList());
     }
 
@@ -315,11 +293,11 @@ public class SolicitanteService {
         s.setTelfCelular(r.telfCelular());
         s.setTelfCasa(r.telfCasa());
         s.setFNacimiento(r.fechaNacimiento());
-        s.setIdEstadoCivil(r.idEstadoCivil());
+        s.setEstadoCivil(r.estadoCivil());
         s.setIdParroquia(r.idParroquia());
-        s.setIdCondicion(r.idCondicion());
-        s.setIdCondicionActividad(r.idCondicionActividad());
-        s.setIdNivel(r.idNivel());
+        s.setCondicionLaboral(r.condicionLaboral());
+        s.setCondicionActividad(r.condicionActividad());
+        s.setNivelEducativo(r.nivelEducativo());
         return s;
     }
 }

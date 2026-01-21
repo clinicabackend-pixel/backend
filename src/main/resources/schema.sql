@@ -183,15 +183,15 @@ CREATE TABLE solicitantes (
   sexo VARCHAR(20),
   email VARCHAR(150),
   concubinato VARCHAR(10),
-  id_estado_civil INTEGER,
+  estado_civil VARCHAR(50),
   telf_celular VARCHAR(20),
   telf_casa VARCHAR(20),
   f_nacimiento DATE NOT NULL,
   edad INTEGER, 
   f_registro DATE DEFAULT CURRENT_DATE,
-  id_condicion INTEGER,
-  id_condicion_actividad INTEGER,
-  id_nivel INTEGER,
+  condicion_laboral VARCHAR(100),
+  condicion_actividad VARCHAR(100),
+  nivel_educativo VARCHAR(100),
   tiempo_estudio VARCHAR(50),
   id_parroquia INTEGER,
   
@@ -200,10 +200,6 @@ CREATE TABLE solicitantes (
   CONSTRAINT chk_sol_concubinato CHECK (concubinato IN ('SI', 'NO')),
   CONSTRAINT chk_logica_nacimiento CHECK (f_nacimiento <= f_registro),
   
-  CONSTRAINT fk_sol_cond FOREIGN KEY (id_condicion) REFERENCES condicion_laboral(id_condicion),
-  CONSTRAINT fk_sol_niv FOREIGN KEY (id_nivel) REFERENCES niveles_educativos(id_nivel),
-  CONSTRAINT fk_sol_civil FOREIGN KEY (id_estado_civil) REFERENCES estado_civil(id_estado_civil),
-  CONSTRAINT fk_sol_actividad FOREIGN KEY (id_condicion_actividad) REFERENCES condicion_actividad(id_condicion_actividad),
   CONSTRAINT fk_sol_parroquia FOREIGN KEY (id_parroquia) REFERENCES parroquias(id_parroquia)
 );
 

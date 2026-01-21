@@ -17,37 +17,39 @@ public class Solicitante implements Persistable<String> {
     private String sexo;
     private String email;
     private String concubinato;
-    private Integer idEstadoCivil;
+    private String estadoCivil; // Changed from idEstadoCivil
+    private String condicionLaboral; // Changed from idCondicion
+    private String condicionActividad; // Changed from idCondicionActividad
+    private String nivelEducativo; // Changed from idNivel
+
+    // Estos campos siguen igual o necesitan revision si apuntan a catalogos
     private Integer idParroquia;
     private String telfCelular;
     private String telfCasa;
     private LocalDate fNacimiento;
     private Integer edad;
-    private Integer idCondicion;
-    private Integer idCondicionActividad;
-    private Integer idNivel;
     private String tiempoEstudio;
 
     public Solicitante() {
     }
 
     public Solicitante(String cedula, String nombre, String nacionalidad, String sexo, String email, String concubinato,
-            Integer idEstadoCivil, String telfCelular, String telfCasa, LocalDate fNacimiento, Integer edad,
-            Integer idCondicion, Integer idCondicionActividad, Integer idNivel, String tiempoEstudio) {
+            String estadoCivil, String telfCelular, String telfCasa, LocalDate fNacimiento, Integer edad,
+            String condicionLaboral, String condicionActividad, String nivelEducativo, String tiempoEstudio) {
         this.cedula = cedula;
         this.nombre = nombre;
         this.nacionalidad = nacionalidad;
         this.sexo = sexo;
         this.email = email;
         this.concubinato = concubinato;
-        this.idEstadoCivil = idEstadoCivil;
+        this.estadoCivil = estadoCivil;
         this.telfCelular = telfCelular;
         this.telfCasa = telfCasa;
         this.fNacimiento = fNacimiento;
         this.edad = edad;
-        this.idCondicion = idCondicion;
-        this.idCondicionActividad = idCondicionActividad;
-        this.idNivel = idNivel;
+        this.condicionLaboral = condicionLaboral;
+        this.condicionActividad = condicionActividad;
+        this.nivelEducativo = nivelEducativo;
         this.tiempoEstudio = tiempoEstudio;
     }
 
@@ -99,12 +101,36 @@ public class Solicitante implements Persistable<String> {
         this.concubinato = concubinato;
     }
 
-    public Integer getIdEstadoCivil() {
-        return idEstadoCivil;
+    public String getEstadoCivil() {
+        return estadoCivil;
     }
 
-    public void setIdEstadoCivil(Integer idEstadoCivil) {
-        this.idEstadoCivil = idEstadoCivil;
+    public void setEstadoCivil(String estadoCivil) {
+        this.estadoCivil = estadoCivil;
+    }
+
+    public String getCondicionLaboral() {
+        return condicionLaboral;
+    }
+
+    public void setCondicionLaboral(String condicionLaboral) {
+        this.condicionLaboral = condicionLaboral;
+    }
+
+    public String getCondicionActividad() {
+        return condicionActividad;
+    }
+
+    public void setCondicionActividad(String condicionActividad) {
+        this.condicionActividad = condicionActividad;
+    }
+
+    public String getNivelEducativo() {
+        return nivelEducativo;
+    }
+
+    public void setNivelEducativo(String nivelEducativo) {
+        this.nivelEducativo = nivelEducativo;
     }
 
     public Integer getIdParroquia() {
@@ -145,30 +171,6 @@ public class Solicitante implements Persistable<String> {
 
     public void setEdad(Integer edad) {
         this.edad = edad;
-    }
-
-    public Integer getIdCondicion() {
-        return idCondicion;
-    }
-
-    public void setIdCondicion(Integer idCondicion) {
-        this.idCondicion = idCondicion;
-    }
-
-    public Integer getIdCondicionActividad() {
-        return idCondicionActividad;
-    }
-
-    public void setIdCondicionActividad(Integer idCondicionActividad) {
-        this.idCondicionActividad = idCondicionActividad;
-    }
-
-    public Integer getIdNivel() {
-        return idNivel;
-    }
-
-    public void setIdNivel(Integer idNivel) {
-        this.idNivel = idNivel;
     }
 
     public String getTiempoEstudio() {

@@ -57,6 +57,9 @@ public interface CasoRepository extends CrudRepository<Caso, String> {
         String registrarNuevoCaso(String sintesis, String tramite, Integer cantBeneficiarios, Integer idTribunal,
                         Integer idCentro, String cedula, String username, Integer comAmbLegal);
 
+        @Query("SELECT MAX(num_caso) FROM casos WHERE num_caso LIKE :prefix || '%'")
+        String findMaxNumCasoByPrefix(String prefix);
+
         @Modifying
         @Query("UPDATE casos SET sintesis = :sintesis, cod_caso_tribunal = :codCasoTribunal, fecha_res_caso_tri = :fechaResCasoTri, fecha_crea_caso_tri = :fechaCreaCasoTri, id_tribunal = :idTribunal, com_amb_legal = :comAmbLegal WHERE num_caso = :numCaso")
         void updateManual(String numCaso, String sintesis,

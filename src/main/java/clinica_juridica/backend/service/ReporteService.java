@@ -129,22 +129,6 @@ public class ReporteService {
     public byte[] generarReporteSocioeconomico() throws IOException {
         List<Solicitante> solicitantes = solicitanteRepository.findAll();
 
-        // Cache catalogs to avoid N+1 queries
-        // Using simple maps for ID -> Description resolution
-        java.util.Map<Integer, String> estadoCivilMap = new java.util.HashMap<>();
-        estadoCivilRepository.findAll().forEach(e -> estadoCivilMap.put(e.getIdEstadoCivil(), e.getDescripcion()));
-
-        java.util.Map<Integer, String> condicionLaboralMap = new java.util.HashMap<>();
-        condicionLaboralRepository.findAll()
-                .forEach(c -> condicionLaboralMap.put(c.getIdCondicion(), c.getCondicion()));
-
-        java.util.Map<Integer, String> condicionActividadMap = new java.util.HashMap<>();
-        condicionActividadRepository.findAll()
-                .forEach(c -> condicionActividadMap.put(c.getIdCondicionActividad(), c.getNombreActividad()));
-
-        java.util.Map<Integer, String> nivelEducativoMap = new java.util.HashMap<>();
-        nivelEducativoRepository.findAll().forEach(n -> nivelEducativoMap.put(n.getIdNivelEdu(), n.getNivel()));
-
         try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
             Sheet sheet = workbook.createSheet("Reporte Socioeconómico");
             createHeaderStyle(workbook); // Ensure style is created
@@ -174,14 +158,14 @@ public class ReporteService {
                 row.createCell(col++).setCellValue(sol.getNacionalidad());
                 row.createCell(col++).setCellValue(sol.getSexo());
                 row.createCell(col++).setCellValue(sol.getEdad() != null ? sol.getEdad().toString() : "");
-                row.createCell(col++).setCellValue(estadoCivilMap.getOrDefault(sol.getIdEstadoCivil(), ""));
+                row.createCell(col++).setCellValue(sol.getEstadoCivil());
                 // Removed Email and Phones
 
                 // LABORAL / ACADEMICO
-                row.createCell(col++).setCellValue(condicionLaboralMap.getOrDefault(sol.getIdCondicion(), ""));
+                row.createCell(col++).setCellValue(sol.getCondicionLaboral());
                 row.createCell(col++)
-                        .setCellValue(condicionActividadMap.getOrDefault(sol.getIdCondicionActividad(), ""));
-                row.createCell(col++).setCellValue(nivelEducativoMap.getOrDefault(sol.getIdNivel(), ""));
+                        .setCellValue(sol.getCondicionActividad());
+                row.createCell(col++).setCellValue(sol.getNivelEducativo());
                 row.createCell(col++).setCellValue(sol.getTiempoEstudio());
 
                 // FAMILIAR

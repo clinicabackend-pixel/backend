@@ -49,12 +49,12 @@ public interface SolicitanteRepository extends CrudRepository<Solicitante, Strin
     @Query("""
                 INSERT INTO solicitantes (
                     cedula, nombre, sexo, nacionalidad, email, concubinato,
-                    telf_casa, telf_celular, f_nacimiento, id_estado_civil, id_parroquia,
-                    id_condicion, id_condicion_actividad, id_nivel
+                    telf_casa, telf_celular, f_nacimiento, estado_civil, id_parroquia,
+                    condicion_laboral, condicion_actividad, nivel_educativo
                 ) VALUES (
                     :cedula, :nombre, :sexo, :nacionalidad, :email, :concubinato,
-                    :telfCasa, :telfCelular, :fNacimiento, :idEstadoCivil, :idParroquia,
-                    :idCondicion, :idCondicionActividad, :idNivel
+                    :telfCasa, :telfCelular, :fNacimiento, :estadoCivil, :idParroquia,
+                    :condicionLaboral, :condicionActividad, :nivelEducativo
                 )
             """)
     void insertSolicitante(
@@ -67,11 +67,11 @@ public interface SolicitanteRepository extends CrudRepository<Solicitante, Strin
             @Param("telfCasa") String telfCasa,
             @Param("telfCelular") String telfCelular,
             @Param("fNacimiento") java.time.LocalDate fNacimiento,
-            @Param("idEstadoCivil") Integer idEstadoCivil,
+            @Param("estadoCivil") String estadoCivil,
             @Param("idParroquia") Integer idParroquia,
-            @Param("idCondicion") Integer idCondicion,
-            @Param("idCondicionActividad") Integer idCondicionActividad,
-            @Param("idNivel") Integer idNivel);
+            @Param("condicionLaboral") String condicionLaboral,
+            @Param("condicionActividad") String condicionActividad,
+            @Param("nivelEducativo") String nivelEducativo);
 
     // --- REPORT Stats Generic Queries ---
 
