@@ -27,20 +27,23 @@ public class UsuarioService {
     private final CoordinadorRepository coordinadorRepository;
     private final ProfesorRepository profesorRepository;
     private final EstudianteRepository estudianteRepository;
-    private final SemestreRepository semestreRepository; // Added field
+    private final SemestreRepository semestreRepository;
+    private final org.springframework.jdbc.core.JdbcTemplate jdbcTemplate;
     private final PasswordEncoder passwordEncoder;
 
     public UsuarioService(UsuarioRepository usuarioRepository,
             CoordinadorRepository coordinadorRepository,
             ProfesorRepository profesorRepository,
             EstudianteRepository estudianteRepository,
-            SemestreRepository semestreRepository, // Added param
+            SemestreRepository semestreRepository,
+            org.springframework.jdbc.core.JdbcTemplate jdbcTemplate,
             PasswordEncoder passwordEncoder) {
         this.usuarioRepository = usuarioRepository;
         this.coordinadorRepository = coordinadorRepository;
         this.profesorRepository = profesorRepository;
         this.estudianteRepository = estudianteRepository;
         this.semestreRepository = semestreRepository;
+        this.jdbcTemplate = jdbcTemplate;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -102,6 +105,7 @@ public class UsuarioService {
         switch (request.getTipoUsuario()) {
             case "COORDINADOR":
                 Coordinador coordinador = new Coordinador(request.getUsername());
+                coordinador.setNew(true);
                 coordinadorRepository.save(coordinador);
                 break;
             case "PROFESOR":
@@ -111,6 +115,7 @@ public class UsuarioService {
                     terminoProf = (active != null) ? active.getTermino() : null;
                 }
                 Profesor profesor = new Profesor(request.getUsername(), terminoProf);
+                profesor.setNew(true);
                 profesorRepository.save(profesor);
                 break;
             case "ESTUDIANTE":
@@ -121,6 +126,7 @@ public class UsuarioService {
                 }
                 Estudiante estudiante = new Estudiante(request.getUsername(), terminoEst,
                         request.getTipoDeEstudiante(), request.getNrc());
+                estudiante.setNew(true);
                 estudianteRepository.save(estudiante);
                 break;
             default:
@@ -172,6 +178,33 @@ public class UsuarioService {
         Usuario usuario = findUsuarioByUsername(username);
         usuario.setStatus("INACTIVO");
         usuarioRepository.save(usuario);
+    }
+
+    @Transactional
+    public void deleteUsuarioPermanently(String username) {
+        Usuario usuario = findUsuarioByUsername(username);
+
+        // 1. Clean up dependencies using JDBC to avoid loading everything
+        // Delete associations (Many-to-Many or Composite PKs containing username)
+        jdbcTemplate.update("DELETE FROM casos_asignados WHERE username = ?", username);
+        jdbcTemplate.update("DELETE FROM casos_supervisados WHERE username = ?", username);
+        jdbcTemplate.update("DELETE FROM acciones_ejecutadas WHERE username = ?", username);
+        jdbcTemplate.update("DELETE FROM encuentros_atendidos WHERE username = ?", username);
+
+        // Nullify ownership/references (Foreign Keys where possible)
+        jdbcTemplate.update("UPDATE casos SET username = NULL WHERE username = ?", username);
+        jdbcTemplate.update("UPDATE accion SET username = NULL WHERE username = ?", username);
+        jdbcTemplate.update("UPDATE encuentros SET username = NULL WHERE username = ?", username);
+        jdbcTemplate.update("UPDATE documentos SET username = NULL WHERE username = ?", username);
+
+        // 2. Delete from role specific tables (Using JDBC to ensure cleanup regardless
+        // of entity state)
+        jdbcTemplate.update("DELETE FROM estudiantes WHERE username = ?", username);
+        jdbcTemplate.update("DELETE FROM profesores WHERE username = ?", username);
+        jdbcTemplate.update("DELETE FROM coordinadores WHERE username = ?", username);
+
+        // 3. Delete user
+        usuarioRepository.delete(usuario);
     }
 
     public String getTerminoByUsername(String username, String tipo) {

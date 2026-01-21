@@ -4,12 +4,15 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 
 @Table("estudiantes")
-public class Estudiante {
+public class Estudiante implements org.springframework.data.domain.Persistable<String> {
     @Id
     private String username; // Part of composite key
     private String termino; // Part of composite key
     private String tipoDeEstudiante;
     private Integer nrc;
+
+    @org.springframework.data.annotation.Transient
+    private boolean isNew = false;
 
     public Estudiante() {
     }
@@ -51,6 +54,20 @@ public class Estudiante {
 
     public void setNrc(Integer nrc) {
         this.nrc = nrc;
+    }
+
+    @Override
+    public String getId() {
+        return username;
+    }
+
+    @Override
+    public boolean isNew() {
+        return isNew;
+    }
+
+    public void setNew(boolean isNew) {
+        this.isNew = isNew;
     }
 
     @Override

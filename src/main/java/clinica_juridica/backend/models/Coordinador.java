@@ -4,9 +4,12 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 
 @Table("coordinadores")
-public class Coordinador {
+public class Coordinador implements org.springframework.data.domain.Persistable<String> {
     @Id
     private String username;
+
+    @org.springframework.data.annotation.Transient
+    private boolean isNew = false;
 
     public Coordinador() {
     }
@@ -21,6 +24,20 @@ public class Coordinador {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    @Override
+    public String getId() {
+        return username;
+    }
+
+    @Override
+    public boolean isNew() {
+        return isNew;
+    }
+
+    public void setNew(boolean isNew) {
+        this.isNew = isNew;
     }
 
     @Override

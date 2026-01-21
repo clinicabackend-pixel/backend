@@ -4,10 +4,13 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 
 @Table("profesores")
-public class Profesor {
+public class Profesor implements org.springframework.data.domain.Persistable<String> {
     @Id
     private String username;
     private String termino;
+
+    @org.springframework.data.annotation.Transient
+    private boolean isNew = false;
 
     public Profesor() {
     }
@@ -31,6 +34,20 @@ public class Profesor {
 
     public void setTermino(String termino) {
         this.termino = termino;
+    }
+
+    @Override
+    public String getId() {
+        return username;
+    }
+
+    @Override
+    public boolean isNew() {
+        return isNew;
+    }
+
+    public void setNew(boolean isNew) {
+        this.isNew = isNew;
     }
 
     @Override

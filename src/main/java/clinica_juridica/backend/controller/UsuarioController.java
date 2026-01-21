@@ -56,6 +56,7 @@ public class UsuarioController {
     @PreAuthorize("hasRole('COORDINADOR')")
     @Operation(summary = "Crear usuario", description = "Crea un nuevo usuario (Estudiante, Profesor o Coordinador). Requiere rol COORDINADOR.")
     public ResponseEntity<String> createUsuario(@RequestBody UsuarioRequest request) {
+        System.out.println("Creando usuario: " + request.getUsername() + ", Termino: " + request.getTermino());
         usuarioService.createUsuario(request);
         return ResponseEntity.ok("Usuario creado exitosamente");
     }
@@ -74,6 +75,14 @@ public class UsuarioController {
     public ResponseEntity<String> deleteUsuario(@PathVariable String username) {
         usuarioService.deleteUsuario(username);
         return ResponseEntity.ok("Usuario desactivado exitosamente");
+    }
+
+    @DeleteMapping("/{username}/permanent")
+    @PreAuthorize("hasRole('COORDINADOR')")
+    @Operation(summary = "Eliminar usuario permanentemente", description = "Elimina físicamente el usuario y sus registros asociados. IRREVERSIBLE. Requiere rol COORDINADOR.")
+    public ResponseEntity<String> deleteUsuarioPermanently(@PathVariable String username) {
+        usuarioService.deleteUsuarioPermanently(username);
+        return ResponseEntity.ok("Usuario eliminado permanentemente");
     }
 
     private UsuarioResponse mapToResponse(Usuario p) {
