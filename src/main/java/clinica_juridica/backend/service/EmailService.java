@@ -49,12 +49,12 @@ public class EmailService {
             return;
         }
 
-        // --- TEMPORARY LOGGING FOR LOCAL DEVELOPMENT ---
+        // --- LOGGING EMAIL CONTENT ---
         logger.info("=================================================");
-        logger.info("EMAIL MOCKED DETECTED - SENDING TO LOGS");
+        logger.info("PREPARING TO SEND EMAIL");
         logger.info("TO: {}", to);
         logger.info("SUBJECT: {}", subject);
-        logger.info("MESSAGE (preview):\n{}", contentString.substring(0, Math.min(contentString.length(), 200)));
+        logger.info("CONTENT:\n{}", contentString);
         logger.info("=================================================");
         // -----------------------------------------------
 
