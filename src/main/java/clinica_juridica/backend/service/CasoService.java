@@ -236,7 +236,8 @@ public class CasoService {
                 Integer maxId = estatusPorCasoRepository.findMaxIdByNumCaso(id);
                 Integer nextId = (maxId == null) ? 1 : maxId + 1;
 
-                estatusPorCasoRepository.saveNewStatus(nextId, id, DateUtils.getCurrentDate(), nuevoEstatus);
+                // estatusPorCasoRepository.saveNewStatus(nextId, id, DateUtils.getCurrentDate(), nuevoEstatus);
+                // NOTA: Se comenta porque el Trigger 'trg_auto_historial_estatus' ya registra el cambio automáticamente.
                 casoRepository.updateEstatus(id, nuevoEstatus);
         }
 

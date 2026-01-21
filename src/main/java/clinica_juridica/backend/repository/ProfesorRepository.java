@@ -26,4 +26,7 @@ public interface ProfesorRepository extends CrudRepository<Profesor, String> {
     boolean existsByUsernameAndTermino(@Param("username") String username, @Param("termino") String termino);
 
     Optional<Profesor> findByUsername(String username);
+
+    @Query("SELECT p.username, u.nombre, u.cedula, p.termino, u.email FROM profesores p JOIN usuarios u ON p.username = u.username")
+    List<clinica_juridica.backend.dto.response.ProfesorResponse> findAllProjected();
 }

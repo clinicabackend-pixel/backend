@@ -91,6 +91,7 @@ public class UsuarioService {
         usuario.setNombre(request.getNombre());
         usuario.setEmail(request.getEmail());
         usuario.setTipo(request.getTipoUsuario());
+        usuario.setSexo(request.getSexo());
         usuario.setStatus("ACTIVO");
 
         // Generate random internal password
@@ -170,8 +171,26 @@ public class UsuarioService {
         if (request.getEstatus() != null) {
             usuario.setStatus(request.getEstatus());
         }
+        if (request.getSexo() != null) {
+            usuario.setSexo(request.getSexo());
+        }
 
         usuarioRepository.save(usuario);
+
+        // Update term for specific roles
+        if (request.getTermino() != null && !request.getTermino().isEmpty()) {
+            if ("PROFESOR".equals(usuario.getTipo())) {
+                profesorRepository.findById(username).ifPresent(p -> {
+                    p.setTermino(request.getTermino());
+                    profesorRepository.save(p);
+                });
+            } else if ("ESTUDIANTE".equals(usuario.getTipo())) {
+                estudianteRepository.findById(username).ifPresent(e -> {
+                    e.setTermino(request.getTermino());
+                    estudianteRepository.save(e);
+                });
+            }
+        }
     }
 
     public void deleteUsuario(String username) {

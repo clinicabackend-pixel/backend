@@ -39,21 +39,33 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             jwt = authorizationHeader.substring(7);
             try {
                 username = jwtUtil.extractUsername(jwt);
+                logger.info("JWT Filter: Extracted username: " + username);
             } catch (Exception e) {
                 logger.error("Error extracting username from JWT", e);
             }
         }
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
+            try {
+                UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
+                logger.info("JWT Filter: User loaded: " + userDetails.getUsername() + ", Authorities: "
+                        + userDetails.getAuthorities());
 
-            if (jwtUtil.validateToken(jwt, userDetails.getUsername())) {
-                UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
-                        userDetails, null, userDetails.getAuthorities());
-                usernamePasswordAuthenticationToken
-                        .setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+                if (jwtUtil.validateToken(jwt, userDetails.getUsername())) {
+                    UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
+                            userDetails, null, userDetails.getAuthorities());
+                    usernamePasswordAuthenticationToken
+                            .setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+                    logger.info("JWT Filter: Authentication set for " + username);
+                } else {
+                    logger.warn("JWT Filter: Token validation failed for " + username);
+                }
+            } catch (Exception e) {
+                logger.error("JWT Filter: Error loading user " + username, e);
             }
+        } else {
+            logger.debug("JWT Filter: No username or Context already set. Header: " + authorizationHeader);
         }
         filterChain.doFilter(request, response);
     }

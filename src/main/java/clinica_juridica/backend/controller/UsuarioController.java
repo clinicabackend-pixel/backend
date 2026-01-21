@@ -87,7 +87,7 @@ public class UsuarioController {
 
     private UsuarioResponse mapToResponse(Usuario p) {
         String termino = usuarioService.getTerminoByUsername(p.getUsername(), p.getTipo());
-        return new UsuarioResponse(p.getCedula(), p.getNombre(), "N/A", p.getEmail(),
+        return new UsuarioResponse(p.getCedula(), p.getNombre(), p.getSexo(), p.getEmail(),
                 p.getUsername(), p.getStatus(), p.getTipo(), termino);
     }
 }

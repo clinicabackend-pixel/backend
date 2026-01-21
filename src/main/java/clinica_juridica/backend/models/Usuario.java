@@ -17,12 +17,13 @@ public class Usuario implements Persistable<String> {
     private String email;
     private String status;
     private String tipo;
+    private String sexo;
 
     public Usuario() {
     }
 
     public Usuario(String username, String cedula, String contrasena, String nombre, String email, String status,
-            String tipo) {
+            String tipo, String sexo) {
         this.username = username;
         this.cedula = cedula;
         this.contrasena = contrasena;
@@ -30,6 +31,7 @@ public class Usuario implements Persistable<String> {
         this.email = email;
         this.status = status;
         this.tipo = tipo;
+        this.sexo = sexo;
     }
 
     public String getUsername() {
@@ -86,6 +88,14 @@ public class Usuario implements Persistable<String> {
 
     public void setTipo(String tipo) {
         this.tipo = tipo;
+    }
+
+    public String getSexo() {
+        return sexo;
+    }
+
+    public void setSexo(String sexo) {
+        this.sexo = sexo;
     }
 
     @org.springframework.data.annotation.Transient

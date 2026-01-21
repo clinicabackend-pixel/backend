@@ -43,6 +43,7 @@ public class DataSeeder {
                 admin.setEmail("admin@clinica.com");
                 admin.setContrasena(passwordEncoder.encode("123456"));
                 admin.setTipo(TipoUsuario.COORDINADOR.name());
+                admin.setSexo("Masculino");
                 admin.setStatus("ACTIVO");
                 admin.setNew(true);
 
@@ -63,6 +64,7 @@ public class DataSeeder {
                 prof.setEmail("profesor1@clinica.com");
                 prof.setContrasena(passwordEncoder.encode("123456"));
                 prof.setTipo(TipoUsuario.PROFESOR.name());
+                prof.setSexo("Masculino");
                 prof.setStatus("ACTIVO");
                 prof.setNew(true);
 
@@ -83,6 +85,7 @@ public class DataSeeder {
                 est.setEmail("estudiante1@clinica.com");
                 est.setContrasena(passwordEncoder.encode("123456"));
                 est.setTipo(TipoUsuario.ESTUDIANTE.name());
+                est.setSexo("Femenino");
                 est.setStatus("ACTIVO");
                 est.setNew(true);
 
