@@ -22,7 +22,16 @@ import clinica_juridica.backend.dto.response.FamiliaDto;
 import clinica_juridica.backend.dto.response.ViviendaDto;
 
 import clinica_juridica.backend.models.Estado;
+import clinica_juridica.backend.models.EstadoCivil;
+import clinica_juridica.backend.models.CondicionLaboral;
+import clinica_juridica.backend.models.CondicionActividad;
+import clinica_juridica.backend.models.NivelEducativo;
 import clinica_juridica.backend.repository.EstadoRepository;
+import clinica_juridica.backend.repository.EstadoCivilRepository;
+import clinica_juridica.backend.repository.CondicionLaboralRepository;
+import clinica_juridica.backend.repository.CondicionActividadRepository;
+import clinica_juridica.backend.repository.NivelEducativoRepository;
+
 import clinica_juridica.backend.dto.request.SolicitanteRequest;
 import clinica_juridica.backend.dto.response.SolicitanteResponse;
 import java.util.stream.Collectors;
@@ -37,19 +46,31 @@ public class SolicitanteService {
     private final FamiliaRepository familiaRepository;
     private final VistaReporteViviendaRepository vistaReporteViviendaRepository;
     private final EstadoRepository estadoRepository;
+    private final EstadoCivilRepository estadoCivilRepository;
+    private final CondicionLaboralRepository condicionLaboralRepository;
+    private final CondicionActividadRepository condicionActividadRepository;
+    private final NivelEducativoRepository nivelEducativoRepository;
 
     public SolicitanteService(SolicitanteRepository solicitanteRepository,
             ParroquiaRepository parroquiaRepository,
             MunicipioRepository municipioRepository,
             FamiliaRepository familiaRepository,
             VistaReporteViviendaRepository vistaReporteViviendaRepository,
-            EstadoRepository estadoRepository) {
+            EstadoRepository estadoRepository,
+            EstadoCivilRepository estadoCivilRepository,
+            CondicionLaboralRepository condicionLaboralRepository,
+            CondicionActividadRepository condicionActividadRepository,
+            NivelEducativoRepository nivelEducativoRepository) {
         this.solicitanteRepository = solicitanteRepository;
         this.parroquiaRepository = parroquiaRepository;
         this.municipioRepository = municipioRepository;
         this.familiaRepository = familiaRepository;
         this.vistaReporteViviendaRepository = vistaReporteViviendaRepository;
         this.estadoRepository = estadoRepository;
+        this.estadoCivilRepository = estadoCivilRepository;
+        this.condicionLaboralRepository = condicionLaboralRepository;
+        this.condicionActividadRepository = condicionActividadRepository;
+        this.nivelEducativoRepository = nivelEducativoRepository;
     }
 
     public List<SolicitanteResponse> getAll(boolean activeCasesOnly, String role) {
@@ -228,6 +249,32 @@ public class SolicitanteService {
                 .collect(Collectors.toMap(Estado::getIdEstado,
                         java.util.function.Function.identity()));
 
+        // 6. Fetch Catalog Data
+        List<Integer> estadoCivilIds = solicitantes.stream().map(Solicitante::getIdEstadoCivil).filter(Objects::nonNull)
+                .distinct().toList();
+        java.util.Map<Integer, EstadoCivil> estadoCivilMap = StreamSupport
+                .stream(estadoCivilRepository.findAllById(estadoCivilIds).spliterator(), false)
+                .collect(Collectors.toMap(EstadoCivil::getIdEstadoCivil, java.util.function.Function.identity()));
+
+        List<Integer> condicionIds = solicitantes.stream().map(Solicitante::getIdCondicionLaboral)
+                .filter(Objects::nonNull).distinct().toList();
+        java.util.Map<Integer, CondicionLaboral> condicionMap = StreamSupport
+                .stream(condicionLaboralRepository.findAllById(condicionIds).spliterator(), false)
+                .collect(Collectors.toMap(CondicionLaboral::getIdCondicion, java.util.function.Function.identity()));
+
+        List<Integer> actividadIds = solicitantes.stream().map(Solicitante::getIdCondicionActividad)
+                .filter(Objects::nonNull).distinct().toList();
+        java.util.Map<Integer, CondicionActividad> actividadMap = StreamSupport
+                .stream(condicionActividadRepository.findAllById(actividadIds).spliterator(), false)
+                .collect(Collectors.toMap(CondicionActividad::getIdCondicionActividad,
+                        java.util.function.Function.identity()));
+
+        List<Integer> nivelIds = solicitantes.stream().map(Solicitante::getIdNivelEducativo).filter(Objects::nonNull)
+                .distinct().toList();
+        java.util.Map<Integer, NivelEducativo> nivelMap = StreamSupport
+                .stream(nivelEducativoRepository.findAllById(nivelIds).spliterator(), false)
+                .collect(Collectors.toMap(NivelEducativo::getIdNivelEdu, java.util.function.Function.identity()));
+
         return solicitantes.stream().map(s -> {
             Integer idMuni = null;
             Integer idEst = null;
@@ -261,19 +308,27 @@ public class SolicitanteService {
                     s.getCedula(),
                     s.getNombre(),
                     s.getSexo(),
-                    null, // TODO: Fetch EstadoCivil Name
+                    (s.getIdEstadoCivil() != null && estadoCivilMap.containsKey(s.getIdEstadoCivil()))
+                            ? estadoCivilMap.get(s.getIdEstadoCivil()).getDescripcion()
+                            : null,
                     s.getFNacimiento(),
                     "SI".equals(s.getConcubinato()),
                     s.getNacionalidad(),
-                    null, // TODO: Fetch CondicionName
-                    null, // TODO: Fetch ActividadName
+                    (s.getIdCondicionLaboral() != null && condicionMap.containsKey(s.getIdCondicionLaboral()))
+                            ? condicionMap.get(s.getIdCondicionLaboral()).getCondicion()
+                            : null,
+                    (s.getIdCondicionActividad() != null && actividadMap.containsKey(s.getIdCondicionActividad()))
+                            ? actividadMap.get(s.getIdCondicionActividad()).getNombreActividad()
+                            : null,
                     s.getTelfCasa(),
                     s.getTelfCelular(),
                     s.getEmail(),
                     s.getIdParroquia(),
                     idMuni,
                     idEst,
-                    null, // TODO: Fetch Nivel Name
+                    (s.getIdNivelEducativo() != null && nivelMap.containsKey(s.getIdNivelEducativo()))
+                            ? nivelMap.get(s.getIdNivelEducativo()).getNivel()
+                            : null,
                     s.getNombre(),
                     nombreParroquia,
                     nombreMunicipio,

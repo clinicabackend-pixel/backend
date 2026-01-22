@@ -64,6 +64,7 @@ public class CasoService {
         private final SolicitanteRepository solicitanteRepository;
         private final SemestreRepository semestreRepository;
         private final CentroRepository centroRepository;
+        private final clinica_juridica.backend.repository.AuditoriaRepository auditoriaRepository;
 
         public CasoService(CasoRepository casoRepository,
                         AccionRepository accionRepository,
@@ -80,7 +81,8 @@ public class CasoService {
                         BeneficiariosCasosRepository beneficiariosCasosRepository,
                         SolicitanteRepository solicitanteRepository,
                         SemestreRepository semestreRepository,
-                        CentroRepository centroRepository) {
+                        CentroRepository centroRepository,
+                        clinica_juridica.backend.repository.AuditoriaRepository auditoriaRepository) {
                 this.casoRepository = casoRepository;
                 this.accionRepository = accionRepository;
                 this.encuentroRepository = encuentroRepository;
@@ -97,6 +99,7 @@ public class CasoService {
                 this.solicitanteRepository = solicitanteRepository;
                 this.semestreRepository = semestreRepository;
                 this.centroRepository = centroRepository;
+                this.auditoriaRepository = auditoriaRepository;
         }
 
         public List<CasoSummaryResponse> getAllSummary() {
@@ -137,6 +140,7 @@ public class CasoService {
 
         @Transactional
         public CasoDetalleResponse create(CasoCreateRequest request) {
+                auditoriaRepository.setAuditoriaUser(request.getUsername());
                 // 1. Obtener Término Activo
                 Semestre terminoActivo = semestreRepository.findActiveSemester();
                 if (terminoActivo == null) {
@@ -226,7 +230,8 @@ public class CasoService {
         }
 
         @Transactional
-        public void addBeneficiario(String numCaso, BeneficiarioCreateRequest ben) {
+        public void addBeneficiario(String numCaso, BeneficiarioCreateRequest ben, String username) {
+                auditoriaRepository.setAuditoriaUser(username);
                 if (!casoRepository.existsById(numCaso)) {
                         throw new RuntimeException("Caso no encontrado: " + numCaso);
                 }
@@ -243,7 +248,8 @@ public class CasoService {
         }
 
         @Transactional
-        public void update(String id, CasoUpdateRequest dto) {
+        public void update(String id, CasoUpdateRequest dto, String username) {
+                auditoriaRepository.setAuditoriaUser(username);
                 if (!casoRepository.existsById(id)) {
                         throw new RuntimeException("Caso no encontrado: " + id);
                 }
@@ -253,7 +259,8 @@ public class CasoService {
         }
 
         @Transactional
-        public void updateBeneficiario(String numCaso, String cedula, BeneficiarioUpdateRequest dto) {
+        public void updateBeneficiario(String numCaso, String cedula, BeneficiarioUpdateRequest dto, String username) {
+                auditoriaRepository.setAuditoriaUser(username);
                 if (!casoRepository.existsById(numCaso)) {
                         throw new RuntimeException("Caso no encontrado: " + numCaso);
                 }
@@ -265,12 +272,14 @@ public class CasoService {
                                 dto.getParentesco());
         }
 
-        public void delete(String id) {
+        public void delete(String id, String username) {
+                auditoriaRepository.setAuditoriaUser(username);
                 casoRepository.deleteById(id);
         }
 
         @Transactional
-        public void updateEstatus(String id, String nuevoEstatus) {
+        public void updateEstatus(String id, String nuevoEstatus, String username) {
+                auditoriaRepository.setAuditoriaUser(username);
                 if (!casoRepository.existsById(id)) {
                         throw new RuntimeException("Caso no encontrado: " + id);
                 }
@@ -352,6 +361,7 @@ public class CasoService {
 
         @Transactional
         public void createAccion(String numCaso, AccionCreateRequest dto) {
+                auditoriaRepository.setAuditoriaUser(dto.getUsername());
                 if (!casoRepository.existsById(numCaso)) {
                         throw new RuntimeException("Caso no encontrado: " + numCaso);
                 }
@@ -369,7 +379,8 @@ public class CasoService {
         }
 
         @Transactional
-        public void deleteAccion(String numCaso, Integer idAccion) {
+        public void deleteAccion(String numCaso, Integer idAccion, String username) {
+                auditoriaRepository.setAuditoriaUser(username);
                 if (!casoRepository.existsById(numCaso)) {
                         throw new RuntimeException("Caso no encontrado: " + numCaso);
                 }
@@ -377,7 +388,8 @@ public class CasoService {
         }
 
         @Transactional
-        public void deleteEncuentro(String numCaso, Integer idEncuentro) {
+        public void deleteEncuentro(String numCaso, Integer idEncuentro, String username) {
+                auditoriaRepository.setAuditoriaUser(username);
                 if (!casoRepository.existsById(numCaso)) {
                         throw new RuntimeException("Caso no encontrado: " + numCaso);
                 }
@@ -386,6 +398,7 @@ public class CasoService {
 
         @Transactional
         public void createEncuentro(String numCaso, EncuentroCreateRequest dto) {
+                auditoriaRepository.setAuditoriaUser(dto.getUsername());
                 if (!casoRepository.existsById(numCaso)) {
                         throw new RuntimeException("Caso no encontrado: " + numCaso);
                 }
@@ -403,6 +416,7 @@ public class CasoService {
 
         @Transactional
         public void createDocumento(String numCaso, DocumentoCreateRequest dto) {
+                auditoriaRepository.setAuditoriaUser(dto.getUsername());
                 if (!casoRepository.existsById(numCaso)) {
                         throw new RuntimeException("Caso no encontrado: " + numCaso);
                 }
@@ -415,6 +429,7 @@ public class CasoService {
 
         @Transactional
         public void createPrueba(String numCaso, PruebaCreateRequest dto) {
+                auditoriaRepository.setAuditoriaUser(dto.getUsername());
                 if (!casoRepository.existsById(numCaso)) {
                         throw new RuntimeException("Caso no encontrado: " + numCaso);
                 }
@@ -436,7 +451,8 @@ public class CasoService {
         }
 
         @Transactional
-        public void deleteDocumento(String numCaso, Integer idDocumento) {
+        public void deleteDocumento(String numCaso, Integer idDocumento, String username) {
+                auditoriaRepository.setAuditoriaUser(username);
                 if (!casoRepository.existsById(numCaso)) {
                         throw new RuntimeException("Caso no encontrado: " + numCaso);
                 }
@@ -444,7 +460,8 @@ public class CasoService {
         }
 
         @Transactional
-        public void deletePrueba(String numCaso, Integer idPrueba) {
+        public void deletePrueba(String numCaso, Integer idPrueba, String username) {
+                auditoriaRepository.setAuditoriaUser(username);
                 if (!casoRepository.existsById(numCaso)) {
                         throw new RuntimeException("Caso no encontrado: " + numCaso);
                 }
@@ -452,7 +469,8 @@ public class CasoService {
         }
 
         @Transactional
-        public void assignStudent(String numCaso, CasoAsignacionRequest dto) {
+        public void assignStudent(String numCaso, CasoAsignacionRequest dto, String assignerUsername) {
+                auditoriaRepository.setAuditoriaUser(assignerUsername);
                 if (!casoRepository.existsById(numCaso)) {
                         throw new RuntimeException("Caso no encontrado: " + numCaso);
                 }
@@ -468,7 +486,8 @@ public class CasoService {
         }
 
         @Transactional
-        public void assignSupervisor(String numCaso, CasoSupervisionRequest dto) {
+        public void assignSupervisor(String numCaso, CasoSupervisionRequest dto, String assignerUsername) {
+                auditoriaRepository.setAuditoriaUser(assignerUsername);
                 if (!casoRepository.existsById(numCaso)) {
                         throw new RuntimeException("Caso no encontrado: " + numCaso);
                 }
@@ -490,7 +509,8 @@ public class CasoService {
         }
 
         @Transactional
-        public void unassignStudent(String numCaso, String username, String termino) {
+        public void unassignStudent(String numCaso, String username, String termino, String assignerUsername) {
+                auditoriaRepository.setAuditoriaUser(assignerUsername);
                 if (!casoRepository.existsById(numCaso)) {
                         throw new RuntimeException("Caso no encontrado: " + numCaso);
                 }
@@ -498,7 +518,8 @@ public class CasoService {
         }
 
         @Transactional
-        public void unassignSupervisor(String numCaso, String username, String termino) {
+        public void unassignSupervisor(String numCaso, String username, String termino, String assignerUsername) {
+                auditoriaRepository.setAuditoriaUser(assignerUsername);
                 if (!casoRepository.existsById(numCaso)) {
                         throw new RuntimeException("Caso no encontrado: " + numCaso);
                 }
@@ -506,7 +527,8 @@ public class CasoService {
         }
 
         @Transactional
-        public void updateAccion(String numCaso, Integer idAccion, AccionUpdateRequest dto) {
+        public void updateAccion(String numCaso, Integer idAccion, AccionUpdateRequest dto, String username) {
+                auditoriaRepository.setAuditoriaUser(username);
                 if (!casoRepository.existsById(numCaso)) {
                         throw new RuntimeException("Caso no encontrado: " + numCaso);
                 }
@@ -525,7 +547,8 @@ public class CasoService {
                         accion.setFechaEjecucion(dto.getFechaEjecucion());
                 }
 
-                accionRepository.save(accion);
+                accionRepository.updateManual(accion.getIdAccion(), accion.getNumCaso(), accion.getTitulo(),
+                                accion.getDescripcion(), accion.getFechaEjecucion());
 
                 // Actualizar lista de ejecutantes si se proporciona
                 if (dto.getUsernames() != null) {
@@ -538,18 +561,19 @@ public class CasoService {
                         Caso caso = casoRepository.findById(numCaso)
                                         .orElseThrow(() -> new RuntimeException("Caso no encontrado: " + numCaso));
 
-                        for (String username : dto.getUsernames()) {
+                        for (String ejecutanteUsername : dto.getUsernames()) {
                                 // Validar que el estudiante esté registrado en el término del caso
-                                if (!estudianteRepository.existsByUsernameAndTermino(username, caso.getTermino())) {
-                                        throw new RuntimeException("El estudiante '" + username
+                                if (!estudianteRepository.existsByUsernameAndTermino(ejecutanteUsername,
+                                                caso.getTermino())) {
+                                        throw new RuntimeException("El estudiante '" + ejecutanteUsername
                                                         + "' no está registrado en el término '" + caso.getTermino()
                                                         + "'.");
                                 }
 
                                 // Insertar solo si no existe previamente (evitar duplicados en el historial)
                                 if (!accionEjecutadaRepository.existsByNumCasoAndIdAccionAndUsername(numCaso, idAccion,
-                                                username)) {
-                                        accionEjecutadaRepository.saveManual(idAccion, numCaso, username);
+                                                ejecutanteUsername)) {
+                                        accionEjecutadaRepository.saveManual(idAccion, numCaso, ejecutanteUsername);
                                 }
                         }
                 }

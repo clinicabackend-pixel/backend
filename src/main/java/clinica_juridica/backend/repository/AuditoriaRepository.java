@@ -16,4 +16,7 @@ public interface AuditoriaRepository extends CrudRepository<Auditoria, Integer> 
     @Query("SELECT * FROM auditoria_sistema WHERE fecha_evento BETWEEN :inicio AND :fin")
     List<Auditoria> findByFechaEventoBetween(@Param("inicio") LocalDateTime inicio, @Param("fin") LocalDateTime fin);
 
+    @Query("SELECT set_config('app.current_user', :username, true)")
+    String setAuditoriaUser(@Param("username") String username);
+
 }

@@ -103,9 +103,10 @@ public class CasoController {
     @PreAuthorize("hasAnyRole('COORDINADOR', 'PROFESOR', 'ESTUDIANTE')")
     public ResponseEntity<String> update(
             @Parameter(description = "ID del caso a actualizar") @PathVariable String id,
-            @RequestBody CasoUpdateRequest dto) {
+            @RequestBody CasoUpdateRequest dto,
+            org.springframework.security.core.Authentication authentication) {
         try {
-            casoService.update(id, dto);
+            casoService.update(id, dto, authentication.getName());
             return ResponseEntity.ok("Caso actualizado exitosamente");
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
@@ -120,11 +121,12 @@ public class CasoController {
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('COORDINADOR')")
     public ResponseEntity<String> delete(
-            @Parameter(description = "ID del caso a eliminar") @PathVariable String id) {
+            @Parameter(description = "ID del caso a eliminar") @PathVariable String id,
+            org.springframework.security.core.Authentication authentication) {
         if (casoService.getById(id).isEmpty()) {
             return ResponseEntity.notFound().build();
         }
-        casoService.delete(id);
+        casoService.delete(id, authentication.getName());
         return ResponseEntity.ok("Caso eliminado exitosamente");
     }
 
@@ -137,12 +139,13 @@ public class CasoController {
     @PreAuthorize("hasAnyRole('COORDINADOR', 'PROFESOR')")
     public ResponseEntity<String> updateEstatus(
             @Parameter(description = "ID del caso") @PathVariable String id,
-            @RequestBody CasoEstatusUpdateRequest request) {
+            @RequestBody CasoEstatusUpdateRequest request,
+            org.springframework.security.core.Authentication authentication) {
         String nuevoEstatus = request.getEstatus();
         if (nuevoEstatus == null || nuevoEstatus.isBlank()) {
             return ResponseEntity.badRequest().body("El campo 'estatus' es obligatorio");
         }
-        casoService.updateEstatus(id, nuevoEstatus);
+        casoService.updateEstatus(id, nuevoEstatus, authentication.getName());
         return ResponseEntity.ok("Estatus actualizado exitosamente");
     }
 
@@ -189,8 +192,9 @@ public class CasoController {
     @PostMapping("/{id}/beneficiarios")
     public void addBeneficiario(
             @Parameter(description = "ID del caso") @PathVariable String id,
-            @RequestBody BeneficiarioCreateRequest dto) {
-        casoService.addBeneficiario(id, dto);
+            @RequestBody BeneficiarioCreateRequest dto,
+            org.springframework.security.core.Authentication authentication) {
+        casoService.addBeneficiario(id, dto, authentication.getName());
     }
 
     @Operation(summary = "Actualizar beneficiario", description = "Actualiza la relación (tipo y parentesco) de un beneficiario en un caso.")
@@ -199,8 +203,9 @@ public class CasoController {
     public ResponseEntity<Void> updateBeneficiario(
             @Parameter(description = "ID del caso") @PathVariable String id,
             @Parameter(description = "Cédula del beneficiario") @PathVariable String cedula,
-            @RequestBody BeneficiarioUpdateRequest dto) {
-        casoService.updateBeneficiario(id, cedula, dto);
+            @RequestBody BeneficiarioUpdateRequest dto,
+            org.springframework.security.core.Authentication authentication) {
+        casoService.updateBeneficiario(id, cedula, dto, authentication.getName());
         return ResponseEntity.ok().build();
     }
 
@@ -245,8 +250,9 @@ public class CasoController {
     public ResponseEntity<Void> updateAccion(
             @Parameter(description = "ID del caso") @PathVariable String id,
             @Parameter(description = "ID de la acción") @PathVariable Integer idAccion,
-            @RequestBody AccionUpdateRequest request) {
-        casoService.updateAccion(id, idAccion, request);
+            @RequestBody AccionUpdateRequest request,
+            org.springframework.security.core.Authentication authentication) {
+        casoService.updateAccion(id, idAccion, request, authentication.getName());
         return ResponseEntity.ok().build();
     }
 
@@ -255,8 +261,9 @@ public class CasoController {
     @DeleteMapping("/{id}/acciones/{idAccion}")
     public ResponseEntity<Void> deleteAccion(
             @Parameter(description = "ID del caso") @PathVariable String id,
-            @Parameter(description = "ID de la acción a eliminar") @PathVariable Integer idAccion) {
-        casoService.deleteAccion(id, idAccion);
+            @Parameter(description = "ID de la acción a eliminar") @PathVariable Integer idAccion,
+            org.springframework.security.core.Authentication authentication) {
+        casoService.deleteAccion(id, idAccion, authentication.getName());
         return ResponseEntity.noContent().build();
     }
 
@@ -270,9 +277,10 @@ public class CasoController {
     @PreAuthorize("hasAnyRole('COORDINADOR', 'PROFESOR', 'ADMIN')")
     public ResponseEntity<String> assignStudent(
             @Parameter(description = "ID del caso") @PathVariable String id,
-            @RequestBody CasoAsignacionRequest request) {
+            @RequestBody CasoAsignacionRequest request,
+            org.springframework.security.core.Authentication authentication) {
         try {
-            casoService.assignStudent(id, request);
+            casoService.assignStudent(id, request, authentication.getName());
             return ResponseEntity.ok("Estudiante asignado exitosamente");
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -289,9 +297,10 @@ public class CasoController {
     public ResponseEntity<String> unassignStudent(
             @Parameter(description = "ID del caso") @PathVariable String id,
             @Parameter(description = "Username del estudiante") @PathVariable String username,
-            @Parameter(description = "Término de la asignación") @PathVariable String termino) {
+            @Parameter(description = "Término de la asignación") @PathVariable String termino,
+            org.springframework.security.core.Authentication authentication) {
         try {
-            casoService.unassignStudent(id, username, termino);
+            casoService.unassignStudent(id, username, termino, authentication.getName());
             return ResponseEntity.ok("Estudiante desasignado exitosamente");
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -326,7 +335,7 @@ public class CasoController {
         }
 
         try {
-            casoService.assignSupervisor(id, request);
+            casoService.assignSupervisor(id, request, authentication.getName());
             return ResponseEntity.ok("Supervisor asignado exitosamente");
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -363,7 +372,7 @@ public class CasoController {
         }
 
         try {
-            casoService.unassignSupervisor(id, username, termino);
+            casoService.unassignSupervisor(id, username, termino, authentication.getName());
             return ResponseEntity.ok("Supervisor desasignado exitosamente");
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -375,8 +384,9 @@ public class CasoController {
     @DeleteMapping("/{id}/encuentros/{idEncuentro}")
     public ResponseEntity<Void> deleteEncuentro(
             @Parameter(description = "ID del caso") @PathVariable String id,
-            @Parameter(description = "ID del encuentro a eliminar") @PathVariable Integer idEncuentro) {
-        casoService.deleteEncuentro(id, idEncuentro);
+            @Parameter(description = "ID del encuentro a eliminar") @PathVariable Integer idEncuentro,
+            org.springframework.security.core.Authentication authentication) {
+        casoService.deleteEncuentro(id, idEncuentro, authentication.getName());
         return ResponseEntity.noContent().build();
     }
 
@@ -385,8 +395,9 @@ public class CasoController {
     @DeleteMapping("/{id}/documentos/{idDocumento}")
     public ResponseEntity<Void> deleteDocumento(
             @Parameter(description = "ID del caso") @PathVariable String id,
-            @Parameter(description = "ID del documento a eliminar") @PathVariable Integer idDocumento) {
-        casoService.deleteDocumento(id, idDocumento);
+            @Parameter(description = "ID del documento a eliminar") @PathVariable Integer idDocumento,
+            org.springframework.security.core.Authentication authentication) {
+        casoService.deleteDocumento(id, idDocumento, authentication.getName());
         return ResponseEntity.noContent().build();
     }
 
@@ -395,8 +406,9 @@ public class CasoController {
     @DeleteMapping("/{id}/pruebas/{idPrueba}")
     public ResponseEntity<Void> deletePrueba(
             @Parameter(description = "ID del caso") @PathVariable String id,
-            @Parameter(description = "ID de la prueba a eliminar") @PathVariable Integer idPrueba) {
-        casoService.deletePrueba(id, idPrueba);
+            @Parameter(description = "ID de la prueba a eliminar") @PathVariable Integer idPrueba,
+            org.springframework.security.core.Authentication authentication) {
+        casoService.deletePrueba(id, idPrueba, authentication.getName());
         return ResponseEntity.noContent().build();
     }
 }

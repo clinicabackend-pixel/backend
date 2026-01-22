@@ -3,6 +3,7 @@ package clinica_juridica.backend.models;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
+import com.fasterxml.jackson.databind.JsonNode; // <--- De Jackson
 
 import java.time.LocalDateTime;
 
@@ -26,10 +27,10 @@ public class Auditoria {
     private LocalDateTime fechaEvento;
 
     @Column("datos_anteriores")
-    private String datosAnteriores;
+    private JsonNode datosAnteriores;
 
     @Column("datos_nuevos")
-    private String datosNuevos;
+    private JsonNode datosNuevos;
 
     public Auditoria() {
     }
@@ -74,19 +75,20 @@ public class Auditoria {
         this.fechaEvento = fechaEvento;
     }
 
-    public String getDatosAnteriores() {
+    public JsonNode getDatosAnteriores() {
         return datosAnteriores;
     }
 
-    public void setDatosAnteriores(String datosAnteriores) {
+    public void setDatosAnteriores(JsonNode datosAnteriores) {
         this.datosAnteriores = datosAnteriores;
     }
 
-    public String getDatosNuevos() {
+    public JsonNode getDatosNuevos() {
         return datosNuevos;
     }
 
-    public void setDatosNuevos(String datosNuevos) {
+    public void setDatosNuevos(JsonNode datosNuevos) {
         this.datosNuevos = datosNuevos;
     }
+
 }
