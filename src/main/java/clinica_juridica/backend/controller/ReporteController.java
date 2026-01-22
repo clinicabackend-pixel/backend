@@ -209,4 +209,5 @@ public class ReporteController {
         public ResponseEntity<DashboardStatsDto> getDashboardStats() {
                 return ResponseEntity.ok(reporteService.getDashboardStats());
         }
+
 }

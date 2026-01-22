@@ -398,77 +398,52 @@ CREATE TABLE pruebas (
 -- SECCIÓN 2: AUDITORÍA Y AUTOMATIZACIÓN (TRIGGERS)
 -- ================================================================
 
--- 2.1 TABLA MAESTRA DE AUDITORÍA
-CREATE TABLE auditoria_sistema (
+-- 1. Crear tabla de auditoría
+CREATE TABLE IF NOT EXISTS auditoria_sistema (
     id_auditoria SERIAL PRIMARY KEY,
     nombre_tabla VARCHAR(50),
     operacion VARCHAR(10), 
     username_aplicacion VARCHAR(50), 
     fecha_evento TIMESTAMP DEFAULT NOW(),
-    datos_anteriores JSONB, 
-    datos_nuevos JSONB      
+    datos_anteriores TEXT, 
+    datos_nuevos TEXT      
 );
-
--- 2.2 FUNCIÓN DE AUDITORÍA GENERAL
+-- 2. Función de auditoría
 CREATE OR REPLACE FUNCTION func_auditoria_global() RETURNS TRIGGER AS $$
 DECLARE
     v_usuario VARCHAR(50);
-    v_old_data JSONB;
-    v_new_data JSONB;
+    v_old_data TEXT;
+    v_new_data TEXT;
 BEGIN
-    v_usuario := current_setting('app.current_user', true);
+    BEGIN
+        v_usuario := current_setting('app.current_user', true);
+    EXCEPTION WHEN OTHERS THEN
+        v_usuario := 'SYSTEM';
+    END;
+    
     IF v_usuario IS NULL OR v_usuario = '' THEN v_usuario := 'DESCONOCIDO'; END IF;
-
     IF (TG_OP = 'INSERT') THEN
-        v_old_data := NULL; v_new_data := to_jsonb(NEW);
+        v_old_data := NULL; 
+        v_new_data := row_to_json(NEW)::TEXT;
     ELSIF (TG_OP = 'UPDATE') THEN
-        v_old_data := to_jsonb(OLD); v_new_data := to_jsonb(NEW);
+        v_old_data := row_to_json(OLD)::TEXT; 
+        v_new_data := row_to_json(NEW)::TEXT;
     ELSIF (TG_OP = 'DELETE') THEN
-        v_old_data := to_jsonb(OLD); v_new_data := NULL;
+        v_old_data := row_to_json(OLD)::TEXT; 
+        v_new_data := NULL;
     END IF;
-
     INSERT INTO auditoria_sistema (nombre_tabla, operacion, username_aplicacion, datos_anteriores, datos_nuevos) 
     VALUES (TG_TABLE_NAME, TG_OP, v_usuario, v_old_data, v_new_data);
-
     RETURN NULL;
 END;
 $$ LANGUAGE plpgsql;
-
--- 2.3 TRIGGERS DE AUDITORÍA
+-- 3. Triggers
+DROP TRIGGER IF EXISTS trg_audit_casos ON casos;
 CREATE TRIGGER trg_audit_casos AFTER INSERT OR UPDATE OR DELETE ON casos FOR EACH ROW EXECUTE FUNCTION func_auditoria_global();
+DROP TRIGGER IF EXISTS trg_audit_solicitantes ON solicitantes;
 CREATE TRIGGER trg_audit_solicitantes AFTER INSERT OR UPDATE OR DELETE ON solicitantes FOR EACH ROW EXECUTE FUNCTION func_auditoria_global();
+DROP TRIGGER IF EXISTS trg_audit_familias ON familias;
 CREATE TRIGGER trg_audit_familias AFTER INSERT OR UPDATE OR DELETE ON familias FOR EACH ROW EXECUTE FUNCTION func_auditoria_global();
-
--- 2.4 AUTOMATIZACIÓN DE ESTATUS
-CREATE OR REPLACE FUNCTION func_historial_estatus_automatico() RETURNS TRIGGER AS $$
-DECLARE
-    v_usuario VARCHAR(50);
-    v_nuevo_id INTEGER;
-BEGIN
-    -- Se dispara si el estatus cambia o es un caso nuevo
-    IF (TG_OP = 'INSERT') OR (OLD.estatus IS DISTINCT FROM NEW.estatus) THEN
-        v_usuario := current_setting('app.current_user', true);
-        
-        -- Calculamos ID correlativo
-        SELECT COALESCE(MAX(id_est_caso), 0) + 1 INTO v_nuevo_id 
-        FROM estatus_por_caso WHERE num_caso = NEW.num_caso;
-
-        -- Insertamos en el historial (La BD lo hace por ti)
-        INSERT INTO estatus_por_caso (
-            id_est_caso, num_caso, fecha_cambio, estatus, observacion, username
-        ) VALUES (
-            v_nuevo_id, NEW.num_caso, CURRENT_DATE, NEW.estatus, 
-            CASE WHEN TG_OP = 'INSERT' THEN 'Creación Inicial del Caso' ELSE 'Cambio de estatus automático' END, 
-            v_usuario
-        );
-    END IF;
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER trg_auto_historial_estatus
-AFTER INSERT OR UPDATE ON casos
-FOR EACH ROW EXECUTE FUNCTION func_historial_estatus_automatico();
 
 -- ================================================================
 -- SECCIÓN 3: PROCEDIMIENTOS Y VISTAS (User Logic)

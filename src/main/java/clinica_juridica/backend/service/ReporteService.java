@@ -25,6 +25,7 @@ import clinica_juridica.backend.repository.AmbitoLegalRepository;
 import clinica_juridica.backend.repository.SubcategoriaAmbitoLegalRepository;
 import clinica_juridica.backend.repository.CategoriaAmbitoLegalRepository;
 import clinica_juridica.backend.repository.MateriaAmbitoLegalRepository;
+
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.poi.ss.util.CellRangeAddress;
@@ -487,6 +488,7 @@ public class ReporteService {
             return out.toByteArray();
         }
     }
+
 
     public DashboardStatsDto getDashboardStats() {
         long totalCasos = casoRepository.countTotalCasos();
