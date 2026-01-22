@@ -1,18 +1,4 @@
 -- ================================================================
--- LIMPIEZA INICIAL (DROP TABLES)
--- ================================================================
-DROP TABLE IF EXISTS 
-  pruebas, documentos, encuentros_atendidos, encuentros, acciones_ejecutadas, accion, estatus_por_caso,
-  casos_supervisados, casos_asignados, beneficiarios_casos, casos,
-  caracteristicas_viviendas, viviendas, familias, solicitantes,
-  estudiantes, profesores, coordinadores, usuarios,
-  categorias_de_vivienda, tipos_categorias_viviendas, estado_civil, condicion_actividad, condicion_laboral, niveles_educativos,
-  ambito_legal, subcategoria_ambito_legal, categoria_ambito_legal, materia_ambito_legal,
-  tribunal, semestre, centros, parroquias, municipios, estados, auditoria_sistema 
-CASCADE;
-
--- ================================================================
-
 -- SECCIÓN 1: ESTRUCTURA DE TABLAS Y REGLAS DE INTEGRIDAD
 -- ================================================================
 
@@ -145,7 +131,6 @@ CREATE TABLE usuarios (
   contrasena VARCHAR(255),
   nombre VARCHAR(150),
   email VARCHAR(150),
-  sexo VARCHAR(20),
   status VARCHAR(20) DEFAULT 'ACTIVO',
   tipo VARCHAR(20),
   CONSTRAINT uq_usuarios_cedula UNIQUE (cedula),
@@ -183,15 +168,15 @@ CREATE TABLE solicitantes (
   sexo VARCHAR(20),
   email VARCHAR(150),
   concubinato VARCHAR(10),
-  estado_civil VARCHAR(50),
+  id_estado_civil INTEGER,
   telf_celular VARCHAR(20),
   telf_casa VARCHAR(20),
   f_nacimiento DATE NOT NULL,
   edad INTEGER, 
   f_registro DATE DEFAULT CURRENT_DATE,
-  condicion_laboral VARCHAR(100),
-  condicion_actividad VARCHAR(100),
-  nivel_educativo VARCHAR(100),
+  id_condicion INTEGER,
+  id_condicion_actividad INTEGER,
+  id_nivel INTEGER,
   tiempo_estudio VARCHAR(50),
   id_parroquia INTEGER,
   
@@ -200,6 +185,10 @@ CREATE TABLE solicitantes (
   CONSTRAINT chk_sol_concubinato CHECK (concubinato IN ('SI', 'NO')),
   CONSTRAINT chk_logica_nacimiento CHECK (f_nacimiento <= f_registro),
   
+  CONSTRAINT fk_sol_cond FOREIGN KEY (id_condicion) REFERENCES condicion_laboral(id_condicion),
+  CONSTRAINT fk_sol_niv FOREIGN KEY (id_nivel) REFERENCES niveles_educativos(id_nivel),
+  CONSTRAINT fk_sol_civil FOREIGN KEY (id_estado_civil) REFERENCES estado_civil(id_estado_civil),
+  CONSTRAINT fk_sol_actividad FOREIGN KEY (id_condicion_actividad) REFERENCES condicion_actividad(id_condicion_actividad),
   CONSTRAINT fk_sol_parroquia FOREIGN KEY (id_parroquia) REFERENCES parroquias(id_parroquia)
 );
 
@@ -402,10 +391,173 @@ CREATE TABLE pruebas (
   CONSTRAINT fk_pru_caso FOREIGN KEY (num_caso) REFERENCES casos(num_caso)
 );
 
+-- ================================================================
+-- SECCIÓN 2: AUDITORÍA Y AUTOMATIZACIÓN (TRIGGERS)
+-- ================================================================
+
+-- 2.1 TABLA MAESTRA DE AUDITORÍA
+CREATE TABLE auditoria_sistema (
+    id_auditoria SERIAL PRIMARY KEY,
+    nombre_tabla VARCHAR(50),
+    operacion VARCHAR(10), 
+    username_aplicacion VARCHAR(50), 
+    fecha_evento TIMESTAMP DEFAULT NOW(),
+    datos_anteriores JSONB, 
+    datos_nuevos JSONB      
+);
+
+-- 2.2 FUNCIÓN DE AUDITORÍA GENERAL
+CREATE OR REPLACE FUNCTION func_auditoria_global() RETURNS TRIGGER AS $$
+DECLARE
+    v_usuario VARCHAR(50);
+    v_old_data JSONB;
+    v_new_data JSONB;
+BEGIN
+    v_usuario := current_setting('app.current_user', true);
+    IF v_usuario IS NULL OR v_usuario = '' THEN v_usuario := 'DESCONOCIDO'; END IF;
+
+    IF (TG_OP = 'INSERT') THEN
+        v_old_data := NULL; v_new_data := to_jsonb(NEW);
+    ELSIF (TG_OP = 'UPDATE') THEN
+        v_old_data := to_jsonb(OLD); v_new_data := to_jsonb(NEW);
+    ELSIF (TG_OP = 'DELETE') THEN
+        v_old_data := to_jsonb(OLD); v_new_data := NULL;
+    END IF;
+
+    INSERT INTO auditoria_sistema (nombre_tabla, operacion, username_aplicacion, datos_anteriores, datos_nuevos) 
+    VALUES (TG_TABLE_NAME, TG_OP, v_usuario, v_old_data, v_new_data);
+
+    RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
+
+-- 2.3 TRIGGERS DE AUDITORÍA
+CREATE TRIGGER trg_audit_casos AFTER INSERT OR UPDATE OR DELETE ON casos FOR EACH ROW EXECUTE FUNCTION func_auditoria_global();
+CREATE TRIGGER trg_audit_solicitantes AFTER INSERT OR UPDATE OR DELETE ON solicitantes FOR EACH ROW EXECUTE FUNCTION func_auditoria_global();
+CREATE TRIGGER trg_audit_familias AFTER INSERT OR UPDATE OR DELETE ON familias FOR EACH ROW EXECUTE FUNCTION func_auditoria_global();
+
+-- 2.4 AUTOMATIZACIÓN DE ESTATUS
+CREATE OR REPLACE FUNCTION func_historial_estatus_automatico() RETURNS TRIGGER AS $$
+DECLARE
+    v_usuario VARCHAR(50);
+    v_nuevo_id INTEGER;
+BEGIN
+    -- Se dispara si el estatus cambia o es un caso nuevo
+    IF (TG_OP = 'INSERT') OR (OLD.estatus IS DISTINCT FROM NEW.estatus) THEN
+        v_usuario := current_setting('app.current_user', true);
+        
+        -- Calculamos ID correlativo
+        SELECT COALESCE(MAX(id_est_caso), 0) + 1 INTO v_nuevo_id 
+        FROM estatus_por_caso WHERE num_caso = NEW.num_caso;
+
+        -- Insertamos en el historial (La BD lo hace por ti)
+        INSERT INTO estatus_por_caso (
+            id_est_caso, num_caso, fecha_cambio, estatus, observacion, username
+        ) VALUES (
+            v_nuevo_id, NEW.num_caso, CURRENT_DATE, NEW.estatus, 
+            CASE WHEN TG_OP = 'INSERT' THEN 'Creación Inicial del Caso' ELSE 'Cambio de estatus automático' END, 
+            v_usuario
+        );
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_auto_historial_estatus
+AFTER INSERT OR UPDATE ON casos
+FOR EACH ROW EXECUTE FUNCTION func_historial_estatus_automatico();
 
 -- ================================================================
--- DATOS IMPORTADOS DEL ESQUEMA ANTERIOR
+-- SECCIÓN 3: PROCEDIMIENTOS Y VISTAS (User Logic)
 -- ================================================================
+
+-- 3.1 PROCEDIMIENTO PARA REGISTRAR CASO (ADAPTADO)
+-- NOTA: Se eliminó el INSERT a 'estatus_por_caso' porque el Trigger 'trg_auto_historial_estatus'
+-- ya lo hace automáticamente. Si se deja, causaría error de llave duplicada.
+CREATE OR REPLACE FUNCTION registrar_nuevo_caso(
+    p_sintesis TEXT,
+    p_tramite VARCHAR,
+    p_cant_beneficiarios INTEGER,
+    p_id_tribunal INTEGER,
+    p_id_centro INTEGER,
+    p_cedula_solicitante VARCHAR,
+    p_username_asignado VARCHAR,
+    p_ambito_legal INTEGER
+) RETURNS VARCHAR AS $$
+DECLARE
+    v_abreviatura VARCHAR(10);
+    v_ultimo_correlativo INTEGER;
+    v_nuevo_correlativo INTEGER;
+    v_num_caso_generado VARCHAR(50);
+    v_termino VARCHAR(20);
+BEGIN
+    -- 0. Validar Término Activo
+    SELECT termino INTO v_termino FROM semestre 
+    WHERE CURRENT_DATE BETWEEN fecha_inicio AND fecha_fin LIMIT 1;
+
+    IF v_termino IS NULL THEN
+        RAISE EXCEPTION 'No se encontró un término académico activo para la fecha actual (%)', CURRENT_DATE;
+    END IF;
+
+    -- 1. Validar Centro
+    SELECT abreviatura INTO v_abreviatura FROM centros WHERE id_centro = p_id_centro;
+    IF v_abreviatura IS NULL THEN
+        RAISE EXCEPTION 'El Centro con ID % no existe', p_id_centro;
+    END IF;
+
+    -- 2. Calcular Correlativo (Lógica de negocio: Por Centro y Término)
+    SELECT COALESCE(MAX(RIGHT(num_caso, 4)::INTEGER), 0) INTO v_ultimo_correlativo
+    FROM casos WHERE id_centro = p_id_centro AND termino = v_termino;
+
+    v_nuevo_correlativo := v_ultimo_correlativo + 1;
+    v_num_caso_generado := v_abreviatura || '-' || v_termino || '-' || LPAD(v_nuevo_correlativo::TEXT, 4, '0');
+
+    -- 3. Insertar Caso (El trigger se encargará del historial de estatus)
+    INSERT INTO casos (
+        num_caso, fecha_recepcion, sintesis, tramite, cant_beneficiarios, 
+        estatus, id_tribunal, termino, id_centro, cedula, username, com_amb_legal
+    ) VALUES (
+        v_num_caso_generado, CURRENT_DATE, p_sintesis, p_tramite, p_cant_beneficiarios,
+        'ABIERTO', p_id_tribunal, v_termino, p_id_centro, p_cedula_solicitante, p_username_asignado, p_ambito_legal
+    );
+
+    RETURN v_num_caso_generado;
+END;
+$$ LANGUAGE plpgsql;
+
+-- 3.2 VISTA DE REPORTE DE VIVIENDA
+CREATE OR REPLACE VIEW vista_reporte_vivienda AS
+SELECT 
+    v.cedula,
+    s.nombre,
+    cat1.descripcion AS tipo_vivienda,
+    cat2.descripcion AS material_piso,
+    cat3.descripcion AS material_paredes,
+    cat4.descripcion AS material_techo,
+    cat5.descripcion AS servicio_agua,
+    cat6.descripcion AS eliminacion_excretas,
+    cat7.descripcion AS aseo_urbano,
+    v.cant_habit,
+    v.cant_banos
+FROM viviendas v
+JOIN solicitantes s ON v.cedula = s.cedula
+LEFT JOIN caracteristicas_viviendas car1 ON v.cedula = car1.cedula AND car1.id_tipo_cat = 1
+LEFT JOIN categorias_de_vivienda cat1 ON car1.id_cat_vivienda = cat1.id_cat_vivienda AND car1.id_tipo_cat = cat1.id_tipo_cat
+LEFT JOIN caracteristicas_viviendas car2 ON v.cedula = car2.cedula AND car2.id_tipo_cat = 2
+LEFT JOIN categorias_de_vivienda cat2 ON car2.id_cat_vivienda = cat2.id_cat_vivienda AND car2.id_tipo_cat = cat2.id_tipo_cat
+LEFT JOIN caracteristicas_viviendas car3 ON v.cedula = car3.cedula AND car3.id_tipo_cat = 3
+LEFT JOIN categorias_de_vivienda cat3 ON car3.id_cat_vivienda = cat3.id_cat_vivienda AND car3.id_tipo_cat = cat3.id_tipo_cat
+LEFT JOIN caracteristicas_viviendas car4 ON v.cedula = car4.cedula AND car4.id_tipo_cat = 4
+LEFT JOIN categorias_de_vivienda cat4 ON car4.id_cat_vivienda = cat4.id_cat_vivienda AND car4.id_tipo_cat = cat4.id_tipo_cat
+LEFT JOIN caracteristicas_viviendas car5 ON v.cedula = car5.cedula AND car5.id_tipo_cat = 5
+LEFT JOIN categorias_de_vivienda cat5 ON car5.id_cat_vivienda = cat5.id_cat_vivienda AND car5.id_tipo_cat = cat5.id_tipo_cat
+LEFT JOIN caracteristicas_viviendas car6 ON v.cedula = car6.cedula AND car6.id_tipo_cat = 6
+LEFT JOIN categorias_de_vivienda cat6 ON car6.id_cat_vivienda = cat6.id_cat_vivienda AND car6.id_tipo_cat = cat6.id_tipo_cat
+LEFT JOIN caracteristicas_viviendas car7 ON v.cedula = car7.cedula AND car7.id_tipo_cat = 7
+LEFT JOIN categorias_de_vivienda cat7 ON car7.id_cat_vivienda = cat7.id_cat_vivienda AND car7.id_tipo_cat = cat7.id_tipo_cat;
+
+
+
 
 
 -- ================================================================
@@ -2117,169 +2269,3 @@ INSERT INTO semestre (termino, nombre, fecha_inicio, fecha_fin) VALUES
 ('2026-15', 'Semestre Sep 2025 - Ene 2026', '2025-09-22', '2026-01-23'),
 ('2026-25', 'Semestre Mar 2026 - Jul 2026', '2026-03-16', '2026-07-17');
 
-
-
--- ================================================================
--- SECCIÓN 2: AUDITORÍA Y AUTOMATIZACIÓN (TRIGGERS)
--- ================================================================
-
--- 2.1 TABLA MAESTRA DE AUDITORÍA
-CREATE TABLE auditoria_sistema (
-    id_auditoria SERIAL PRIMARY KEY,
-    nombre_tabla VARCHAR(50),
-    operacion VARCHAR(10), 
-    username_aplicacion VARCHAR(50), 
-    fecha_evento TIMESTAMP DEFAULT NOW(),
-    datos_anteriores JSONB, 
-    datos_nuevos JSONB      
-);
-
--- 2.2 FUNCIÓN DE AUDITORÍA GENERAL
-CREATE OR REPLACE FUNCTION func_auditoria_global() RETURNS TRIGGER AS $$
-DECLARE
-    v_usuario VARCHAR(50);
-    v_old_data JSONB;
-    v_new_data JSONB;
-BEGIN
-    v_usuario := current_setting('app.current_user', true);
-    IF v_usuario IS NULL OR v_usuario = '' THEN v_usuario := 'DESCONOCIDO'; END IF;
-
-    IF (TG_OP = 'INSERT') THEN
-        v_old_data := NULL; v_new_data := to_jsonb(NEW);
-    ELSIF (TG_OP = 'UPDATE') THEN
-        v_old_data := to_jsonb(OLD); v_new_data := to_jsonb(NEW);
-    ELSIF (TG_OP = 'DELETE') THEN
-        v_old_data := to_jsonb(OLD); v_new_data := NULL;
-    END IF;
-
-    INSERT INTO auditoria_sistema (nombre_tabla, operacion, username_aplicacion, datos_anteriores, datos_nuevos) 
-    VALUES (TG_TABLE_NAME, TG_OP, v_usuario, v_old_data, v_new_data);
-
-    RETURN NULL;
-END;
-$$ LANGUAGE plpgsql;
-
--- 2.3 TRIGGERS DE AUDITORÍA
-CREATE TRIGGER trg_audit_casos AFTER INSERT OR UPDATE OR DELETE ON casos FOR EACH ROW EXECUTE FUNCTION func_auditoria_global();
-CREATE TRIGGER trg_audit_solicitantes AFTER INSERT OR UPDATE OR DELETE ON solicitantes FOR EACH ROW EXECUTE FUNCTION func_auditoria_global();
-CREATE TRIGGER trg_audit_familias AFTER INSERT OR UPDATE OR DELETE ON familias FOR EACH ROW EXECUTE FUNCTION func_auditoria_global();
-
--- 2.4 AUTOMATIZACIÓN DE ESTATUS
-CREATE OR REPLACE FUNCTION func_historial_estatus_automatico() RETURNS TRIGGER AS $$
-DECLARE
-    v_usuario VARCHAR(50);
-    v_nuevo_id INTEGER;
-BEGIN
-    -- Se dispara si el estatus cambia o es un caso nuevo
-    IF (TG_OP = 'INSERT') OR (OLD.estatus IS DISTINCT FROM NEW.estatus) THEN
-        v_usuario := current_setting('app.current_user', true);
-        
-        -- Calculamos ID correlativo
-        SELECT COALESCE(MAX(id_est_caso), 0) + 1 INTO v_nuevo_id 
-        FROM estatus_por_caso WHERE num_caso = NEW.num_caso;
-
-        -- Insertamos en el historial (La BD lo hace por ti)
-        INSERT INTO estatus_por_caso (
-            id_est_caso, num_caso, fecha_cambio, estatus, observacion, username
-        ) VALUES (
-            v_nuevo_id, NEW.num_caso, CURRENT_DATE, NEW.estatus, 
-            CASE WHEN TG_OP = 'INSERT' THEN 'Creación Inicial del Caso' ELSE 'Cambio de estatus automático' END, 
-            v_usuario
-        );
-    END IF;
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER trg_auto_historial_estatus
-AFTER INSERT OR UPDATE ON casos
-FOR EACH ROW EXECUTE FUNCTION func_historial_estatus_automatico();
-
--- ================================================================
--- SECCIÓN 3: PROCEDIMIENTOS Y VISTAS (User Logic)
--- ================================================================
-
--- 3.1 PROCEDIMIENTO PARA REGISTRAR CASO (ADAPTADO)
--- NOTA: Se eliminó el INSERT a 'estatus_por_caso' porque el Trigger 'trg_auto_historial_estatus'
--- ya lo hace automáticamente. Si se deja, causaría error de llave duplicada.
-CREATE OR REPLACE FUNCTION registrar_nuevo_caso(
-    p_sintesis TEXT,
-    p_tramite VARCHAR,
-    p_cant_beneficiarios INTEGER,
-    p_id_tribunal INTEGER,
-    p_id_centro INTEGER,
-    p_cedula_solicitante VARCHAR,
-    p_username_asignado VARCHAR,
-    p_ambito_legal INTEGER
-) RETURNS VARCHAR AS $$
-DECLARE
-    v_abreviatura VARCHAR(10);
-    v_ultimo_correlativo INTEGER;
-    v_nuevo_correlativo INTEGER;
-    v_num_caso_generado VARCHAR(50);
-    v_termino VARCHAR(20);
-BEGIN
-    -- 0. Validar Término Activo
-    SELECT termino INTO v_termino FROM semestre 
-    WHERE CURRENT_DATE BETWEEN fecha_inicio AND fecha_fin LIMIT 1;
-
-    IF v_termino IS NULL THEN
-        RAISE EXCEPTION 'No se encontró un término académico activo para la fecha actual (%)', CURRENT_DATE;
-    END IF;
-
-    -- 1. Validar Centro
-    SELECT abreviatura INTO v_abreviatura FROM centros WHERE id_centro = p_id_centro;
-    IF v_abreviatura IS NULL THEN
-        RAISE EXCEPTION 'El Centro con ID % no existe', p_id_centro;
-    END IF;
-
-    -- 2. Calcular Correlativo (Lógica de negocio: Por Centro y Término)
-    SELECT COALESCE(MAX(RIGHT(num_caso, 4)::INTEGER), 0) INTO v_ultimo_correlativo
-    FROM casos WHERE id_centro = p_id_centro AND termino = v_termino;
-
-    v_nuevo_correlativo := v_ultimo_correlativo + 1;
-    v_num_caso_generado := v_abreviatura || '-' || v_termino || '-' || LPAD(v_nuevo_correlativo::TEXT, 4, '0');
-
-    -- 3. Insertar Caso (El trigger se encargará del historial de estatus)
-    INSERT INTO casos (
-        num_caso, fecha_recepcion, sintesis, tramite, cant_beneficiarios, 
-        estatus, id_tribunal, termino, id_centro, cedula, username, com_amb_legal
-    ) VALUES (
-        v_num_caso_generado, CURRENT_DATE, p_sintesis, p_tramite, p_cant_beneficiarios,
-        'ABIERTO', p_id_tribunal, v_termino, p_id_centro, p_cedula_solicitante, p_username_asignado, p_ambito_legal
-    );
-
-    RETURN v_num_caso_generado;
-END;
-$$ LANGUAGE plpgsql;
-
--- 3.2 VISTA DE REPORTE DE VIVIENDA
-CREATE OR REPLACE VIEW vista_reporte_vivienda AS
-SELECT 
-    v.cedula,
-    s.nombre,
-    cat1.descripcion AS tipo_vivienda,
-    cat2.descripcion AS material_piso,
-    cat3.descripcion AS material_paredes,
-    cat4.descripcion AS material_techo,
-    cat5.descripcion AS servicio_agua,
-    cat6.descripcion AS eliminacion_excretas,
-    cat7.descripcion AS aseo_urbano,
-    v.cant_habit,
-    v.cant_banos
-FROM viviendas v
-JOIN solicitantes s ON v.cedula = s.cedula
-LEFT JOIN caracteristicas_viviendas car1 ON v.cedula = car1.cedula AND car1.id_tipo_cat = 1
-LEFT JOIN categorias_de_vivienda cat1 ON car1.id_cat_vivienda = cat1.id_cat_vivienda AND car1.id_tipo_cat = cat1.id_tipo_cat
-LEFT JOIN caracteristicas_viviendas car2 ON v.cedula = car2.cedula AND car2.id_tipo_cat = 2
-LEFT JOIN categorias_de_vivienda cat2 ON car2.id_cat_vivienda = cat2.id_cat_vivienda AND car2.id_tipo_cat = cat2.id_tipo_cat
-LEFT JOIN caracteristicas_viviendas car3 ON v.cedula = car3.cedula AND car3.id_tipo_cat = 3
-LEFT JOIN categorias_de_vivienda cat3 ON car3.id_cat_vivienda = cat3.id_cat_vivienda AND car3.id_tipo_cat = cat3.id_tipo_cat
-LEFT JOIN caracteristicas_viviendas car4 ON v.cedula = car4.cedula AND car4.id_tipo_cat = 4
-LEFT JOIN categorias_de_vivienda cat4 ON car4.id_cat_vivienda = cat4.id_cat_vivienda AND car4.id_tipo_cat = cat4.id_tipo_cat
-LEFT JOIN caracteristicas_viviendas car5 ON v.cedula = car5.cedula AND car5.id_tipo_cat = 5
-LEFT JOIN categorias_de_vivienda cat5 ON car5.id_cat_vivienda = cat5.id_cat_vivienda AND car5.id_tipo_cat = cat5.id_tipo_cat
-LEFT JOIN caracteristicas_viviendas car6 ON v.cedula = car6.cedula AND car6.id_tipo_cat = 6
-LEFT JOIN categorias_de_vivienda cat6 ON car6.id_cat_vivienda = cat6.id_cat_vivienda AND car6.id_tipo_cat = cat6.id_tipo_cat
-LEFT JOIN caracteristicas_viviendas car7 ON v.cedula = car7.cedula AND car7.id_tipo_cat = 7
-LEFT JOIN categorias_de_vivienda cat7 ON car7.id_cat_vivienda = cat7.id_cat_vivienda AND car7.id_tipo_cat = cat7.id_tipo_cat;

@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-import clinica_juridica.backend.repository.EstatusPorCasoRepository;
 import org.springframework.transaction.annotation.Transactional;
 import clinica_juridica.backend.utils.DateUtils;
 import clinica_juridica.backend.models.Accion;
@@ -50,7 +49,6 @@ import clinica_juridica.backend.dto.response.PruebaResponse;
 public class CasoService {
 
         private final CasoRepository casoRepository;
-        private final EstatusPorCasoRepository estatusPorCasoRepository;
         private final AccionRepository accionRepository;
         private final EncuentroRepository encuentroRepository;
         private final DocumentoRepository documentoRepository;
@@ -68,7 +66,6 @@ public class CasoService {
         private final CentroRepository centroRepository;
 
         public CasoService(CasoRepository casoRepository,
-                        EstatusPorCasoRepository estatusPorCasoRepository,
                         AccionRepository accionRepository,
                         EncuentroRepository encuentroRepository,
                         DocumentoRepository documentoRepository,
@@ -85,7 +82,6 @@ public class CasoService {
                         SemestreRepository semestreRepository,
                         CentroRepository centroRepository) {
                 this.casoRepository = casoRepository;
-                this.estatusPorCasoRepository = estatusPorCasoRepository;
                 this.accionRepository = accionRepository;
                 this.encuentroRepository = encuentroRepository;
                 this.documentoRepository = documentoRepository;
@@ -279,11 +275,6 @@ public class CasoService {
                         throw new RuntimeException("Caso no encontrado: " + id);
                 }
 
-                Integer maxId = estatusPorCasoRepository.findMaxIdByNumCaso(id);
-                Integer nextId = (maxId == null) ? 1 : maxId + 1;
-
-                // estatusPorCasoRepository.saveNewStatus(nextId, id,
-                // DateUtils.getCurrentDate(), nuevoEstatus);
                 // NOTA: Se comenta porque el Trigger 'trg_auto_historial_estatus' ya registra
                 // el cambio automáticamente.
                 casoRepository.updateEstatus(id, nuevoEstatus);

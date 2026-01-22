@@ -6,11 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
-
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.times;
 
@@ -24,18 +20,14 @@ class StartupNotificationListenerTest {
     private StartupNotificationListener listener;
 
     @Test
-    @SuppressWarnings("null")
-    void onApplicationEvent_shouldSendEmail_whenRecipientsAreConfigured() {
-        // Given
-        String recipients = "test1@example.com, test2@example.com";
-        String subject = "Test Subject";
-        ReflectionTestUtils.setField(listener, "recipientsStr", recipients);
-        ReflectionTestUtils.setField(listener, "subject", subject);
-
+    void onApplicationEvent_shouldLogMessage() {
         // When
         listener.onApplicationEvent();
 
         // Then
-        verify(emailService, times(1)).sendSimpleMessage(any(), eq(subject), anyString());
+        // Since the email functionality was removed, we just verify the method runs
+        // without exception.
+        // We can also verify that emailService is NOT called, just to be sure.
+        verify(emailService, times(0)).sendSimpleMessage(any(), any(), any());
     }
 }

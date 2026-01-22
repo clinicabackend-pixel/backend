@@ -21,6 +21,7 @@ import java.util.Objects;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @Service
+@SuppressWarnings("null")
 public class UsuarioService {
 
     private final UsuarioRepository usuarioRepository;

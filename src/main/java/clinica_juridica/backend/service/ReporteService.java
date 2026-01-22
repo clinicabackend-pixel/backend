@@ -27,6 +27,11 @@ import clinica_juridica.backend.repository.CategoriaAmbitoLegalRepository;
 import clinica_juridica.backend.repository.MateriaAmbitoLegalRepository;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.ss.util.CellRangeAddress;
+import clinica_juridica.backend.dto.stats.ReporteDataDto;
+import clinica_juridica.backend.dto.stats.TipoReporte;
+import clinica_juridica.backend.dto.stats.StatsItem;
+import clinica_juridica.backend.dto.projection.MateriaCountProjection;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
@@ -50,10 +55,6 @@ public class ReporteService {
     private final SubcategoriaAmbitoLegalRepository subcategoriaAmbitoLegalRepository;
     private final CategoriaAmbitoLegalRepository categoriaAmbitoLegalRepository;
     private final MateriaAmbitoLegalRepository materiaAmbitoLegalRepository;
-    private final clinica_juridica.backend.repository.CondicionLaboralRepository condicionLaboralRepository;
-    private final clinica_juridica.backend.repository.CondicionActividadRepository condicionActividadRepository;
-    private final clinica_juridica.backend.repository.NivelEducativoRepository nivelEducativoRepository;
-    private final clinica_juridica.backend.repository.EstadoCivilRepository estadoCivilRepository;
 
     public ReporteService(CasoRepository casoRepository, CasoService casoService,
             SolicitanteRepository solicitanteRepository, FamiliaRepository familiaRepository,
@@ -62,11 +63,7 @@ public class ReporteService {
             AmbitoLegalRepository ambitoLegalRepository,
             SubcategoriaAmbitoLegalRepository subcategoriaAmbitoLegalRepository,
             CategoriaAmbitoLegalRepository categoriaAmbitoLegalRepository,
-            MateriaAmbitoLegalRepository materiaAmbitoLegalRepository,
-            clinica_juridica.backend.repository.CondicionLaboralRepository condicionLaboralRepository,
-            clinica_juridica.backend.repository.CondicionActividadRepository condicionActividadRepository,
-            clinica_juridica.backend.repository.NivelEducativoRepository nivelEducativoRepository,
-            clinica_juridica.backend.repository.EstadoCivilRepository estadoCivilRepository) {
+            MateriaAmbitoLegalRepository materiaAmbitoLegalRepository) {
         this.casoRepository = casoRepository;
         this.casoService = casoService;
         this.solicitanteRepository = solicitanteRepository;
@@ -79,10 +76,6 @@ public class ReporteService {
         this.subcategoriaAmbitoLegalRepository = subcategoriaAmbitoLegalRepository;
         this.categoriaAmbitoLegalRepository = categoriaAmbitoLegalRepository;
         this.materiaAmbitoLegalRepository = materiaAmbitoLegalRepository;
-        this.condicionLaboralRepository = condicionLaboralRepository;
-        this.condicionActividadRepository = condicionActividadRepository;
-        this.nivelEducativoRepository = nivelEducativoRepository;
-        this.estadoCivilRepository = estadoCivilRepository;
     }
 
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
@@ -251,7 +244,7 @@ public class ReporteService {
             Row titleRow = sheet.createRow(rowIdx++);
             titleRow.createCell(0).setCellValue("ENCUESTA SOCIOECONÓMICA");
             titleRow.getCell(0).setCellStyle(headerStyle);
-            sheet.addMergedRegion(new org.apache.poi.ss.util.CellRangeAddress(rowIdx - 1, rowIdx - 1, 0, 1));
+            sheet.addMergedRegion(new CellRangeAddress(rowIdx - 1, rowIdx - 1, 0, 1));
 
             // 1. Datos Familiares
             Familia familia = familiaRepository.findById(cedula).orElse(null);
@@ -298,7 +291,7 @@ public class ReporteService {
             Row solHeader = sheet.createRow(rowIdx++);
             solHeader.createCell(0).setCellValue("Casos como Solicitante");
             solHeader.getCell(0).setCellStyle(headerStyle);
-            sheet.addMergedRegion(new org.apache.poi.ss.util.CellRangeAddress(rowIdx - 1, rowIdx - 1, 0, 1));
+            sheet.addMergedRegion(new CellRangeAddress(rowIdx - 1, rowIdx - 1, 0, 1));
 
             List<CasoSummaryResponse> casosSolicitante = casoRepository.findCasosBySolicitanteCedula(cedula);
             if (!casosSolicitante.isEmpty()) {
@@ -328,7 +321,7 @@ public class ReporteService {
             Row benHeader = sheet.createRow(rowIdx++);
             benHeader.createCell(0).setCellValue("Casos como Beneficiario");
             benHeader.getCell(0).setCellStyle(headerStyle);
-            sheet.addMergedRegion(new org.apache.poi.ss.util.CellRangeAddress(rowIdx - 1, rowIdx - 1, 0, 1));
+            sheet.addMergedRegion(new CellRangeAddress(rowIdx - 1, rowIdx - 1, 0, 1));
 
             List<CasoSummaryResponse> casosBeneficiario = casoRepository.findCasosByBeneficiarioCedula(cedula);
             if (!casosBeneficiario.isEmpty()) {
@@ -497,10 +490,10 @@ public class ReporteService {
         long casosCerrados = casoRepository.countByEstatus("CERRADO");
         long totalSolicitantes = solicitanteRepository.count();
 
-        List<clinica_juridica.backend.dto.projection.MateriaCountProjection> materiaCounts = casoRepository
+        List<MateriaCountProjection> materiaCounts = casoRepository
                 .countDistribucionMateria();
         java.util.Map<String, Long> distribucionMateria = new java.util.HashMap<>();
-        for (clinica_juridica.backend.dto.projection.MateriaCountProjection p : materiaCounts) {
+        for (MateriaCountProjection p : materiaCounts) {
             distribucionMateria.put(p.getMateria(), p.getCantidad());
         }
 
@@ -780,18 +773,17 @@ public class ReporteService {
 
     // --- STATISTICAL CHARTS DATA ---
 
-    public clinica_juridica.backend.dto.stats.ReporteDataDto getReporteData(
-            clinica_juridica.backend.dto.stats.TipoReporte tipo) {
-        clinica_juridica.backend.dto.stats.ReporteDataDto dto = new clinica_juridica.backend.dto.stats.ReporteDataDto();
+    public ReporteDataDto getReporteData(TipoReporte tipo) {
+        ReporteDataDto dto = new ReporteDataDto();
         java.util.List<String> labels = new java.util.ArrayList<>();
         java.util.List<Long> values = new java.util.ArrayList<>();
         dto.setChartType("bar"); // Default
 
         switch (tipo) {
             case USUARIOS_POR_PARROQUIA:
-                List<clinica_juridica.backend.dto.stats.StatsItem> itemsP = solicitanteRepository
+                List<StatsItem> itemsP = solicitanteRepository
                         .countSolicitantesPorParroquia();
-                for (clinica_juridica.backend.dto.stats.StatsItem item : itemsP) {
+                for (StatsItem item : itemsP) {
                     labels.add(item.getLabel());
                     values.add(item.getValue());
                 }
@@ -800,9 +792,9 @@ public class ReporteService {
                 break;
 
             case USUARIOS_POR_ESTADO:
-                List<clinica_juridica.backend.dto.stats.StatsItem> itemsE = solicitanteRepository
+                List<StatsItem> itemsE = solicitanteRepository
                         .countSolicitantesPorEstado();
-                for (clinica_juridica.backend.dto.stats.StatsItem item : itemsE) {
+                for (StatsItem item : itemsE) {
                     labels.add(item.getLabel());
                     values.add(item.getValue());
                 }
