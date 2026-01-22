@@ -61,6 +61,12 @@ public class EmailService {
         Email from = new Email(fromEmail);
         String mimeType = isHtml ? "text/html" : "text/plain";
         Content content = new Content(mimeType, contentString);
+
+        if (sendGridApiKey == null || sendGridApiKey.trim().isEmpty()) {
+            logger.warn("SendGrid API Key is missing. Skipping email sending.");
+            return;
+        }
+
         SendGrid sg = new SendGrid(sendGridApiKey);
 
         Personalization personalization = new Personalization();
@@ -124,7 +130,7 @@ public class EmailService {
 
     @Async
     public void sendInvitationEmail(String to, String token) {
-        String setupUrl = "http://localhost:5173/setup-password?token=" + token;
+        String setupUrl = "https://front-clinica.netlify.app/setup-password?token=" + token;
         String subject = "Bienvenido a Clinica Juridica - Configura tu Contraseña";
 
         String logoHtml = "<h1>Clínica Jurídica</h1>"; // Fallback

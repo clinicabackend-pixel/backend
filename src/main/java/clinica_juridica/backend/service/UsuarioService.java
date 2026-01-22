@@ -140,8 +140,14 @@ public class UsuarioService {
 
         // Generate invitation token and send email
         // Note: We use the HASHED password as part of the key.
-        String invitationToken = jwtUtil.generateInvitationToken(username, usuario.getContrasena());
-        emailService.sendInvitationEmail(usuario.getEmail(), invitationToken);
+        try {
+            String invitationToken = jwtUtil.generateInvitationToken(username, usuario.getContrasena());
+            emailService.sendInvitationEmail(usuario.getEmail(), invitationToken);
+        } catch (Exception e) {
+            // Log error but do not fail user creation
+            System.err.println("Error enviando correo de invitación a " + usuario.getEmail() + ": " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     public void setupPassword(String token, String nuevaContrasena) {
