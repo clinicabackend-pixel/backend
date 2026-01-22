@@ -92,7 +92,17 @@ public class UsuarioService {
         usuario.setNombre(request.getNombre());
         usuario.setEmail(request.getEmail());
         usuario.setTipo(request.getTipoUsuario());
-        usuario.setSexo(request.getSexo());
+        usuario.setTipo(request.getTipoUsuario());
+
+        // Normalize Sexo (Database requires Title Case)
+        String sexo = request.getSexo();
+        if (sexo != null) {
+            if (sexo.equalsIgnoreCase("MASCULINO"))
+                sexo = "Masculino";
+            else if (sexo.equalsIgnoreCase("FEMENINO"))
+                sexo = "Femenino";
+        }
+        usuario.setSexo(sexo);
         usuario.setStatus("ACTIVO");
 
         // Password handling
@@ -182,7 +192,12 @@ public class UsuarioService {
             usuario.setStatus(request.getEstatus());
         }
         if (request.getSexo() != null) {
-            usuario.setSexo(request.getSexo());
+            String sexo = request.getSexo();
+            if (sexo.equalsIgnoreCase("MASCULINO"))
+                sexo = "Masculino";
+            else if (sexo.equalsIgnoreCase("FEMENINO"))
+                sexo = "Femenino";
+            usuario.setSexo(sexo);
         }
 
         usuarioRepository.save(usuario);
