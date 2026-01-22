@@ -50,9 +50,18 @@ public class AuditoriaService {
                 row.createCell(3).setCellValue(aud.getOperacion());
                 row.createCell(4).setCellValue(aud.getNombreTabla());
 
-                // Truncate very long JSON strings to avoid Excel limits if necessary
-                row.createCell(5).setCellValue(aud.getDatosAnteriores() != null ? aud.getDatosAnteriores() : "-");
-                row.createCell(6).setCellValue(aud.getDatosNuevos() != null ? aud.getDatosNuevos() : "-");
+                // Truncate very long JSON strings to avoid Excel limits (32,767 chars)
+                String datosAnteriores = aud.getDatosAnteriores() != null ? aud.getDatosAnteriores() : "-";
+                if (datosAnteriores.length() > 32000) {
+                    datosAnteriores = datosAnteriores.substring(0, 32000) + "... [TRUNCATED]";
+                }
+                row.createCell(5).setCellValue(datosAnteriores);
+
+                String datosNuevos = aud.getDatosNuevos() != null ? aud.getDatosNuevos() : "-";
+                if (datosNuevos.length() > 32000) {
+                    datosNuevos = datosNuevos.substring(0, 32000) + "... [TRUNCATED]";
+                }
+                row.createCell(6).setCellValue(datosNuevos);
             }
 
             for (int i = 0; i < 5; i++) {
