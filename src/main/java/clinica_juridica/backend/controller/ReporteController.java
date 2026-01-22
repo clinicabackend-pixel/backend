@@ -22,10 +22,13 @@ public class ReporteController {
 
         private final PdfService pdfService;
         private final ReporteService reporteService;
+        private final clinica_juridica.backend.service.AuditoriaService auditoriaService;
 
-        public ReporteController(PdfService pdfService, ReporteService reporteService) {
+        public ReporteController(PdfService pdfService, ReporteService reporteService,
+                        clinica_juridica.backend.service.AuditoriaService auditoriaService) {
                 this.pdfService = pdfService;
                 this.reporteService = reporteService;
+                this.auditoriaService = auditoriaService;
         }
 
         @Operation(summary = "Descargar Ficha de Solicitante (PDF)", description = "Genera y descarga la ficha del solicitante en formato PDF.")
@@ -41,6 +44,29 @@ public class ReporteController {
                 return ResponseEntity.ok()
                                 .headers(headers)
                                 .body(pdfBytes);
+        }
+
+        @Operation(summary = "Descargar Auditoría del Sistema (Excel)", description = "Genera un reporte de auditoría del sistema filtrado por fechas. Roles: COORDINADOR, ADMIN.")
+        @GetMapping("/auditoria")
+        public ResponseEntity<byte[]> descargarReporteAuditoria(
+                        @RequestParam @Parameter(description = "Fecha de inicio (YYYY-MM-DD)") String inicio,
+                        @RequestParam @Parameter(description = "Fecha de fin (YYYY-MM-DD)") String fin)
+                        throws IOException {
+                LocalDate fechaInicio = LocalDate.parse(inicio);
+                LocalDate fechaFin = LocalDate.parse(fin);
+
+                byte[] content = auditoriaService.generarReporteAuditoria(fechaInicio, fechaFin);
+
+                HttpHeaders headers = new HttpHeaders();
+                headers.add(HttpHeaders.CONTENT_TYPE,
+                                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+                headers.add(HttpHeaders.CONTENT_DISPOSITION,
+                                "form-data; name=\"attachment\"; filename=\"auditoria_sistema_" + inicio + "_al_" + fin
+                                                + ".xlsx\"");
+
+                return ResponseEntity.ok()
+                                .headers(headers)
+                                .body(content);
         }
 
         @Operation(summary = "Descargar Reporte General (Excel)", description = "Genera y descarga un reporte general de casos en formato Excel.")
