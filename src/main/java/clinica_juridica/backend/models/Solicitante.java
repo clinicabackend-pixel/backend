@@ -2,6 +2,7 @@ package clinica_juridica.backend.models;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.domain.Persistable;
+import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 import java.time.LocalDate;
@@ -18,8 +19,13 @@ public class Solicitante implements Persistable<String> {
     private String email;
     private String concubinato;
     private Integer idEstadoCivil;
+
+    @Column("id_condicion")
     private Integer idCondicionLaboral; // Mapped to id_condicion in DB
+
     private Integer idCondicionActividad;
+
+    @Column("id_nivel")
     private Integer idNivelEducativo; // Mapped to id_nivel in DB
 
     private Integer idParroquia;
