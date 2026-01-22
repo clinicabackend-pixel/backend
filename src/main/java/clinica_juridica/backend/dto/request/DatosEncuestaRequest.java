@@ -16,11 +16,11 @@ public class DatosEncuestaRequest {
     @Schema(description = "Lista de características seleccionadas (checklist)")
     private List<CaracteristicaRequest> caracteristicas;
 
-    @Schema(description = "Condición laboral (Catalogo)")
-    private String condicionLaboral;
+    @Schema(description = "ID Condición laboral")
+    private Integer idCondicionLaboral;
 
-    @Schema(description = "Condición de actividad (Catalogo)")
-    private String condicionActividad;
+    @Schema(description = "ID Condición de actividad")
+    private Integer idCondicionActividad;
 
     public FamiliaDTO getFamilia() {
         return familia;
@@ -46,20 +46,20 @@ public class DatosEncuestaRequest {
         this.caracteristicas = caracteristicas;
     }
 
-    public String getCondicionLaboral() {
-        return condicionLaboral;
+    public Integer getIdCondicionLaboral() {
+        return idCondicionLaboral;
     }
 
-    public void setCondicionLaboral(String condicionLaboral) {
-        this.condicionLaboral = condicionLaboral;
+    public void setIdCondicionLaboral(Integer idCondicionLaboral) {
+        this.idCondicionLaboral = idCondicionLaboral;
     }
 
-    public String getCondicionActividad() {
-        return condicionActividad;
+    public Integer getIdCondicionActividad() {
+        return idCondicionActividad;
     }
 
-    public void setCondicionActividad(String condicionActividad) {
-        this.condicionActividad = condicionActividad;
+    public void setIdCondicionActividad(Integer idCondicionActividad) {
+        this.idCondicionActividad = idCondicionActividad;
     }
 
     // Inner DTOs for organization

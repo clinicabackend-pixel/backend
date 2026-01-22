@@ -151,14 +151,18 @@ public class ReporteService {
                 row.createCell(col++).setCellValue(sol.getNacionalidad());
                 row.createCell(col++).setCellValue(sol.getSexo());
                 row.createCell(col++).setCellValue(sol.getEdad() != null ? sol.getEdad().toString() : "");
-                row.createCell(col++).setCellValue(sol.getEstadoCivil());
+                row.createCell(col++)
+                        .setCellValue(sol.getIdEstadoCivil() != null ? sol.getIdEstadoCivil().toString() : "");
                 // Removed Email and Phones
 
                 // LABORAL / ACADEMICO
-                row.createCell(col++).setCellValue(sol.getCondicionLaboral());
+                row.createCell(col++).setCellValue(
+                        sol.getIdCondicionLaboral() != null ? sol.getIdCondicionLaboral().toString() : "");
                 row.createCell(col++)
-                        .setCellValue(sol.getCondicionActividad());
-                row.createCell(col++).setCellValue(sol.getNivelEducativo());
+                        .setCellValue(
+                                sol.getIdCondicionActividad() != null ? sol.getIdCondicionActividad().toString() : "");
+                row.createCell(col++)
+                        .setCellValue(sol.getIdNivelEducativo() != null ? sol.getIdNivelEducativo().toString() : "");
                 row.createCell(col++).setCellValue(sol.getTiempoEstudio());
 
                 // FAMILIAR

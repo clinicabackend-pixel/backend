@@ -6,31 +6,31 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "Solicitud de creación de un nuevo solicitante")
 public record SolicitanteRequest(
-        @Schema(description = "Cédula de identidad", example = "12345678", requiredMode = Schema.RequiredMode.REQUIRED) String cedula,
+                @Schema(description = "Cédula de identidad", example = "12345678", requiredMode = Schema.RequiredMode.REQUIRED) String cedula,
 
-        @Schema(description = "Nombre completo", example = "Juan Pérez", requiredMode = Schema.RequiredMode.REQUIRED) String nombre,
+                @Schema(description = "Nombre completo", example = "Juan Pérez", requiredMode = Schema.RequiredMode.REQUIRED) String nombre,
 
-        @Schema(description = "Sexo del solicitante", example = "Masculino") String sexo,
+                @Schema(description = "Sexo del solicitante", example = "Masculino") String sexo,
 
-        @Schema(description = "Estado civil", example = "Soltero/a") String estadoCivil,
+                @Schema(description = "ID del Estado civil", example = "1") Integer idEstadoCivil,
 
-        @Schema(description = "Fecha de nacimiento", example = "1990-01-01") LocalDate fechaNacimiento,
+                @Schema(description = "Fecha de nacimiento", example = "1990-01-01") LocalDate fechaNacimiento,
 
-        @Schema(description = "Indica si vive en concubinato", example = "false") Boolean concubinato,
+                @Schema(description = "Indica si vive en concubinato", example = "false") Boolean concubinato,
 
-        @Schema(description = "Nacionalidad", example = "Venezolano") String nacionalidad,
+                @Schema(description = "Nacionalidad", example = "Venezolano") String nacionalidad,
 
-        @Schema(description = "Condición laboral", example = "Trabajador") String condicionLaboral,
+                @Schema(description = "ID de Condición laboral", example = "1") Integer idCondicionLaboral,
 
-        @Schema(description = "Condición de actividad", example = "Activo") String condicionActividad,
+                @Schema(description = "ID de Condición de actividad", example = "1") Integer idCondicionActividad,
 
-        @Schema(description = "Teléfono de habitación", example = "02121234567") String telfCasa,
+                @Schema(description = "Teléfono de habitación", example = "02121234567") String telfCasa,
 
-        @Schema(description = "Teléfono celular", example = "04141234567") String telfCelular,
+                @Schema(description = "Teléfono celular", example = "04141234567") String telfCelular,
 
-        @Schema(description = "Correo electrónico", example = "juan.perez@email.com") String email,
+                @Schema(description = "Correo electrónico", example = "juan.perez@email.com") String email,
 
-        @Schema(description = "ID de la parroquia de residencia", example = "5") Integer idParroquia,
+                @Schema(description = "ID de la parroquia de residencia", example = "5") Integer idParroquia,
 
-        @Schema(description = "Nivel educativo", example = "Universitario") String nivelEducativo) {
+                @Schema(description = "ID de Nivel educativo", example = "1") Integer idNivelEducativo) {
 }

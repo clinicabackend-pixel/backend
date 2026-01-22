@@ -131,8 +131,11 @@ CREATE TABLE usuarios (
   contrasena VARCHAR(255),
   nombre VARCHAR(150),
   email VARCHAR(150),
-  status VARCHAR(20) DEFAULT 'ACTIVO',
+  estatus VARCHAR(20) DEFAULT 'ACTIVO',
   tipo VARCHAR(20),
+  sexo VARCHAR(20),
+
+  CONSTRAINT chk_sol_sexo CHECK (sexo IN ('Masculino', 'Femenino')),
   CONSTRAINT uq_usuarios_cedula UNIQUE (cedula),
   CONSTRAINT chk_usuarios_tipo CHECK (tipo IN ('COORDINADOR', 'PROFESOR', 'ESTUDIANTE', 'ADMIN'))
 );

@@ -154,11 +154,11 @@ public class SolicitanteService {
                 s.getTelfCasa(),
                 s.getTelfCelular(),
                 s.getFNacimiento(),
-                s.getEstadoCivil(),
+                s.getIdEstadoCivil(),
                 s.getIdParroquia(),
-                s.getCondicionLaboral(),
-                s.getCondicionActividad(),
-                s.getNivelEducativo());
+                s.getIdCondicionLaboral(),
+                s.getIdCondicionActividad(),
+                s.getIdNivelEducativo());
     }
 
     @Transactional
@@ -261,24 +261,27 @@ public class SolicitanteService {
                     s.getCedula(),
                     s.getNombre(),
                     s.getSexo(),
-                    s.getEstadoCivil(), // Passing string directly
+                    null, // TODO: Fetch EstadoCivil Name
                     s.getFNacimiento(),
                     "SI".equals(s.getConcubinato()),
                     s.getNacionalidad(),
-                    s.getCondicionLaboral(), // String
-                    s.getCondicionActividad(), // String
+                    null, // TODO: Fetch CondicionName
+                    null, // TODO: Fetch ActividadName
                     s.getTelfCasa(),
                     s.getTelfCelular(),
                     s.getEmail(),
                     s.getIdParroquia(),
                     idMuni,
                     idEst,
-                    s.getNivelEducativo(), // String
-                    s.getNombre(), // Just use nombre as apellido fallback if needed, or remove param if we update
-                                   // dto
+                    null, // TODO: Fetch Nivel Name
+                    s.getNombre(),
                     nombreParroquia,
                     nombreMunicipio,
-                    nombreEstado);
+                    nombreEstado,
+                    s.getIdEstadoCivil(),
+                    s.getIdCondicionLaboral(),
+                    s.getIdCondicionActividad(),
+                    s.getIdNivelEducativo());
         }).collect(Collectors.toList());
     }
 
@@ -293,11 +296,11 @@ public class SolicitanteService {
         s.setTelfCelular(r.telfCelular());
         s.setTelfCasa(r.telfCasa());
         s.setFNacimiento(r.fechaNacimiento());
-        s.setEstadoCivil(r.estadoCivil());
+        s.setIdEstadoCivil(r.idEstadoCivil());
         s.setIdParroquia(r.idParroquia());
-        s.setCondicionLaboral(r.condicionLaboral());
-        s.setCondicionActividad(r.condicionActividad());
-        s.setNivelEducativo(r.nivelEducativo());
+        s.setIdCondicionLaboral(r.idCondicionLaboral());
+        s.setIdCondicionActividad(r.idCondicionActividad());
+        s.setIdNivelEducativo(r.idNivelEducativo());
         return s;
     }
 }

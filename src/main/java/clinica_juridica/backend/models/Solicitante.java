@@ -17,12 +17,11 @@ public class Solicitante implements Persistable<String> {
     private String sexo;
     private String email;
     private String concubinato;
-    private String estadoCivil; // Changed from idEstadoCivil
-    private String condicionLaboral; // Changed from idCondicion
-    private String condicionActividad; // Changed from idCondicionActividad
-    private String nivelEducativo; // Changed from idNivel
+    private Integer idEstadoCivil;
+    private Integer idCondicionLaboral; // Mapped to id_condicion in DB
+    private Integer idCondicionActividad;
+    private Integer idNivelEducativo; // Mapped to id_nivel in DB
 
-    // Estos campos siguen igual o necesitan revision si apuntan a catalogos
     private Integer idParroquia;
     private String telfCelular;
     private String telfCasa;
@@ -34,22 +33,22 @@ public class Solicitante implements Persistable<String> {
     }
 
     public Solicitante(String cedula, String nombre, String nacionalidad, String sexo, String email, String concubinato,
-            String estadoCivil, String telfCelular, String telfCasa, LocalDate fNacimiento, Integer edad,
-            String condicionLaboral, String condicionActividad, String nivelEducativo, String tiempoEstudio) {
+            Integer idEstadoCivil, String telfCelular, String telfCasa, LocalDate fNacimiento, Integer edad,
+            Integer idCondicionLaboral, Integer idCondicionActividad, Integer idNivelEducativo, String tiempoEstudio) {
         this.cedula = cedula;
         this.nombre = nombre;
         this.nacionalidad = nacionalidad;
         this.sexo = sexo;
         this.email = email;
         this.concubinato = concubinato;
-        this.estadoCivil = estadoCivil;
+        this.idEstadoCivil = idEstadoCivil;
         this.telfCelular = telfCelular;
         this.telfCasa = telfCasa;
         this.fNacimiento = fNacimiento;
         this.edad = edad;
-        this.condicionLaboral = condicionLaboral;
-        this.condicionActividad = condicionActividad;
-        this.nivelEducativo = nivelEducativo;
+        this.idCondicionLaboral = idCondicionLaboral;
+        this.idCondicionActividad = idCondicionActividad;
+        this.idNivelEducativo = idNivelEducativo;
         this.tiempoEstudio = tiempoEstudio;
     }
 
@@ -101,36 +100,36 @@ public class Solicitante implements Persistable<String> {
         this.concubinato = concubinato;
     }
 
-    public String getEstadoCivil() {
-        return estadoCivil;
+    public Integer getIdEstadoCivil() {
+        return idEstadoCivil;
     }
 
-    public void setEstadoCivil(String estadoCivil) {
-        this.estadoCivil = estadoCivil;
+    public void setIdEstadoCivil(Integer idEstadoCivil) {
+        this.idEstadoCivil = idEstadoCivil;
     }
 
-    public String getCondicionLaboral() {
-        return condicionLaboral;
+    public Integer getIdCondicionLaboral() {
+        return idCondicionLaboral;
     }
 
-    public void setCondicionLaboral(String condicionLaboral) {
-        this.condicionLaboral = condicionLaboral;
+    public void setIdCondicionLaboral(Integer idCondicionLaboral) {
+        this.idCondicionLaboral = idCondicionLaboral;
     }
 
-    public String getCondicionActividad() {
-        return condicionActividad;
+    public Integer getIdCondicionActividad() {
+        return idCondicionActividad;
     }
 
-    public void setCondicionActividad(String condicionActividad) {
-        this.condicionActividad = condicionActividad;
+    public void setIdCondicionActividad(Integer idCondicionActividad) {
+        this.idCondicionActividad = idCondicionActividad;
     }
 
-    public String getNivelEducativo() {
-        return nivelEducativo;
+    public Integer getIdNivelEducativo() {
+        return idNivelEducativo;
     }
 
-    public void setNivelEducativo(String nivelEducativo) {
-        this.nivelEducativo = nivelEducativo;
+    public void setIdNivelEducativo(Integer idNivelEducativo) {
+        this.idNivelEducativo = idNivelEducativo;
     }
 
     public Integer getIdParroquia() {
